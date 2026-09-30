@@ -1,0 +1,1448 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B6E77">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="Regalinspektion">
+<title>Regalinspektion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Gleiche Formensprache wie Sicherheitsregister und Zählerprüfung:
+   Kopfleiste mit Speicher-Anzeige, Kacheln als Filter, Tab-Leiste unten, eine Spalte */
+:root{
+  --ground:#E9EDEE; --surface:#FFFFFF; --surface-2:#F3F6F6;
+  --ink:#0F1618; --ink-2:#48595D; --ink-3:#78898D;
+  --line:#D2DADB; --line-strong:#B4C0C2;
+  --accent:#0B6E77; --accent-ink:#FFFFFF; --accent-soft:#DCEDEE;
+  --ok:#2C7A52; --ok-soft:#DCEDE3; --warn:#9C6B00; --warn-soft:#F7EBCE; --crit:#B3122C; --crit-soft:#F8DCE1;
+  --tape:#F2C230; --tape-ink:#1B211F; --status-ink:#FFFFFF;
+  --rot:var(--crit); --gelb:var(--tape); --gruen:var(--ok);
+  --shadow:0 1px 2px rgba(15,22,24,.08),0 6px 18px rgba(15,22,24,.06);
+  --r:6px;
+  --f-ui:"IBM Plex Sans","Segoe UI",Roboto,system-ui,sans-serif;
+  --f-disp:Archivo,"Arial Narrow",Roboto,system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0D1315; --surface:#161F21; --surface-2:#1D282B; --ink:#E6EDEC; --ink-2:#A2B2B4; --ink-3:#76888B;
+  --line:#263336; --line-strong:#3A4A4D; --accent:#37A8B2; --accent-ink:#06181A; --accent-soft:#123338;
+  --ok:#5FB587; --ok-soft:#122C20; --warn:#E3B24E; --warn-soft:#2E2413; --crit:#F2748A; --crit-soft:#33161C;
+  --tape:#E6B927; --status-ink:#0D1315; --shadow:0 1px 2px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.35); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --ground:#0D1315; --surface:#161F21; --surface-2:#1D282B; --ink:#E6EDEC; --ink-2:#A2B2B4; --ink-3:#76888B;
+  --line:#263336; --line-strong:#3A4A4D; --accent:#37A8B2; --accent-ink:#06181A; --accent-soft:#123338;
+  --ok:#5FB587; --ok-soft:#122C20; --warn:#E3B24E; --warn-soft:#2E2413; --crit:#F2748A; --crit-soft:#33161C;
+  --tape:#E6B927; --status-ink:#0D1315; --shadow:0 1px 2px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.35); color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font:16px/1.5 var(--f-ui);-webkit-text-size-adjust:100%;padding-bottom:env(safe-area-inset-bottom,0px)}
+h1,h2,h3{font-family:var(--f-disp);text-wrap:balance;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Kopfleiste */
+.topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 8px;min-height:58px}
+.topbar .back{background:none;border:0;min-width:44px;min-height:44px;font-size:30px;line-height:1;color:var(--accent);cursor:pointer;padding:0 4px;margin-left:-6px}
+.mark{width:32px;height:32px;border-radius:4px;flex:none;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:700 .78rem var(--f-disp)}
+.mark.haslogo{background:transparent;width:auto;max-width:90px}
+.mark.haslogo img{height:30px;width:auto;display:block}
+.tt{min-width:0;flex:1}
+.topbar h1{font-size:1.05rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.topbar .sub{font-size:.74rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.synckn{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:5px 11px;border-radius:99px;border:1px solid var(--line);
+  background:var(--surface-2);color:var(--ink-2);font:600 .76rem var(--f-ui);white-space:nowrap;flex:none}
+.synckn .punkt{width:9px;height:9px;border-radius:50%;background:var(--ink-3);flex:none}
+.synckn.ok{color:var(--ok);background:var(--ok-soft);border-color:transparent}.synckn.ok .punkt{background:var(--ok)}
+.synckn.laeuft .punkt{background:var(--accent);animation:puls 1s ease-in-out infinite}
+.synckn.crit{color:var(--crit);background:var(--crit-soft);border-color:transparent}.synckn.crit .punkt{background:var(--crit)}
+@keyframes puls{50%{opacity:.25}}
+#err{position:sticky;top:0;z-index:50;background:var(--crit);color:var(--status-ink);font-weight:600;padding:12px 14px;font-size:.95rem}
+
+main{padding:12px 12px 110px;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+
+/* Tab-Leiste */
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar button{background:none;border:0;padding:8px 2px 9px;cursor:pointer;color:var(--ink-3);display:flex;flex-direction:column;align-items:center;gap:3px;
+  font:600 .64rem var(--f-disp);letter-spacing:.04em;text-transform:uppercase;min-height:60px;border-top:2px solid transparent;margin-top:-1px}
+.tabbar button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabbar button[aria-current="true"]{color:var(--accent);border-top-color:var(--accent)}
+.tabbar button.plus{color:var(--status-ink);background:var(--crit);border-radius:14px;margin:6px 6px 4px;min-height:52px;border-top:0}
+.tabbar button.plus svg{stroke-width:2.6}
+
+/* Karten, Felder, Knöpfe */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px}
+.card.tight{padding:10px 12px;gap:8px}
+.card.flush{padding:0;gap:0;overflow:hidden}
+.card h2,.eyebrow{font:600 .7rem var(--f-disp);letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin:0}
+label.f{display:flex;flex-direction:column;gap:5px;font:600 .7rem var(--f-disp);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+input[type=text],input[type=date],input[type=number],input[type=email],input[type=search],select,textarea{width:100%;min-height:50px;border:1px solid var(--line-strong);
+  border-radius:var(--r);padding:10px 12px;background:var(--surface);font:400 1rem var(--f-ui);color:var(--ink);text-transform:none;letter-spacing:0}
+textarea{min-height:76px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.btn{min-height:50px;border-radius:var(--r);border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:600 .92rem var(--f-disp);
+  padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.big{min-height:60px;font-size:1.02rem;width:100%}
+.btn.warn{border-color:var(--crit);color:var(--crit)}
+.btn.ok{border-color:var(--ok);color:var(--ok)}
+.btn:active{transform:translateY(1px)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>.btn{flex:1 1 140px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sub{font-size:.85rem;color:var(--ink-2)}
+.hint{font-size:.85rem;color:var(--ink-3);margin:0}
+.banner{padding:10px 12px;border-radius:var(--r);font-size:.88rem;background:var(--warn-soft);color:var(--warn)}
+.warnbox{background:var(--warn-soft);color:var(--warn);border-radius:var(--r);padding:10px 12px;font-size:.92rem}
+
+/* Grosse Aktion (Startseite) */
+.gross-aktion{display:flex;align-items:center;gap:16px;width:100%;min-height:88px;padding:16px 18px;background:var(--accent);color:var(--accent-ink);
+  border:0;border-radius:8px;cursor:pointer;text-align:left;box-shadow:var(--shadow)}
+.gross-aktion svg{width:38px;height:38px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gross-aktion b{display:block;font:700 1.18rem var(--f-disp)}
+.gross-aktion small{display:block;font-size:.88rem;opacity:.85;margin-top:2px}
+
+/* Kacheln */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--line-strong);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:9px 8px;text-align:left;cursor:pointer;width:100%;min-height:68px}
+.stat .n{display:block;font:700 1.7rem/1 var(--f-disp);font-variant-numeric:tabular-nums}
+.stat .l{display:block;font-size:.68rem;color:var(--ink-2);margin-top:5px;line-height:1.2;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.stat.rot{border-top-color:var(--rot)}.stat.rot .n{color:var(--crit)}
+.stat.gelb{border-top-color:var(--gelb)}.stat.gelb .n{color:var(--warn)}
+.stat.gruen{border-top-color:var(--gruen)}.stat.gruen .n{color:var(--ok)}
+.stat.z{border-top-color:var(--accent)}
+.progress{display:flex;align-items:center;gap:10px}
+.progress .bar{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.progress .bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.progress .zahl{font:500 .8rem var(--f-mono);color:var(--ink-2);white-space:nowrap}
+
+/* Chips und Ampel */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-height:46px;padding:8px 13px;border-radius:24px;border:1px solid var(--line-strong);background:var(--surface);font-size:.95rem;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.amps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.amp{min-height:74px;border-radius:8px;border:2px solid transparent;font:700 1.1rem var(--f-disp);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;padding:6px}
+.amp small{font:600 .72rem var(--f-ui);margin-top:4px}
+.amp.rot{background:var(--crit-soft);color:var(--crit)} .amp.rot.on{background:var(--rot);color:#fff;border-color:var(--ink)}
+.amp.gelb{background:var(--warn-soft);color:var(--warn)} .amp.gelb.on{background:var(--gelb);color:var(--tape-ink);border-color:var(--ink)}
+.amp.gruen{background:var(--ok-soft);color:var(--ok)} .amp.gruen.on{background:var(--gruen);color:#fff;border-color:var(--ink)}
+.amps.missing .amp{border-color:var(--crit);border-style:dashed}
+.stepper{display:grid;grid-template-columns:50px 1fr 50px;gap:6px;align-items:center}
+.stepper button{min-height:50px;border-radius:var(--r);border:1px solid var(--line-strong);background:var(--surface);font-size:1.5rem;font-weight:700;cursor:pointer;color:var(--ink)}
+.stepper input{text-align:center;font-family:var(--f-mono)}
+
+/* Listen wie im Sicherheitsregister */
+.list{display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:12px;padding:11px 13px;border:0;border-bottom:1px solid var(--line);background:var(--surface);cursor:pointer;
+  width:100%;text-align:left;min-height:62px;color:inherit}
+.list>:last-child,.list>:last-child .item{border-bottom:0}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;font-weight:600;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .t span{display:block;font-size:.8rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zrow{display:flex;align-items:stretch;border-bottom:1px solid var(--line)}
+.zrow .item{border-bottom:0}
+.dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.dot{min-width:28px;height:28px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font:700 .85rem var(--f-disp);padding:0 6px}
+.dot.rot{background:var(--rot);color:#fff}.dot.gelb{background:var(--gelb);color:var(--tape-ink)}.dot.gruen{background:var(--gruen);color:#fff}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;font:600 .68rem var(--f-disp);letter-spacing:.03em;text-transform:uppercase;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.offen{background:var(--surface-2);color:var(--ink-2)}.pill.io{background:var(--ok-soft);color:var(--ok)}.pill.gp{background:var(--accent-soft);color:var(--accent)}.pill.crit{background:var(--crit-soft);color:var(--crit)}
+.qio{min-width:74px;border:0;border-left:1px solid var(--line);background:var(--ok-soft);color:var(--ok);font:700 .9rem var(--f-disp);cursor:pointer}
+.mg{box-shadow:inset 6px 0 0 var(--line-strong)}
+.mg.rot{box-shadow:inset 6px 0 0 var(--rot)}.mg.gelb{box-shadow:inset 6px 0 0 var(--gelb)}.mg.gruen{box-shadow:inset 6px 0 0 var(--gruen)}
+.mg img{width:52px;height:52px;object-fit:cover;border-radius:4px;flex:none;border:1px solid var(--line)}
+.nr{font-family:var(--f-mono);font-weight:600;color:var(--accent);margin-right:6px}
+.lb{font:600 .7rem var(--f-disp);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 11px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:30px!important}
+.check{border-bottom:1px solid var(--line);padding:11px 13px;display:flex;flex-direction:column;gap:8px}
+.check:last-child{border-bottom:0}
+.check.hatm{box-shadow:inset 4px 0 0 var(--crit)}
+.check .q{font-weight:600;font-size:.98rem;display:flex;align-items:center;gap:8px}
+.check .lt{flex:1;min-width:0}
+.ib{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--accent);font-size:1.1rem;cursor:pointer}
+.hp{font-size:.88rem;color:var(--ink-2);background:var(--accent-soft);border-radius:var(--r);padding:8px 10px;line-height:1.45}
+.check .code{font:600 .72rem var(--f-mono);background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--ink-2);margin-top:2px}
+details.info{margin-left:auto}
+details.info summary{list-style:none;cursor:pointer;color:var(--accent);font-size:1.15rem;min-width:36px;min-height:32px;text-align:center}
+details.info summary::-webkit-details-marker{display:none}
+details.info p{font-weight:400;font-size:.88rem;color:var(--ink-2);margin:4px 0 0;flex-basis:100%}
+details.info[open]{flex-basis:100%;margin-left:0}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg.s4{grid-template-columns:repeat(4,1fr)}
+.seg button{border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r);min-height:48px;cursor:pointer;font:600 .85rem var(--f-disp);color:var(--ink-2)}
+.seg button[data-on="ok"]{background:var(--ok);border-color:var(--ok);color:var(--status-ink)}
+.seg button[data-on="mangel"],.seg button[data-on="fehlt"]{background:var(--crit);border-color:var(--crit);color:var(--status-ink)}
+.seg button[data-on="nv"],.seg button[data-on="na"]{background:var(--ink-3);border-color:var(--ink-3);color:var(--surface)}
+body.gross .seg button{min-height:58px;font-size:.95rem}
+.mchips{display:flex;flex-wrap:wrap;gap:6px}
+.mchip{border:1px solid var(--line-strong);border-left:5px solid var(--line-strong);background:var(--surface-2);border-radius:6px;padding:7px 10px;min-height:44px;cursor:pointer;font-size:.88rem;text-align:left;color:var(--ink)}
+.mchip b{font-family:var(--f-mono)}
+.mchip.rot{border-left-color:var(--rot)}.mchip.gelb{border-left-color:var(--gelb)}.mchip.gruen{border-left-color:var(--gruen)}
+.check textarea{min-height:60px}
+.kl{display:flex;flex-direction:column;gap:4px}
+.kl input{font:700 1.5rem var(--f-mono);text-align:center}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.quick .chip{border-radius:var(--r);text-align:left;line-height:1.2;padding:8px 10px;font-size:.9rem}
+body.gross .quick .chip{font-size:.95rem;padding:8px 10px}
+.filterchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.filterchips .chip{flex:none}
+
+/* Fotos */
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.photos:empty{display:none}
+.ph{position:relative;aspect-ratio:1;border-radius:4px;overflow:hidden;background:var(--surface-2);max-width:100%;border:1px solid var(--line)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph button{position:absolute;top:4px;right:4px;width:34px;height:34px;border-radius:17px;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:20px;cursor:pointer}
+
+/* Speicherleiste im Mangel */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:8px}
+.bar .btn{flex:1;min-height:56px;font-size:1rem}
+.sig{width:100%;height:170px;border:1px dashed var(--line-strong);border-radius:var(--r);background:#fff;touch-action:none;display:block}
+
+/* Sicherungsstatus */
+.bk{display:flex;gap:10px;align-items:center;background:var(--warn-soft);color:var(--warn);border-radius:var(--r);padding:9px 12px}
+.bk.ok{background:var(--ok-soft);color:var(--ok)}
+.bk div{flex:1;min-width:0}.bk b{display:block;font-size:.9rem}.bk span{font-size:.78rem;opacity:.9}
+.bk .btn{min-height:44px;flex:none;background:var(--surface)}
+
+/* Hilfe wie im Sicherheitsregister */
+.help{background:var(--accent-soft)}
+.help p{margin:0;font-size:.92rem}
+.mess{display:flex;flex-direction:column;gap:8px}
+details.hilfe{border-bottom:1px solid var(--line)}
+details.hilfe:last-child{border-bottom:0}
+details.hilfe summary{list-style:none;cursor:pointer;padding:14px 16px;min-height:54px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.hilfe summary::-webkit-details-marker{display:none}
+details.hilfe summary::after{content:'+';font-size:1.4rem;color:var(--accent);font-weight:400}
+details.hilfe[open] summary::after{content:'−'}
+details.hilfe>div{padding:0 16px 14px;color:var(--ink-2);font-size:.95rem;line-height:1.55}
+details.hilfe p{margin:0 0 8px}
+.pl{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+details.card>summary{list-style:none;min-height:40px;display:flex;align-items:center;cursor:pointer}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary h2::after{content:" +";color:var(--accent);font-size:1rem}
+details.card[open]>summary h2::after{content:" −"}
+
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:11px 16px;border-radius:8px;font-weight:600;z-index:60;max-width:90vw;text-align:center;box-shadow:var(--shadow)}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:70;display:flex;align-items:center;justify-content:center;padding:12px}
+#lb img{max-width:100%;max-height:100%;object-fit:contain}
+.rptbar{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 8px;display:flex;gap:8px;align-items:center}
+#rptview{background:#fff;color:#111}
+#rptview .rp{padding:12px}
+
+/* Handschuhmodus */
+body.gross{font-size:18px}
+body.gross .btn{min-height:58px;font-size:1rem}
+body.gross .chip{min-height:54px;font-size:1.02rem;padding:10px 15px}
+body.gross .amp{min-height:88px;font-size:1.25rem}
+body.gross .item{min-height:74px}
+body.gross .stepper{grid-template-columns:60px 1fr 60px}
+body.gross .stepper button,body.gross input,body.gross select{min-height:58px}
+body.gross .tabbar button{min-height:66px}
+body.gross .qio{min-width:86px}
+
+@media (max-width:380px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  body{background:#fff}
+  body>*:not(#rptview){display:none!important}
+  #rptview .rptbar,#rptview .noprint{display:none!important}
+  #rptview .rp{padding:0}
+}
+</style>
+
+<style id="rptcss">
+/* Berichtslayout A4 – gemeinsam fuer App-Druck und Kundenbericht */
+.rp{color:#111;font:10.5pt/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;max-width:190mm;margin:0 auto;background:#fff}
+.rp h1{font-size:22pt;margin:0 0 2mm;color:#0B6E77;line-height:1.15}
+.rp h2{font-size:13pt;color:#0B6E77;border-bottom:1.5pt solid #0B6E77;padding-bottom:1.5mm;margin:7mm 0 3mm;break-after:avoid;page-break-after:avoid}
+.rp .pg{break-after:page;page-break-after:always}
+.rp .cover{display:flex;flex-direction:column;gap:6mm;padding-top:4mm}
+.rp .logo{max-height:22mm;max-width:80mm;object-fit:contain;align-self:flex-start}
+.rp .wm{font-weight:800;font-size:16pt;color:#0B6E77;letter-spacing:.02em}
+.rp .wm span{display:block;font-size:9pt;font-weight:600;color:#56687a;letter-spacing:.12em;text-transform:uppercase}
+.rp .norm{font-size:11pt;color:#56687a;font-weight:600}
+.rp table{width:100%;border-collapse:collapse;font-size:10pt}
+.rp th,.rp td{border:.5pt solid #b8c3ce;padding:1.6mm 2mm;text-align:left;vertical-align:top}
+.rp th{background:#eef2f6;font-weight:700}
+.rp table.kv th{width:42mm}
+.rp .num{text-align:center;font-variant-numeric:tabular-nums;font-weight:700}
+.rp .big{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
+.rp .big div{border-radius:3mm;padding:4mm;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rp .big b{display:block;font-size:30pt;line-height:1}
+.rp .big span{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.rp .c-rot{background:#B3122C;color:#fff}.rp .c-gelb{background:#e8a400;color:#1d1600}.rp .c-gruen{background:#2C7A52;color:#fff}
+.rp .res{font-size:13pt;font-weight:800;padding:3mm 4mm;border-radius:2mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rp .res.rot{background:#fde8e8;color:#B3122C;border:1pt solid #B3122C}.rp .res.gelb{background:#fff4d1;color:#6b4d00;border:1pt solid #e8a400}.rp .res.gruen{background:#e3f3e4;color:#2C7A52;border:1pt solid #2C7A52}
+.rp .amp td:first-child{width:24mm;font-weight:800;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rp td.s-rot{background:#B3122C;color:#fff}.rp td.s-gelb{background:#e8a400;color:#1d1600}.rp td.s-gruen{background:#2C7A52;color:#fff}
+.rp .mgl{border:.8pt solid #b8c3ce;border-left:4mm solid #999;border-radius:1.5mm;padding:3mm;margin:0 0 4mm;break-inside:avoid;page-break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rp .mgl.rot{border-left-color:#B3122C;background:#fff5f5;border-color:#B3122C}
+.rp .mgl.gelb{border-left-color:#e8a400}
+.rp .mgl.gruen{border-left-color:#2C7A52}
+.rp .mgh{display:flex;gap:3mm;align-items:baseline;flex-wrap:wrap;margin-bottom:2mm}
+.rp .mgh b{font-size:12pt}
+.rp .badge{font-size:8.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:.8mm 2mm;border-radius:1mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rp .badge.rot{background:#B3122C;color:#fff}.rp .badge.gelb{background:#e8a400;color:#1d1600}.rp .badge.gruen{background:#2C7A52;color:#fff}
+.rp .mgd{display:grid;grid-template-columns:30mm 1fr;gap:1mm 3mm;font-size:10pt}
+.rp .mgd dt{color:#56687a;font-weight:600}.rp .mgd dd{margin:0}
+.rp .fotos{display:flex;flex-wrap:wrap;gap:2mm;margin-top:2.5mm}
+.rp .fotos img{height:52mm;max-width:88mm;object-fit:contain;border:.5pt solid #b8c3ce;background:#f4f6f8}
+.rp .sigs{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:6mm;break-inside:avoid;page-break-inside:avoid}
+.rp .sigs div{border-top:.8pt solid #111;padding-top:1.5mm;font-size:9.5pt}
+.rp .sigs img{height:24mm;max-width:100%;object-fit:contain;display:block;margin-bottom:1mm}
+.rp .sigbox{min-height:25mm;display:flex;align-items:flex-end}
+.rp .small{font-size:9pt;color:#56687a}
+.rp .foot{margin-top:8mm;font-size:8.5pt;color:#56687a;border-top:.5pt solid #b8c3ce;padding-top:2mm}
+.rp p{margin:0 0 2.5mm}
+.rp th.grp{background:#DCEDEE;color:#0B6E77;text-transform:uppercase;letter-spacing:.05em;font-size:8.5pt}
+.rp td.neg{color:#B3122C;font-weight:700}.rp td.pos{color:#2C7A52;font-weight:700}
+.rp .mtx{overflow-x:auto}
+.rp table.mx{font-size:8.5pt}.rp table.mx th,.rp table.mx td{padding:1.2mm 1mm}
+.rp td.ok{color:#2C7A52;font-weight:700}.rp td.na{background:#F3F6F6}.rp td.open{color:#9C6B00}
+.rp td.m-rot,.rp td.m-gelb,.rp td.m-gruen{font-weight:800;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rp td.m-rot{background:#B3122C;color:#fff}.rp td.m-gelb{background:#F2C230;color:#1B211F}.rp td.m-gruen{background:#2C7A52;color:#fff}
+.rp ol.emp{margin:0;padding-left:6mm}.rp ol.emp li{margin-bottom:1.5mm}
+@page{size:A4 portrait;margin:13mm 12mm 14mm}
+</style>
+</head>
+<body>
+<div id="err" role="alert" hidden></div>
+<header class="topbar" id="hdr"><button class="back" id="back" aria-label="Zurück" hidden>‹</button><div class="mark" id="mark">DT</div><div class="tt"><h1 id="ttl">Regalinspektion</h1><div class="sub" id="ctx">DIN EN 15635</div></div><span class="synckn" id="saved" hidden><span class="punkt"></span><span id="savedT"></span></span></header>
+<main id="main"></main>
+<nav class="tabbar" id="tabs" hidden></nav>
+<div id="rptview" hidden></div>
+<div id="toast" hidden></div>
+<div id="lb" hidden><img alt="Foto gross"></div>
+<input type="file" id="fcam" accept="image/*" capture="environment" hidden>
+<input type="file" id="fgal" accept="image/*" multiple hidden>
+<input type="file" id="fjson" accept=".json,application/json,text/plain" hidden>
+<input type="file" id="flogo" accept="image/*" hidden>
+
+<!-- ============ GEMEINSAMER CODE (wird auch in den Kundenbericht kopiert) ============ -->
+<script id="shared">
+/* ================= Katalog: Regaltypen, Bauteile, Prüfpunkte ================= */
+var TYPEN=[["P","Palettenregal"],["F","Fachbodenregal"],["W","Weitspannregal"],["K","Kragarmregal"],["E","Einfahr- / Durchfahrregal"],["D","Durchlaufregal"],["M","Mehrgeschossanlage / Bühne"],["R","Reifenregal"],["S","Sonstiges Regal"]];
+function typName(k){for(var i=0;i<TYPEN.length;i++)if(TYPEN[i][0]===k)return TYPEN[i][1];return k||"–"}
+function typKey(v){if(!v)return "P";for(var i=0;i<TYPEN.length;i++)if(TYPEN[i][0]===v||TYPEN[i][1]===v)return TYPEN[i][0];return "S"}
+/* t: Regaltypen, für die das Bauteil gilt ("*" = alle). a: [Schadensart, Vorauswahl Ampel] – "mess" = Einstufung über Messung */
+var BT=[
+ {k:"stuetze",c:"ST",l:"Rahmen / Stützen",t:"PFWKEDMRS",mess:[{l:"in Traversenrichtung",g:5},{l:"quer zur Traverse",g:3}],
+  a:[["Verformung / Anfahrschaden","mess"],["Riss / Knick","rot"],["Lochung eingerissen","rot"],["Lotabweichung (Schiefstand)","gelb"],["Korrosion","gelb"],["Sonstiges",""]],
+  p:"Stützen vor allem im Anfahrbereich (unten bis ca. 1.5 m) auf Beulen, Knicke, Risse und eingerissene Lochung prüfen. Rahmen im Lot? Richtwert Lotabweichung je nach Hersteller H/350 bis H/500.",
+  g:"Verformung mit 1 m Richtscheit messen: in Traversenrichtung max. 5 mm, quer zur Traverse max. 3 mm. Bis Grenzwert = Grün · bis doppelter Grenzwert = Gelb · darüber = Rot. Risse, Knicke und eingerissene Lochung immer Rot."},
+ {k:"fachwerk",c:"FW",l:"Fachwerk (Diagonalen / Horizontalen)",t:"PWKEDMRS",mess:[{l:"Verbiegung",g:10}],
+  a:[["Verbogen","mess"],["Abgerissen / fehlt","rot"],["Schraube lose / fehlt","gelb","Fehlende Schrauben ergänzen bzw. lose Schrauben nachziehen (Originalschrauben, Anzugsmoment gemäss Hersteller)."],["Korrosion","gelb"],["Sonstiges",""]],
+  p:"Verbände zwischen den Stützen: verbogen, abgerissen, Schrauben lose oder fehlend?",
+  g:"Verbiegung mit 1 m Richtscheit: max. 10 mm (beide Richtungen). Bis 10 mm Grün · bis 20 mm Gelb · darüber Rot. Abgerissener Verband: Rot."},
+ {k:"fuss",c:"FP",l:"Fussplatten / Bodenanker",t:"*",
+  a:[["Anker fehlt","gelb","Fehlende Bodenanker gemäss Herstellerangabe setzen."],["Anker lose / ausgerissen","gelb","Anker nachziehen bzw. neu setzen gemäss Herstellerangabe. Bei ausgebrochenem Boden Fachfirma beiziehen."],["Fussplatte verformt","gelb"],["Fussplatte gerissen / fehlt","rot"],["Unterlegplatten unzulässig","gelb"],["Sonstiges",""]],
+  p:"Jede Stütze mit Fussplatte, vollflächig aufliegend. Bodenanker gemäss Hersteller vollständig und fest. Unterlegplatten nur nach Herstellerangabe.",
+  g:"Fehlender oder loser Anker: Gelb. Gerissene oder fehlende Fussplatte, ausgebrochener Boden unter der Stütze: Rot."},
+ {k:"traverse",c:"TR",l:"Traversen",t:"PWEDR",
+  a:[["Bleibende Durchbiegung","gelb"],["Seitlich angefahren / verformt","gelb"],["Riss an Schweissnaht / Haken","rot"],["Haken verbogen / nicht voll eingehängt","rot"],["Überladung","rot"],["Höhe weicht vom Plan / Schild ab","gelb"],["Korrosion","gelb"],["Sonstiges",""]],
+  p:"Durchbiegung unter Last, bleibende Verformung nach Entladen, Anfahrschäden, Einhängehaken und Schweissnähte, Traversenhöhen gemäss Belastungsschild.",
+  g:"Zulässige Durchbiegung unter Nennlast L/200 (z. B. 2700 mm → 13.5 mm). Bleibende Verformung = Schaden. Risse an Schweissnaht oder Haken, verbogene Haken: Rot."},
+ {k:"sicherung",c:"SI",l:"Traversensicherung (Sicherungsstifte)",t:"PWEDMR",
+  a:[["Fehlt","gelb","Fehlende Sicherungsstifte ergänzen (Originalteil des Herstellers)."],["Falsch / nicht passend","gelb","Durch passenden Original-Sicherungsstift des Herstellers ersetzen."],["Sonstiges",""]],
+  p:"Jede Traverse an beiden Enden mit Sicherungsstift (Aushebesicherung).",
+  g:"Fehlende Sicherung: Gelb. Meist sofort vor Ort ergänzbar – dann in der Bemerkung vermerken."},
+ {k:"reihenverb",c:"RV",l:"Reihenverbinder / Wandanker",t:"PFWEDMR",
+  a:[["Fehlt","gelb"],["Lose","gelb"],["Verformt","gelb"],["Sonstiges",""]],
+  p:"Doppelregale mit Reihenverbindern, Einzelregale an der Wand gemäss Hersteller verankert.",
+  g:"Fehlend, lose oder verformt: Gelb."},
+ {k:"durchschub",c:"DS",l:"Durchschubsicherung",t:"PED",
+  a:[["Fehlt (erforderlich)","gelb"],["Beschädigt","gelb"],["Lose / falsch montiert","gelb"],["Sonstiges",""]],
+  p:"Erforderlich, wo Ladeeinheiten auf der Rückseite in Gänge, Verkehrswege oder Arbeitsplätze geschoben werden können.",
+  g:"Fehlt an gefährdeter Stelle oder beschädigt: Gelb."},
+ {k:"rueckwand",c:"GR",l:"Gitterrückwand",t:"PFWR",
+  a:[["Fehlt (erforderlich)","gelb"],["Beschädigt","gelb"],["Befestigung lose / fehlt","gelb","Befestigung der Gitterrückwand ergänzen bzw. nachziehen."],["Sonstiges",""]],
+  p:"Schutz gegen herabfallende Ware über Verkehrswegen, Durchgängen und Arbeitsplätzen.",
+  g:"Fehlt an gefährdeter Stelle, beschädigt oder lose: Gelb."},
+ {k:"gitterrost",c:"RO",l:"Gitterroste / Palettenauflagen",t:"PWE",
+  a:[["Verformt","gelb"],["Nicht gesichert / verrutscht","gelb"],["Nicht vollflächig aufliegend","gelb"],["Unzulässiger Typ / zu schwach","rot"],["Sonstiges",""]],
+  p:"Gitterroste und Auflagen passend zur Traverse, gegen Verschieben gesichert, Tragfähigkeit passend zur Fachlast.",
+  g:"Verformt oder verrutscht: Gelb. Unzulässiger oder zu schwacher Rost unter Last: Rot."},
+ {k:"holz",c:"HE",l:"Holzeinlagen / Spanplatten",t:"PFWM",
+  a:[["Gebrochen / eingerissen","rot","Einlage sofort entfernen und durch eine vom Hersteller freigegebene Ausführung ersetzen."],["Durchgebogen","gelb","Einlage durch eine vom Hersteller freigegebene, ausreichend tragfähige Ausführung ersetzen."],["Nicht vollflächig aufliegend / verrutscht","gelb"],["Nicht vom Hersteller freigegeben","gelb"],["Feucht / beschädigt","gelb","Beschädigte Einlage ersetzen (vom Hersteller freigegebene Ausführung)."],["Sonstiges",""]],
+  p:"Nur vom Hersteller freigegebene Einlagen, vollflächig aufliegend, nicht durchgebogen oder gebrochen.",
+  g:"Gebrochen unter Last: Rot. Durchgebogen, verrutscht, feucht oder nicht freigegeben: Gelb."},
+ {k:"fachboden",c:"FB",l:"Fachböden / Fachbodenträger",t:"FWMS",
+  a:[["Verformt","gelb"],["Träger / Einhängung beschädigt","rot"],["Überladung","rot"],["Sicherung fehlt","gelb","Fachbodensicherung ergänzen (Originalteil des Herstellers)."],["Sonstiges",""]],
+  p:"Fachböden richtig eingehängt und gesichert, keine bleibende Durchbiegung, Fachlast eingehalten.",
+  g:"Bleibend verformt: Gelb. Beschädigte Einhängung oder Überladung: Rot."},
+ {k:"kragarm",c:"KA",l:"Kragarme",t:"K",
+  a:[["Verformt","gelb"],["Riss","rot"],["Endanschlag fehlt","gelb","Endanschlag an den Kragarmen nachrüsten (Originalteil des Herstellers)."],["Sicherung fehlt","gelb","Kragarm-Sicherung ergänzen (Originalteil des Herstellers)."],["Überladung","rot"],["Sonstiges",""]],
+  p:"Kragarme gerade, gesichert, mit Endanschlag. Armlast und Ständerlast gemäss Schild.",
+  g:"Verformt oder Anschlag fehlt: Gelb. Riss oder Überladung: Rot."},
+ {k:"rollen",c:"RB",l:"Rollenbahnen / Bremsen",t:"D",
+  a:[["Rollen blockiert / beschädigt","gelb"],["Bremse / Vereinzeler defekt","rot"],["Endanschlag defekt","rot"],["Sonstiges",""]],
+  p:"Rollen leichtgängig, Bremsrollen und Vereinzeler funktionsfähig, Endanschläge intakt.",
+  g:"Blockierte Rollen: Gelb. Defekte Bremse oder Endanschlag: Rot."},
+ {k:"buehne",c:"BU",l:"Bühne: Belag, Geländer, Treppe",t:"M",
+  a:[["Geländer / Fussleiste fehlt oder beschädigt","rot","Bereich sofort sperren. Geländer mit Knie- und Fussleiste durch Fachfirma instand stellen bzw. nachrüsten."],["Belag beschädigt","gelb"],["Treppe beschädigt","gelb"],["Übergabestelle ungesichert","rot","Übergabestelle sofort sichern (Schranke bzw. Sicherung gegen Absturz nachrüsten)."],["Flächenlast nicht angeschrieben","gelb","Zulässige Flächenlast der Bühne gut sichtbar anschreiben."],["Sonstiges",""]],
+  p:"Geländer mit Knie- und Fussleiste, Belag intakt, Treppe und Übergabestellen gesichert, Flächenlast angeschrieben.",
+  g:"Absturzgefahr (Geländer, Übergabe): Rot. Übrige Schäden: Gelb."},
+ {k:"anfahr",c:"AS",l:"Anfahrschutz / Rammschutz",t:"*",
+  a:[["Fehlt (erforderlich)","gelb","Anfahrschutz nachrüsten (mind. 400 mm hoch, am Boden verankert)."],["Beschädigt","gelb","Beschädigten Anfahrschutz ersetzen."],["Nicht verankert / lose","gelb"],["Zu niedrig (unter 400 mm)","gelb"],["Sonstiges",""]],
+  p:"Anfahrschutz an Gangenden, Kreuzungen und Durchfahrten, Stützenschutz an gefährdeten Stützen, frei stehend verankert.",
+  g:"Stützen- und Eckschutz mind. 400 mm hoch (DIN EN 15635). Fehlend an gefährdeter Stelle oder beschädigt: Gelb."},
+ {k:"schild",c:"BS",l:"Belastungsschild",t:"*",
+  a:[["Fehlt","gelb","Belastungsschild mit zulässiger Fach- und Feldlast beim Hersteller bestellen und gut sichtbar anbringen."],["Unlesbar","gelb","Belastungsschild erneuern (lesbar, gut sichtbar)."],["Angaben falsch / passen nicht zum Aufbau","gelb","Aufbau mit dem Hersteller abgleichen und korrektes Belastungsschild anbringen."],["Sonstiges",""]],
+  p:"Belastungsschild an jeder Regalzeile gut sichtbar: Hersteller, zulässige Fach- und Feldlast, Anzahl Ebenen bzw. Traversenhöhen.",
+  g:"Pflicht nach DIN EN 15635. Fehlt, unlesbar oder passt nicht zum Aufbau: Gelb."},
+ {k:"beladung",c:"LG",l:"Beladung / Lagergut / Paletten",t:"*",
+  a:[["Überladung","rot"],["Palette beschädigt","gelb"],["Falsch aufgelegt / Überstand","gelb"],["Ware quer über Traversen / ungesichert","gelb","Ware korrekt einlagern und sichern; ohne geeignete Auflage nicht quer über Traversen lagern."],["Sonstiges",""]],
+  p:"Lasten innerhalb der Angaben, Paletten intakt, mittig und mit korrektem Überstand aufgelegt.",
+  g:"Überladung: Rot. Beschädigte oder falsch aufgelegte Paletten: Gelb."},
+ {k:"kennz",c:"KZ",l:"Kennzeichnung Feld / Platz",t:"*",
+  a:[["Fehlt","gruen","Regalzeilen und Felder eindeutig kennzeichnen."],["Unlesbar","gruen","Kennzeichnung erneuern."],["Sonstiges",""]],
+  p:"Regalzeilen und Felder eindeutig gekennzeichnet.",
+  g:"Fehlend oder unlesbar: Grün (Empfehlung)."},
+ {k:"sonst",c:"SO",l:"Sonstiges",t:"*",a:[["Sonstiges",""]],p:"Alles, was in keine andere Rubrik passt.",g:"Nach Gefährdung einstufen."}
+];
+var BAUTEILE=BT.map(function(b){return b.l});
+var ARTEN=[];BT.forEach(function(b){b.a.forEach(function(x){if(ARTEN.indexOf(x[0])<0)ARTEN.push(x[0])})});
+function btByKey(k){for(var i=0;i<BT.length;i++)if(BT[i].k===k)return BT[i];return null}
+function btByLabel(l){for(var i=0;i<BT.length;i++)if(BT[i].l===l)return BT[i];return null}
+function btFor(typ){typ=typKey(typ);return BT.filter(function(b){return b.t==="*"||b.t.indexOf(typ)>=0})}
+/* Allgemeine Prüfpunkte der Anlage – e = Empfehlung, wenn nicht i. O. */
+var ALLG=[
+ {g:"Dokumentation",items:[
+  {k:"anleitung",l:"Aufbau- und Betriebsanleitung des Herstellers vorhanden",p:"Der Hersteller liefert Aufbau- und Betriebsanleitung. Sie gehört an den Standort.",e:"Aufbau- und Betriebsanleitung beim Hersteller anfordern und am Standort ablegen."},
+  {k:"lasttabelle",l:"Belastungstabellen / Tragfähigkeitsnachweis vorhanden",p:"Nachweis der zulässigen Fach- und Feldlasten für die aktuelle Konfiguration.",e:"Tragfähigkeitsnachweis für die aktuelle Konfiguration beim Hersteller anfordern."},
+  {k:"layout",l:"Regal-Layout / Aufstellplan vorhanden und aktuell",p:"Plan mit Regalzeilen, Gängen, Traversenhöhen. Grundlage für Änderungen.",e:"Aktuellen Aufstellplan erstellen bzw. nachführen lassen."},
+  {k:"aenderung",l:"Keine Umbauten ohne Herstellerfreigabe",p:"Aufbau entspricht dem Belastungsschild. Änderungen (Traversenhöhen, Felder) nur mit Freigabe des Herstellers.",e:"Umbauten vom Hersteller prüfen und freigeben lassen, Belastungsschild anpassen."},
+  {k:"bericht",l:"Letzter Inspektionsbericht vorhanden, Mängel erledigt",p:"Inspektion durch fachkundige Person mind. alle 12 Monate, offene Mängel nachverfolgt.",e:"Offene Mängel aus der letzten Inspektion erledigen und dokumentieren."},
+  {k:"plakette",l:"Prüfplakette der letzten Inspektion vorhanden",p:"Sichtbarer Nachweis der letzten Inspektion an der Anlage.",e:"Nach dieser Inspektion Prüfplaketten anbringen."},
+  {k:"person",l:"Verantwortliche Person für Lagereinrichtungen benannt",p:"DIN EN 15635 verlangt eine verantwortliche Person für die Sicherheit der Lagereinrichtung.",e:"Verantwortliche Person für Lagereinrichtungen schriftlich benennen."},
+  {k:"sichtkontrolle",l:"Regelmässige Sichtkontrollen durch Betreiber dokumentiert",p:"Zusätzlich zur jährlichen Inspektion regelmässige (z. B. wöchentliche) Sichtkontrollen.",e:"Regelmässige Sichtkontrollen einführen und dokumentieren."}
+ ]},
+ {g:"Umgebung und Betrieb",items:[
+  {k:"boden",l:"Boden tragfähig, ohne Risse / Setzungen bei den Stützen",p:"Boden im Bereich der Fussplatten ohne Risse, Absenkungen oder Ausbrüche.",e:"Bodenschäden im Stützenbereich durch Fachfirma beurteilen und instand stellen lassen."},
+  {k:"gaenge",l:"Gänge und Verkehrswege frei, Gangbreite ausreichend",p:"Keine abgestellte Ware in Gängen und Fluchtwegen.",e:"Gänge und Verkehrswege freihalten."},
+  {k:"anfahrgang",l:"Anfahrschutz an Gangenden und Durchfahrten",p:"Eck- und Stirnseitenschutz an allen Gangenden mit Staplerverkehr.",e:"Anfahrschutz an Gangenden und Durchfahrten nachrüsten."},
+  {k:"markierung",l:"Boden- und Verkehrswegmarkierungen vorhanden",p:"Verkehrswege und Abstellflächen markiert.",e:"Verkehrswege markieren."},
+  {k:"licht",l:"Beleuchtung ausreichend",p:"Regalfächer und Gänge ausreichend beleuchtet.",e:"Beleuchtung verbessern."},
+  {k:"stapler",l:"Stapler / Flurförderzeuge passend zu Regal und Gangbreite",p:"Hubhöhe, Gabellänge und Gangbreite passen zur Anlage.",e:"Einsatz der Flurförderzeuge auf die Anlage abstimmen."},
+  {k:"paletten",l:"Ladungsträger (Paletten) in gutem Zustand",p:"Keine beschädigten Paletten im Regal.",e:"Beschädigte Paletten aussortieren."},
+  {k:"instruktion",l:"Personal zu Beladung und Schadensmeldung instruiert",p:"Mitarbeitende kennen Lasten und melden Schäden sofort.",e:"Personal zu Beladung und Schadensmeldung instruieren."}
+ ]}
+];
+var ASTATUS={ok:"i. O.",mangel:"Mangel",fehlt:"fehlt",nv:"n. v."};
+var SEITEN=["vorne","hinten","links","rechts"];
+var STUFEN={
+  rot:{l:"Rot",kurz:"Sofort sperren",t:"Sofort entladen und sperren. Instandsetzung vor Wiederbenutzung."},
+  gelb:{l:"Gelb",kurz:"Innert 4 Wochen",t:"Schaden. Instandsetzung innert 4 Wochen. Betroffenen Bereich nicht neu beladen."},
+  gruen:{l:"Grün",kurz:"Beobachten",t:"Beobachten. Keine Massnahme nötig, bei der nächsten Inspektion erneut prüfen."}
+};
+var ORDER={rot:0,gelb:1,gruen:2};
+function massVorschlag(art,stufe,bauteil){
+  var a=String(art||""),b=bauteil||"Bauteil",t="",bt=btByLabel(bauteil),spez="";
+  if(bt)bt.a.forEach(function(x){if(x[0]===a&&x[2])spez=x[2]});
+  if(spez){t=spez;if(stufe==="rot"&&!/^Sofort|sofort/.test(t))t="Sofort entladen und sperren. "+t;return t}
+  if(/Überladung/.test(a))t="Last sofort auf die zulässige Fach- bzw. Feldlast gemäss Belastungsschild reduzieren.";
+  else if(/abgerissen|gerissen|Riss/i.test(a))t="«"+b+"» durch Originalteil des Herstellers ersetzen. Nicht richten oder schweissen.";
+  else if(/nicht vom hersteller|unzulässig|falsch \/|zu schwach/i.test(a))t="Durch ein vom Hersteller freigegebenes Bauteil ersetzen.";
+  else if(/gesichert|verrutscht|aufliegend/i.test(a))t="Korrekt auflegen und gegen Verschieben sichern (gemäss Herstellerangabe).";
+  else if(/^Fehlt|fehlt$|fehlt \(|Anker fehlt|Endanschlag fehlt|Sicherung fehlt/.test(a))t="«"+b+"» nachrüsten bzw. ergänzen (Originalteil des Herstellers).";
+  else if(/lose|Lose/.test(a))t="Befestigung gemäss Herstellerangabe instand stellen bzw. nachziehen.";
+  else if(/Korrosion/.test(a))t="Korrosionsgrad beurteilen: bei Querschnittsverlust Bauteil ersetzen, sonst Oberfläche instand stellen.";
+  else if(/Lotabweichung/.test(a))t="Ursache abklären (Anfahrschaden, Boden, Montage). Regal entlasten und durch Hersteller neu ausrichten lassen.";
+  else if(/Höhe weicht/.test(a))t="Konfiguration vom Hersteller prüfen und freigeben lassen, Belastungsschild anpassen.";
+  else if(/Palette beschädigt/.test(a))t="Beschädigte Palette entfernen und Ware umlagern.";
+  else if(/aufgelegt|quer über/.test(a))t="Ware korrekt einlagern: Palette mittig, Überstand gemäss Herstellerangabe, Ware gesichert.";
+  else if(/Unlesbar|Angaben falsch/.test(a))t="Belastungsschild mit korrekten, lesbaren Angaben anbringen.";
+  else if(/zu niedrig|unter 400/.test(a))t="Anfahrschutz mit mindestens 400 mm Höhe einsetzen.";
+  else if(/Rollen|Bremse|Endanschlag/.test(a))t="Durch Hersteller bzw. Fachfirma instand stellen lassen.";
+  else if(/Geländer|Übergabestelle|Belag|Treppe|Flächenlast/.test(a))t="Durch Fachfirma instand stellen bzw. nachrüsten.";
+  else if(a&&a!=="Sonstiges")t="«"+b+"» durch Originalteil des Herstellers ersetzen. Nicht richten oder schweissen.";
+  if(stufe==="rot")t="Sofort entladen und sperren. "+t;
+  if(stufe==="gruen"&&/Verformung|Verbogen|Durchbiegung/.test(a))t="Beobachten, bei der nächsten Inspektion erneut messen.";
+  return t.trim();
+}
+var MASS_OPTS=["Beobachten, bei der nächsten Inspektion erneut beurteilen.","Sofort entladen und sperren bis zur Instandsetzung.","Durch Originalteil des Herstellers ersetzen.","Nachrüsten (Originalzubehör des Herstellers).","Befestigung instand stellen bzw. nachziehen.","Vor Ort erledigt."];
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function nl(s){return esc(s).replace(/\n/g,"<br>")}
+function pad(n){return String(n).padStart(2,"0")}
+function isoToDate(iso){if(!iso)return null;var p=String(iso).split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+function dateToIso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function todayIso(){return dateToIso(new Date())}
+function fDate(iso){var d=isoToDate(iso);return d?pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear():"–"}
+function addDays(iso,n){var d=isoToDate(iso)||new Date();d.setDate(d.getDate()+n);return dateToIso(d)}
+function addMonths(iso,n){var d=isoToDate(iso)||new Date();d.setMonth(d.getMonth()+n);return dateToIso(d)}
+function fristIso(m,I){if(m.stufe==="rot")return I.datum||todayIso();if(m.stufe==="gelb")return addDays(I.datum,28);return I.naechste||addMonths(I.datum,12)}
+function fristText(m,I){if(m.stufe==="rot")return "sofort";if(m.stufe==="gelb")return fDate(addDays(I.datum,28));return "nächste Inspektion"}
+function zeileOf(I,id){for(var i=0;i<I.zeilen.length;i++)if(I.zeilen[i].id===id)return I.zeilen[i];return null}
+function kNr(n){return n==null||n===""?"–":String(n).padStart(3,"0")}
+function rName(z){if(!z)return "Allgemein";var k=kNr(z.plakette),nm=String(z.name||"");return "Regal "+k+(nm&&nm!==k&&nm!==String(z.plakette)?" ("+nm+")":"")}
+function zName(I,id){return rName(zeileOf(I,id))}
+function posText(m,I){
+  if(!m.zeileId)return "Allgemein";
+  var p=[zName(I,m.zeileId)];
+  if(m.feld)p.push("Feld "+m.feld);
+  if(m.ebene!==""&&m.ebene!=null)p.push("Ebene "+m.ebene);
+  if(m.seite)p.push(m.seite);
+  return p.join(" · ");
+}
+function zIndex(I){var zi={};I.zeilen.forEach(function(z,i){zi[z.id]=i});return zi}
+function sortedMaengel(I){
+  var zi=zIndex(I);
+  return I.maengel.filter(function(m){return m.stufe}).slice().sort(function(a,b){
+    return (ORDER[a.stufe]-ORDER[b.stufe])||((zi[a.zeileId]==null?-1:zi[a.zeileId])-(zi[b.zeileId]==null?-1:zi[b.zeileId]))||((a.nr||0)-(b.nr||0));
+  });
+}
+function nrText(n){return n==null||n===""?"–":"M"+String(n).padStart(2,"0")}
+function nummern(I){var r={};I.maengel.forEach(function(m){r[m.id]=nrText(m.nr)});return r}
+function countStufen(list){var c={rot:0,gelb:0,gruen:0};list.forEach(function(m){if(c[m.stufe]!=null)c[m.stufe]++});return c}
+function gesamtErgebnis(c){
+  if(c.rot)return {k:"rot",t:"Nicht in Ordnung – sofortige Massnahmen erforderlich"};
+  if(c.gelb)return {k:"gelb",t:"Mängel vorhanden – Instandsetzung innert 4 Wochen"};
+  if(c.gruen)return {k:"gruen",t:"In Ordnung – mit Beobachtungspunkten"};
+  return {k:"gruen",t:"In Ordnung – keine Mängel festgestellt"};
+}
+/* Beurteilung eines Bauteils in einer Zeile: aus Mängeln abgeleitet, sonst aus der Checkliste */
+function zCheck(I,z,k){
+  var ms=I.maengel.filter(function(m){return m.stufe&&m.zeileId===z.id&&m.bk===k});
+  if(ms.length){var w="gruen";ms.forEach(function(m){if(ORDER[m.stufe]<ORDER[w])w=m.stufe});return {s:"mangel",w:w,n:ms.length}}
+  var v=(z.checks||{})[k];return {s:v==="mangel"?"":(v||""),n:0};
+}
+function zStand(I,z){
+  var l=btFor(z.typ),done=0;l.forEach(function(b){if(zCheck(I,z,b.k).s)done++});
+  return {done:done,total:l.length,fertig:l.length>0&&done===l.length};
+}
+var KSTATUS={offen:"offen",arbeit:"in Arbeit",behoben:"behoben"};
+function buildReport(I,P,logo,opt){
+  opt=opt||{};var F=I.firma||{};
+  var L=sortedMaengel(I),c=countStufen(L),g=gesamtErgebnis(c),NR=nummern(I);
+  var fertig=I.zeilen.filter(function(z){return zStand(I,z).fertig}).length;
+  var io=I.zeilen.filter(function(z){return zStand(I,z).fertig&&!I.maengel.some(function(m){return m.stufe&&m.zeileId===z.id})});
+  var typen=[];I.zeilen.forEach(function(z){var t=typName(typKey(z.typ));if(typen.indexOf(t)<0)typen.push(t)});
+  var A=I.allg||{};
+  var brand=logo?'<img class="logo" src="'+logo+'" alt="Logo">':'<div class="wm">'+esc(F.name||"DETEC Facility Services")+'</div>';
+  var h='<div class="rp">';
+  h+='<section class="pg cover">'+brand+'<div><h1>Inspektionsbericht Regalanlage</h1><div class="norm">Regalinspektion nach SN EN 15635 / DIN EN 15635</div></div>';
+  h+='<table class="kv"><tr><th>Kunde</th><td>'+esc(I.kunde)+'</td></tr><tr><th>Standort / Halle</th><td>'+esc(I.standort)+'</td></tr><tr><th>Datum Inspektion</th><td>'+fDate(I.datum)+'</td></tr><tr><th>Prüfer</th><td>'+esc(I.pruefer)+(F.name?', '+esc(F.name):'')+'</td></tr><tr><th>Regaltypen</th><td>'+esc(typen.join(", ")||"–")+'</td></tr><tr><th>Hersteller</th><td>'+esc(I.hersteller||"–")+'</td></tr><tr><th>Regale</th><td>'+I.zeilen.length+' (vollständig beurteilt: '+fertig+')</td></tr><tr><th>Nächste Inspektion</th><td>'+fDate(I.naechste||addMonths(I.datum,12))+'</td></tr></table>';
+  h+='<div class="big"><div class="c-rot"><b>'+c.rot+'</b><span>Rot · sofort</span></div><div class="c-gelb"><b>'+c.gelb+'</b><span>Gelb · 4 Wochen</span></div><div class="c-gruen"><b>'+c.gruen+'</b><span>Grün · beobachten</span></div></div>';
+  h+='<div class="res '+g.k+'">Gesamtergebnis: '+esc(g.t)+'</div>';
+  h+='<div class="small">'+esc(F.name||"")+(F.email?' · '+esc(F.email):'')+'</div></section>';
+  // 1 Zusammenfassung
+  h+='<section><h2>1. Zusammenfassung</h2>';
+  h+='<p>Am '+fDate(I.datum)+' wurde die Regalanlage'+(I.kunde?' beim Kunden '+esc(I.kunde):'')+(I.standort?', Standort '+esc(I.standort):'')+' durch '+esc(I.pruefer)+' visuell inspiziert. Beurteilt wurden '+I.zeilen.length+' Regale ('+esc(typen.join(", "))+') mit allen zugänglichen tragenden Bauteilen, Sicherungen und Schutzeinrichtungen sowie die allgemeinen Prüfpunkte zu Dokumentation, Umgebung und Betrieb.</p>';
+  h+='<p>Festgestellt wurden <b>'+c.rot+' rote</b>, <b>'+c.gelb+' gelbe</b> und <b>'+c.gruen+' grüne</b> Mängel. Jedes beurteilte Regal ist vor Ort mit einem nummerierten Kleber gekennzeichnet; die Regal-Nummer in diesem Bericht entspricht der Nummer auf dem Kleber.</p>';
+  if(I.bemerkung)h+='<p><b>Bemerkung:</b> '+nl(I.bemerkung)+'</p>';
+  if(I.gesamt)h+='<p><b>Gesamtbeurteilung:</b> '+nl(I.gesamt)+'</p>';
+  // 2 Norm
+  h+='<h2>2. Grundlagen und Ampelsystem</h2>';
+  h+='<p>Die Inspektion erfolgt nach SN EN 15635 / DIN EN 15635 «Ortsfeste Regalsysteme aus Stahl – Anwendung und Wartung von Lagereinrichtungen». Die Norm verlangt eine Inspektion durch eine fachkundige Person in Abständen von höchstens 12 Monaten sowie regelmässige Sichtkontrollen durch den Betreiber. In der Schweiz gelten zudem die Pflichten des Arbeitgebers nach der Verordnung über die Unfallverhütung (VUV) und die EKAS-Richtlinie 6512 «Arbeitsmittel».</p>';
+  h+='<table class="amp"><tr><td class="s-rot">ROT</td><td>'+esc(STUFEN.rot.t)+'</td></tr><tr><td class="s-gelb">GELB</td><td>'+esc(STUFEN.gelb.t)+'</td></tr><tr><td class="s-gruen">GRÜN</td><td>'+esc(STUFEN.gruen.t)+'</td></tr></table>';
+  h+='<p class="small" style="margin-top:2mm">Die Inspektion ist eine Sichtprüfung der zugänglichen Bauteile im Zustand am Prüftag. Sie ersetzt keine statische Berechnung und keine Belastungsprüfung.</p>';
+  // 3 Allgemeine Prüfpunkte
+  h+='<h2>3. Allgemeine Prüfpunkte</h2><table><tr><th>Prüfpunkt</th><th style="width:20mm">Ergebnis</th><th>Empfehlung / Bemerkung</th></tr>';
+  ALLG.forEach(function(gr){
+    h+='<tr><th colspan="3" class="grp">'+esc(gr.g)+'</th></tr>';
+    gr.items.forEach(function(it){var a=A[it.k]||{},s=a.s||"";
+      var cls=s==="mangel"||s==="fehlt"?' class="neg"':s==="ok"?' class="pos"':'';
+      h+='<tr><td>'+esc(it.l)+'</td><td'+cls+'>'+esc(ASTATUS[s]||"nicht beurteilt")+'</td><td>'+nl(a.t||((s==="mangel"||s==="fehlt")?it.e:""))+'</td></tr>'});
+  });
+  h+='</table></section>';
+  // 4 Prüfmatrix
+  var used=BT.filter(function(b){return I.zeilen.some(function(z){return btFor(z.typ).indexOf(b)>=0})});
+  h+='<section><h2>4. Beurteilung je Regal</h2><div class="mtx"><table class="mx"><tr><th class="num">Regal</th><th>Bez.</th><th>Typ</th>'+used.map(function(b){return '<th class="num" title="'+esc(b.l)+'">'+b.c+'</th>'}).join("")+'</tr>';
+  I.zeilen.forEach(function(z){var app=btFor(z.typ);
+    var nm=String(z.name||"");h+='<tr><td class="num"><b>'+kNr(z.plakette)+'</b></td><td>'+esc(nm===kNr(z.plakette)||nm===String(z.plakette)?"":nm)+'</td><td>'+esc(typName(typKey(z.typ)))+'</td>';
+    used.forEach(function(b){
+      if(app.indexOf(b)<0){h+='<td class="num na"></td>';return}
+      var r=zCheck(I,z,b.k);
+      if(r.s==="mangel")h+='<td class="num m-'+r.w+'">'+r.n+'</td>';
+      else if(r.s==="ok")h+='<td class="num ok">✓</td>';
+      else if(r.s==="nv")h+='<td class="num">–</td>';
+      else h+='<td class="num open">?</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</table></div><p class="small">✓ = in Ordnung · Zahl = Anzahl Mängel (Farbe = schwerste Stufe) · – = nicht vorhanden · ? = nicht beurteilt · leer = beim Regaltyp nicht vorgesehen.<br>'+used.map(function(b){return b.c+' '+esc(b.l)}).join(" · ")+'</p></section>';
+  // 5 Mängelliste
+  h+='<section><h2>5. Mängelliste</h2>';
+  if(!L.length)h+='<p>Keine Mängel festgestellt.</p>';
+  L.forEach(function(m){
+    h+='<div class="mgl '+m.stufe+'"><div class="mgh"><b>'+NR[m.id]+'</b><span class="badge '+m.stufe+'">'+STUFEN[m.stufe].l+' – '+STUFEN[m.stufe].kurz+'</span><span>'+esc(posText(m,I))+'</span></div><dl class="mgd">';
+    h+='<dt>Bauteil</dt><dd>'+esc(m.bauteil||"–")+'</dd><dt>Befund</dt><dd>'+esc(m.art||"–")+(m.messMm?' ('+esc(m.messMm)+' mm)':'')+'</dd>';
+    if(m.beschreibung)h+='<dt>Bemerkung</dt><dd>'+nl(m.beschreibung)+'</dd>';
+    h+='<dt>Massnahme</dt><dd>'+nl(m.massnahme||"–")+'</dd><dt>Frist</dt><dd><b>'+esc(fristText(m,I))+'</b></dd>';
+    if(opt.status){var s=opt.status[m.id];if(s&&(s.status&&s.status!=="offen"||s.notiz))h+='<dt>Status Kunde</dt><dd>'+esc(KSTATUS[s.status]||"offen")+(s.datum?' ('+fDate(s.datum)+')':'')+(s.notiz?' – '+esc(s.notiz):'')+'</dd>';}
+    h+='</dl>';
+    var f=(m.fotos||[]).filter(function(id){return P[id]});
+    if(f.length){h+='<div class="fotos">';f.forEach(function(id){h+='<img src="'+P[id]+'" alt="Foto '+NR[m.id]+'">'});h+='</div>'}
+    h+='</div>';
+  });
+  h+='</section>';
+  // 6 Empfehlungen
+  var emp=[];
+  ALLG.forEach(function(gr){gr.items.forEach(function(it){var a=A[it.k]||{};if(a.s==="mangel"||a.s==="fehlt")emp.push(a.t||it.e)})});
+  var fehlt=L.filter(function(m){return /^Fehlt|fehlt \(|Anker fehlt|Sicherung fehlt|Endanschlag fehlt/.test(m.art||"")});
+  if(fehlt.length){var byB={};fehlt.forEach(function(m){byB[m.bauteil]=(byB[m.bauteil]||[]).concat(NR[m.id])});Object.keys(byB).forEach(function(b){emp.push("«"+b+"» nachrüsten ("+byB[b].join(", ")+").")})}
+  if(c.rot)emp.push("Rot markierte Bereiche sofort entladen und bis zur Instandsetzung sperren.");
+  emp.push("Beschädigte Bauteile nur durch Originalteile des Herstellers ersetzen; nicht richten oder schweissen.");
+  emp.push("Nächste Inspektion durch eine fachkundige Person bis "+fDate(I.naechste||addMonths(I.datum,12))+".");
+  h+='<section><h2>6. Empfehlungen</h2><ol class="emp">'+emp.map(function(t){return '<li>'+esc(t)+'</li>'}).join("")+'</ol>';
+  h+='<h2>7. Ohne Mängel beurteilte Regale</h2><p>'+(io.length?io.map(function(z){return esc(rName(z))}).join(", "):"–")+'</p>';
+  h+='<h2>8. Abschluss</h2><p>Nächste Inspektion fällig am: <b>'+fDate(I.naechste||addMonths(I.datum,12))+'</b></p>';
+  h+='<div class="sigs"><div><div class="sigbox">'+(I.sigP?'<img src="'+I.sigP+'" alt="Unterschrift Prüfer">':'')+'</div>Prüfer: '+esc(I.pruefer)+'<br>'+fDate(I.datum)+'</div><div><div class="sigbox">'+(I.sigK?'<img src="'+I.sigK+'" alt="Unterschrift Kunde">':'')+'</div>Kunde: '+esc(I.kundeName||I.kunde)+'<br>'+fDate(I.datum)+'</div></div>';
+  h+='<div class="foot">'+esc(F.name||"")+' · Prüfer '+esc(I.pruefer)+(F.email?' · '+esc(F.email):'')+' · Bericht erstellt '+fDate(todayIso())+'</div></section></div>';
+  return h;
+}
+</script>
+
+<!-- ============ KUNDENBERICHT: CSS und JS (wird nur in die exportierte Datei kopiert) ============ -->
+<script type="text/plain" id="kcss">
+[hidden]{display:none!important}
+:root{--bg:#eef2f6;--card:#fff;--ink:#0f2233;--mut:#56687a;--line:#cdd6e0;--brand:#0B6E77;--rot:#B3122C;--gelb:#F2C230;--gruen:#2C7A52;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.app{max-width:1000px;margin:0 auto;padding:16px 16px 60px;display:flex;flex-direction:column;gap:14px}
+.hd{background:var(--brand);color:#fff;border-radius:12px;padding:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.hd img{max-height:52px;max-width:180px;background:#fff;border-radius:6px;padding:4px}
+.hd h1{margin:0;font-size:22px}.hd p{margin:2px 0 0;opacity:.85;font-size:14px}
+.hd .t{flex:1;min-width:200px}
+.hd .act{display:flex;gap:8px;flex-wrap:wrap}
+.b{min-height:44px;border-radius:8px;border:1.5px solid var(--brand);background:#fff;color:var(--brand);font:inherit;font-weight:700;padding:8px 14px;cursor:pointer}
+.b.w{border-color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.kpi{border:2px solid transparent;border-radius:10px;padding:10px;background:var(--card);cursor:pointer;text-align:left;font:inherit;color:inherit}
+.kpi b{display:block;font-size:28px;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi span{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.kpi.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand) inset}
+.kpi.rot b{color:var(--rot)}.kpi.gelb b{color:#a37300}.kpi.gruen b{color:var(--gruen)}
+.flt{background:var(--card);border-radius:10px;padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.flt input,.flt select{min-height:44px;border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;background:#fff;width:100%}
+.flt .q{grid-column:1/-1}
+.cnt{font-size:14px;color:var(--mut)}
+.list{display:flex;flex-direction:column;gap:10px}
+.m{background:var(--card);border-radius:10px;border:1px solid var(--line);border-left:8px solid var(--line);padding:12px;display:grid;grid-template-columns:1fr;gap:8px}
+.m.rot{border-left-color:var(--rot)}.m.gelb{border-left-color:var(--gelb)}.m.gruen{border-left-color:var(--gruen)}
+.mh{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mh b{font-size:18px}
+.bd{font-size:12px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:5px;color:#fff}
+.bd.rot{background:var(--rot)}.bd.gelb{background:var(--gelb);color:#1d1600}.bd.gruen{background:var(--gruen)}
+.st{font-size:12px;font-weight:800;padding:3px 8px;border-radius:5px;background:#dfe6ee;color:var(--mut);margin-left:auto}
+.st.arbeit{background:#fff4d1;color:#6b4d00}.st.behoben{background:#e3f3e4;color:var(--gruen)}
+.dl{display:grid;grid-template-columns:120px 1fr;gap:2px 10px;font-size:15px}
+.dl dt{color:var(--mut)}.dl dd{margin:0;min-width:0}
+.ph{display:flex;gap:6px;flex-wrap:wrap}
+.ph img{width:110px;height:110px;object-fit:cover;border-radius:6px;cursor:zoom-in;border:1px solid var(--line)}
+.ed{border-top:1px dashed var(--line);padding-top:8px;display:grid;grid-template-columns:auto 160px;gap:8px;align-items:center}
+.seg{display:flex;border:1.5px solid var(--brand);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:#fff;color:var(--brand);font:inherit;font-weight:700;min-height:42px;padding:0 10px;cursor:pointer;flex:1}
+.seg button.on{background:var(--brand);color:#fff}
+.ed input,.ed textarea{border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;min-height:42px;width:100%;background:#fff}
+.ed textarea{grid-column:1/-1;min-height:60px;resize:vertical}
+details.info{background:var(--card);border-radius:10px;padding:10px 14px}
+details.info summary{cursor:pointer;font-weight:700}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;padding:12px;z-index:9}
+#lb img{max-width:100%;max-height:100%;object-fit:contain}
+#print{display:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #1b6aa5;outline-offset:1px}
+@media (max-width:560px){.ed{grid-template-columns:1fr}.dl{grid-template-columns:96px 1fr}}
+.edp{background:var(--card);border:2px solid var(--brand);border-radius:10px;padding:14px}
+.edp h2{margin:0 0 4px;font-size:18px}.edp .hint{margin:0 0 10px;color:var(--mut);font-size:14px}
+.edp .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.edp label{display:flex;flex-direction:column;gap:3px;font-size:13px;font-weight:700;color:var(--mut)}
+.edp .w{grid-column:1/-1}
+.edp input,.edp select,.edp textarea,.dl select,.dl textarea{border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;font-weight:400;color:var(--ink);min-height:42px;width:100%;background:#fff}
+.edp textarea,.dl textarea{min-height:70px;resize:vertical}
+@media print{.app,#lb{display:none!important}#print{display:block}body{background:#fff}}
+</script>
+<script type="text/plain" id="kjs">
+var D=JSON.parse(document.getElementById("data").textContent);
+var I=D.insp,P=D.photos||{},LOGO=D.logo||"";
+var KEY="regalinspektion_rueckmeldung_"+I.id,EKEY="regalinspektion_bearbeitung_"+I.id;
+var ST={};try{ST=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){ST={}}
+try{var ED=JSON.parse(localStorage.getItem(EKEY));if(ED&&ED.insp&&ED.insp.id===I.id&&(ED.insp.editStamp||0)>(I.editStamp||0)){I=ED.insp;if(ED.logo)LOGO=ED.logo}}catch(e){}
+function saveST(){try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}}
+function saveED(){I.editStamp=Date.now();try{localStorage.setItem(EKEY,JSON.stringify({insp:I,logo:LOGO}))}catch(e){}}
+var L,NR;function recalc(){L=sortedMaengel(I);NR=nummern(I)}recalc();
+var EDIT=false;
+var F={q:"",stufe:"",zeile:"",bauteil:"",art:"",status:"",sort:"stufe"};
+function kst(m){return (ST[m.id]&&ST[m.id].status)||"offen"}
+function $(s){return document.querySelector(s)}
+function opts(arr,sel,all){return (all!=null?'<option value="">'+all+'</option>':'')+arr.map(function(v){var val=typeof v==="object"?v.v:v,lab=typeof v==="object"?v.l:v;return '<option value="'+esc(val)+'"'+(sel===val?" selected":"")+'>'+esc(lab)+'</option>'}).join("")}
+function uniq(a){return a.filter(function(v,i){return v&&a.indexOf(v)===i})}
+function init(){
+  $(".app").innerHTML='<div class="hd" id="hd"></div><div class="edp" id="edp" hidden></div><div class="kpis" id="kpis"></div><details class="info" id="info"></details>'
+  +'<div class="flt"><input class="q" id="fq" type="search" placeholder="Suchen: Nummer, Position, Bauteil, Beschreibung …">'
+  +'<select id="fstufe">'+opts([{v:"rot",l:"Rot"},{v:"gelb",l:"Gelb"},{v:"gruen",l:"Grün"}],"","Alle Stufen")+'</select>'
+  +'<select id="fzeile">'+opts(I.zeilen.map(function(z){return {v:z.id,l:rName(z)}}),"","Alle Regale")+'</select>'
+  +'<select id="fbauteil">'+opts(uniq(L.map(function(m){return m.bauteil})),"","Alle Bauteile")+'</select>'
+  +'<select id="fart">'+opts(uniq(L.map(function(m){return m.art})),"","Alle Schadensarten")+'</select>'
+  +'<select id="fstatus">'+opts([{v:"offen",l:"offen"},{v:"arbeit",l:"in Arbeit"},{v:"behoben",l:"behoben"}],"","Alle Status")+'</select>'
+  +'<select id="fsort"><option value="stufe">Sortierung: Stufe</option><option value="nr">Sortierung: Nummer</option><option value="zeile">Sortierung: Regal</option><option value="frist">Sortierung: Frist</option></select></div>'
+  +'<div class="cnt" id="cnt"></div><div class="list" id="list"></div>';
+  ["stufe","zeile","bauteil","art","status","sort"].forEach(function(k){$("#f"+k).addEventListener("change",function(e){F[k]=e.target.value;render()})});
+  $("#fq").addEventListener("input",function(e){F.q=e.target.value.toLowerCase();render()});
+  $("#hd").addEventListener("click",onHead);
+  $("#edp").addEventListener("input",onPanel);$("#edp").addEventListener("change",onPanel);
+  $("#lb").addEventListener("click",function(){this.hidden=true});
+  $("#list").addEventListener("click",onList);
+  $("#list").addEventListener("change",onEdit);
+  $("#list").addEventListener("input",onEdit);
+  $("#kpis").addEventListener("click",function(e){var b=e.target.closest(".kpi");if(!b)return;var k=b.dataset.k,v=b.dataset.v;
+    if(k==="all"){F.stufe="";F.status=""}else{F[k]=F[k]===v?"":v}
+    $("#fstufe").value=F.stufe;$("#fstatus").value=F.status;render()});
+  head();info();render();
+}
+function head(){
+  $("#hd").innerHTML=(LOGO?'<img src="'+LOGO+'" alt="Logo">':'')+'<div class="t"><h1>Regalinspektion '+esc(I.kunde||"")+'</h1><p>'+esc(I.standort||"")+(I.standort?' · ':'')+fDate(I.datum)+' · Prüfer '+esc(I.pruefer)+' · DIN EN 15635</p></div><div class="act">'
+  +(EDIT?'<button class="b w" data-h="savehtml">Als HTML-Datei speichern</button><button class="b w" data-h="edit">Bearbeiten beenden</button>':'<button class="b w" data-h="edit">Bearbeiten</button><button class="b w" data-h="exp">Rückmeldung exportieren</button>')
+  +'<button class="b w" data-h="print">Drucken / PDF</button></div>';
+}
+function headText(){var t=document.querySelector("#hd .t");if(t)t.innerHTML='<h1>Regalinspektion '+esc(I.kunde||"")+'</h1><p>'+esc(I.standort||"")+(I.standort?' · ':'')+fDate(I.datum)+' · Prüfer '+esc(I.pruefer)+' · DIN EN 15635</p>'}
+function info(){
+  $("#info").innerHTML='<summary>Ampelsystem und Hinweise</summary><p><b style="color:var(--rot)">Rot:</b> '+esc(STUFEN.rot.t)+'<br><b style="color:#a37300">Gelb:</b> '+esc(STUFEN.gelb.t)+'<br><b style="color:var(--gruen)">Grün:</b> '+esc(STUFEN.gruen.t)+'</p><p>Sie können pro Mangel den Status, ein Erledigungsdatum und eine Notiz eintragen. Die Angaben bleiben in diesem Browser gespeichert. Mit «Rückmeldung exportieren» erhalten Sie eine Datei, die Sie an '+esc((I.firma&&I.firma.email)||"den Prüfer")+' zurücksenden.</p>'+(I.gesamt?'<p><b>Gesamtbeurteilung:</b> '+nl(I.gesamt)+'</p>':'')+'<p>Nächste Inspektion: <b>'+fDate(I.naechste||addMonths(I.datum,12))+'</b></p>';
+}
+function panel(){
+  function t(k,l,type){return '<label>'+l+'<input type="'+(type||"text")+'" data-p="'+k+'" value="'+esc(I[k]||"")+'"></label>'}
+  $("#edp").innerHTML='<h2>Berichtsdaten bearbeiten</h2><p class="hint">Änderungen werden in diesem Browser automatisch gespeichert. Für den Versand: «Als HTML-Datei speichern» oder «Drucken / PDF».</p><div class="g">'
+  +t("kunde","Kunde")+t("standort","Standort / Halle")+t("datum","Datum Inspektion","date")+t("pruefer","Prüfer")
+  +'<label>Regaltyp<select data-p="regaltyp">'+opts(REGALTYPEN,I.regaltyp,"–")+'</select></label>'+t("hersteller","Hersteller")
+  +'<label>Belastungsschild<select data-p="schild">'+opts([{v:"ja",l:"vorhanden"},{v:"nein",l:"nicht vorhanden"}],I.schild,"nicht erfasst")+'</select></label>'
+  +t("kundeName","Name Kunde (Unterschrift)")+t("naechste","Nächste Inspektion","date")
+  +'<label class="w">Bemerkung<textarea data-p="bemerkung">'+esc(I.bemerkung||"")+'</textarea></label>'
+  +'<label class="w">Gesamtbeurteilung<textarea data-p="gesamt">'+esc(I.gesamt||"")+'</textarea></label>'
+  +'<label>Logo für Bericht<input type="file" accept="image/*" data-logo="1"></label>'
+  +'</div>';
+}
+function onPanel(e){
+  if(e.target.dataset.logo&&e.type==="change"){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);LOGO=c.toDataURL("image/jpeg",.9);saveED();head()};im.src=r.result};r.readAsDataURL(f);return}
+  var k=e.target.dataset.p;if(!k)return;I[k]=e.target.value;saveED();
+  if(e.type==="change"||k==="kunde"||k==="standort"||k==="pruefer"){headText();info()}
+}
+function onHead(e){
+  var b=e.target.closest("[data-h]");if(!b)return;var a=b.dataset.h;
+  if(a==="edit"){EDIT=!EDIT;if(EDIT)panel();$("#edp").hidden=!EDIT;head();render();return}
+  if(a==="exp")exportST();
+  if(a==="savehtml")saveHtml();
+  if(a==="print"){$("#print").innerHTML=buildReport(I,P,LOGO,{status:EDIT?null:ST});setTimeout(function(){window.print()},50)}
+}
+function kpis(){
+  var c=countStufen(L),s={offen:0,arbeit:0,behoben:0};L.forEach(function(m){s[kst(m)]++});
+  function k(key,v,n,l,cls){var on=key==="all"?(!F.stufe&&!F.status):F[key]===v;return '<button class="kpi '+(cls||"")+(on?" on":"")+'" data-k="'+key+'" data-v="'+v+'"><b>'+n+'</b><span>'+l+'</span></button>'}
+  $("#kpis").innerHTML=k("all","",L.length,"Alle Mängel")+k("stufe","rot",c.rot,"Rot","rot")+k("stufe","gelb",c.gelb,"Gelb","gelb")+k("stufe","gruen",c.gruen,"Grün","gruen")+k("status","offen",s.offen,"Offen")+k("status","arbeit",s.arbeit,"In Arbeit")+k("status","behoben",s.behoben,"Behoben");
+}
+function render(){
+  kpis();
+  var zi={};I.zeilen.forEach(function(z,i){zi[z.id]=i});
+  var r=L.filter(function(m){
+    if(F.stufe&&m.stufe!==F.stufe)return false;if(F.zeile&&m.zeileId!==F.zeile)return false;
+    if(F.bauteil&&m.bauteil!==F.bauteil)return false;if(F.art&&m.art!==F.art)return false;
+    if(F.status&&kst(m)!==F.status)return false;
+    if(F.q){var t=(NR[m.id]+" "+posText(m,I)+" "+m.bauteil+" "+m.art+" "+(m.beschreibung||"")+" "+(m.massnahme||"")+" "+((ST[m.id]&&ST[m.id].notiz)||"")).toLowerCase();if(t.indexOf(F.q)<0)return false}
+    return true});
+  if(F.sort==="nr")r.sort(function(a,b){return (a.nr||0)-(b.nr||0)});
+  if(F.sort==="zeile")r.sort(function(a,b){return (zi[a.zeileId]-zi[b.zeileId])||((+a.feld||0)-(+b.feld||0))||(ORDER[a.stufe]-ORDER[b.stufe])});
+  if(F.sort==="frist")r.sort(function(a,b){return fristIso(a,I).localeCompare(fristIso(b,I))||(ORDER[a.stufe]-ORDER[b.stufe])});
+  $("#cnt").textContent=r.length+" von "+L.length+" Mängeln";
+  $("#list").innerHTML=r.map(card).join("")||'<p>Keine Mängel für diese Auswahl.</p>';
+}
+function card(m){
+  var s=ST[m.id]||{},k=kst(m);
+  var h='<article class="m '+m.stufe+'" data-id="'+m.id+'"><div class="mh"><b>'+NR[m.id]+'</b><span class="bd '+m.stufe+'">'+STUFEN[m.stufe].l+'</span><span>'+esc(posText(m,I))+'</span>'+(EDIT?'':'<span class="st '+k+'">'+KSTATUS[k]+'</span>')+'</div>';
+  if(EDIT){
+    h+='<div class="dl"><dt>Stufe</dt><dd><select data-e="stufe">'+opts([{v:"rot",l:"Rot"},{v:"gelb",l:"Gelb"},{v:"gruen",l:"Grün"}],m.stufe)+'</select></dd>'
+     +'<dt>Bauteil</dt><dd><select data-e="bauteil">'+opts(BAUTEILE,m.bauteil)+'</select></dd><dt>Schadensart</dt><dd><select data-e="art">'+opts(ARTEN,m.art)+'</select></dd>'
+     +'<dt>Beschreibung</dt><dd><textarea data-e="beschreibung">'+esc(m.beschreibung||"")+'</textarea></dd><dt>Massnahme</dt><dd><textarea data-e="massnahme">'+esc(m.massnahme||"")+'</textarea></dd><dt>Frist</dt><dd><b>'+esc(fristText(m,I))+'</b></dd></div>';
+  }else{
+    h+='<dl class="dl"><dt>Bauteil</dt><dd>'+esc(m.bauteil||"–")+'</dd><dt>Schadensart</dt><dd>'+esc(m.art||"–")+'</dd>'+(m.beschreibung?'<dt>Beschreibung</dt><dd>'+nl(m.beschreibung)+'</dd>':'')+'<dt>Massnahme</dt><dd>'+nl(m.massnahme||"–")+'</dd><dt>Frist</dt><dd><b>'+esc(fristText(m,I))+'</b></dd></dl>';
+  }
+  h+='<div class="ph">'+(m.fotos||[]).filter(function(id){return P[id]}).map(function(id){return '<img src="'+P[id]+'" alt="Foto" data-lb="'+id+'">'}).join("")+'</div>';
+  if(!EDIT)h+='<div class="ed"><div class="seg">'+["offen","arbeit","behoben"].map(function(v){return '<button data-st="'+v+'" class="'+(k===v?"on":"")+'">'+KSTATUS[v]+'</button>'}).join("")+'</div><input type="date" data-f="datum" value="'+esc(s.datum||"")+'" aria-label="Erledigt am"><textarea data-f="notiz" placeholder="Notiz (z. B. Auftrag erteilt an …)">'+esc(s.notiz||"")+'</textarea></div>';
+  return h+'</article>';
+}
+function mById(id){return I.maengel.filter(function(m){return m.id===id})[0]}
+function onList(e){
+  var im=e.target.closest("[data-lb]");if(im){$("#lb img").src=P[im.dataset.lb];$("#lb").hidden=false;return}
+  var b=e.target.closest("[data-st]");if(!b)return;
+  var id=b.closest(".m").dataset.id;ST[id]=ST[id]||{};ST[id].status=b.dataset.st;
+  if(b.dataset.st==="behoben"&&!ST[id].datum){ST[id].datum=todayIso()}
+  ST[id].geaendert=new Date().toISOString();saveST();
+  b.closest(".m").outerHTML=card(mById(id));kpis();
+}
+function onEdit(e){
+  var el=e.target,id=el.closest(".m")&&el.closest(".m").dataset.id;if(!id)return;
+  if(el.dataset.e){var m=mById(id);m[el.dataset.e]=el.value;if(el.dataset.e==="bauteil"){var bb=btByLabel(el.value);m.bk=bb?bb.k:m.bk}saveED();if(e.type==="change"&&el.tagName==="SELECT"){recalc();render()}return}
+  var f=el.dataset.f;if(!f)return;
+  ST[id]=ST[id]||{};ST[id][f]=el.value;ST[id].geaendert=new Date().toISOString();saveST();
+}
+function dl(text,name,mime){
+  var blob=new Blob([text],{type:mime}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},2000);
+}
+function fname(s){return String(s||"").trim().replace(/[^\wäöüÄÖÜ-]+/g,"_")||"Kunde"}
+function exportST(){
+  var out={format:"regalinspektion-rueckmeldung-v1",inspId:I.id,kunde:I.kunde,standort:I.standort,datum:I.datum,exportiert:new Date().toISOString(),status:{}};
+  L.forEach(function(m){if(ST[m.id])out.status[m.id]=Object.assign({nr:NR[m.id]},ST[m.id])});
+  dl(JSON.stringify(out,null,1),"Rueckmeldung_"+fname(I.kunde)+"_"+todayIso()+".json","application/json");
+}
+function saveHtml(){
+  var data=JSON.stringify({insp:I,photos:P,logo:LOGO}).replace(/</g,"\\u003c");
+  var html='<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>Regalinspektion '+esc(I.kunde||"")+' '+fDate(I.datum)+'</title><style id="kst">'+document.getElementById("kst").textContent+'</style></head><body>'
+    +'<div class="app"></div><div id="print"></div><div id="lb" hidden><img alt="Foto gross"></div>'
+    +'<script type="application/json" id="data">'+data+'<\/script>'
+    +'<script id="shared">'+document.getElementById("shared").textContent+'<\/script><script id="kjs">'+document.getElementById("kjs").textContent+'<\/script></body></html>';
+  dl(html,"Regalinspektion_"+fname(I.kunde)+"_"+I.datum+".html","text/html");
+}
+init();
+</script>
+
+<!-- ============ APP ============ -->
+<script>
+"use strict";
+var DEF_FIRMA={name:"DETEC Facility Services",pruefer:"Dominik Lüthi",email:"dominik.luethi@detec-fs.ch"};
+var I=null, SET={firma:Object.assign({},DEF_FIRMA),logo:""}, LAST={}, PH=new Map(), V={v:"home"};
+var $=function(s){return document.querySelector(s)};
+var main=$("#main");
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function slug(s){return String(s||"").trim().replace(/[^\wäöüÄÖÜ-]+/g,"_").replace(/^_+|_+$/g,"")||"ohne_Name"}
+
+/* ---------- IndexedDB ---------- */
+var dbp=null;
+function db(){
+  if(!dbp)dbp=new Promise(function(res,rej){
+    var r=indexedDB.open("regalinspektion",1);
+    r.onupgradeneeded=function(){var d=r.result;d.createObjectStore("insp",{keyPath:"id"});d.createObjectStore("photos",{keyPath:"id"});d.createObjectStore("meta",{keyPath:"k"})};
+    r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)};
+  });
+  return dbp;
+}
+function tx(store,mode,fn){
+  return db().then(function(d){return new Promise(function(res,rej){
+    var t=d.transaction(store,mode),s=t.objectStore(store),out,r=fn(s);
+    if(r)r.onsuccess=function(){out=r.result};
+    t.oncomplete=function(){res(out)};t.onerror=function(){rej(t.error)};t.onabort=function(){rej(t.error||new Error("Speichern abgebrochen"))};
+  })});
+}
+function dput(st,v){return tx(st,"readwrite",function(s){return s.put(v)})}
+function dget(st,k){return tx(st,"readonly",function(s){return s.get(k)})}
+function dall(st){return tx(st,"readonly",function(s){return s.getAll()})}
+function ddel(st,k){return tx(st,"readwrite",function(s){return s.delete(k)})}
+
+/* ---------- Speichern ----------
+   Jede Änderung wird sofort in IndexedDB geschrieben (seriell, keine Überholungen)
+   und zusätzlich als Textkopie (ohne Fotos) in localStorage gespiegelt. */
+var writing=false,dirty=false,saveErr=null,waiters=[];
+function mirror(){try{localStorage.setItem("ri_spiegel_"+I.id,JSON.stringify(I))}catch(e){}}
+function setSaved(t){var e=$("#saved");if(!e)return;var st=/NICHT/.test(t)?"crit":t==="…"?"laeuft":"ok";e.className="synckn "+st;$("#savedT").textContent=st==="crit"?"Nicht gespeichert":st==="laeuft"?"Speichert …":"Gespeichert"}
+function save(){ if(!I)return; I.updated=Date.now(); mirror(); dirty=true; setSaved("…"); pump(); }
+function pump(){
+  if(writing||!dirty||!I)return;
+  writing=true;dirty=false;var copy=JSON.parse(JSON.stringify(I));
+  dput("insp",copy).then(function(){
+    writing=false;if(saveErr){saveErr=null;errBanner("")}
+    if(dirty){pump();return}
+    setSaved("gespeichert ✓");var w=waiters;waiters=[];w.forEach(function(f){f()});
+  }).catch(function(e){
+    writing=false;dirty=true;saveErr=e;setSaved("NICHT gespeichert");
+    errBanner("Speichern auf dem Gerät fehlgeschlagen ("+(e&&e.name||e)+"). Die Texte sind als Kopie gesichert, neue Fotos evtl. nicht. Sofort «Sicherung jetzt» machen.");
+    setTimeout(pump,2000);
+    var w=waiters;waiters=[];w.forEach(function(f){f()});
+  });
+}
+function flushSave(){ if(!writing&&!dirty)return Promise.resolve(); return new Promise(function(res){waiters.push(res);pump()}); }
+function saveMeta(k,v){return dput("meta",{k:k,v:v}).catch(function(){})}
+function errBanner(t){var b=$("#err");b.textContent=t;b.hidden=!t}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden"){pump()}else{wake()}});
+addEventListener("pagehide",function(){pump()});
+var wl=null;function wake(){try{if(navigator.wakeLock&&!wl)navigator.wakeLock.request("screen").then(function(x){wl=x;x.addEventListener("release",function(){wl=null})}).catch(function(){})}catch(e){}}
+
+/* ---------- Fotos ---------- */
+function getPhoto(id){ if(PH.has(id))return Promise.resolve(PH.get(id)); return dget("photos",id).then(function(p){var d=p?p.data:"";PH.set(id,d);return d}); }
+function loadPhotos(ids){return Promise.all(ids.map(getPhoto)).then(function(){var o={};ids.forEach(function(id){if(PH.get(id))o[id]=PH.get(id)});return o})}
+function allPhotoIds(X){var a=[];X.maengel.forEach(function(m){(m.fotos||[]).forEach(function(id){a.push(id)})});return a}
+function resizeImg(file,max,q){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){
+      var w=img.naturalWidth,h=img.naturalHeight,s=Math.min(1,max/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);
+      var c=document.createElement("canvas");c.width=w;c.height=h;var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);res(c.toDataURL("image/jpeg",q));
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);rej(new Error("Bild konnte nicht gelesen werden"))};
+    img.src=url;
+  });
+}
+
+/* ---------- UI Helfer ---------- */
+var toastT;
+function toast(t,ms){var e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){e.hidden=true},ms||2200)}
+function lightbox(src){var l=$("#lb");l.querySelector("img").src=src;l.hidden=false}
+$("#lb").addEventListener("click",function(){this.hidden=true});
+function chips(field,list,val,act){return '<div class="chips">'+list.map(function(v){return '<button type="button" class="chip'+(val===v?" on":"")+'" data-act="'+act+'" data-f="'+field+'" data-v="'+esc(v)+'">'+esc(v)+'</button>'}).join("")+'</div>'}
+function mcount(zid){return countStufen(I.maengel.filter(function(m){return m.stufe&&(zid==null||m.zeileId===zid)}))}
+function dots(c){return (c.rot?'<span class="dot rot">'+c.rot+'</span>':'')+(c.gelb?'<span class="dot gelb">'+c.gelb+'</span>':'')+(c.gruen?'<span class="dot gruen">'+c.gruen+'</span>':'')}
+var TABVIEWS={insp:1,anlage:1,alle:1,mehr:1,zeile:1};
+var ICON={
+ insp:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 10h18M3 15h18M9 4v16"/></svg>',
+ alle:'<svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1.2"/><circle cx="4" cy="12" r="1.2"/><circle cx="4" cy="18" r="1.2"/></svg>',
+ plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+ anlage:'<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="1"/><path d="M9 4V3h6v1M8.5 10l1.5 1.5 3-3M8.5 16l1.5 1.5 3-3"/></svg>',
+ mehr:'<svg viewBox="0 0 24 24"><path d="M4 20h16M6 16l4-4 3 3 5-6"/><path d="M14 4h6v6"/></svg>'
+};
+function renderTabs(){
+  var t=$("#tabs"),show=!!(I&&TABVIEWS[V.v]);t.hidden=!show;if(!show)return;
+  var cur=V.v==="zeile"?"insp":V.v;
+  function b(v,l){return '<button data-tab="'+v+'"'+(cur===v?' aria-current="true"':'')+'>'+ICON[v]+'<span>'+l+'</span></button>'}
+  t.innerHTML=b("insp","Übersicht")+b("alle","Mängel")+'<button class="plus" data-tab="plus" aria-label="Neuer Mangel">'+ICON.plus+'<span>Mangel</span></button>'+b("anlage","Anlage")+b("mehr","Abschluss");
+}
+$("#tabs").addEventListener("click",function(e){var b=e.target.closest("[data-tab]");if(!b||!I)return;var v=b.dataset.tab;
+  if(v==="plus"){newMangel(V.v==="zeile"?V.zid:(V.v==="anlage"?"":null));return}
+  if(v===V.v)return;go(v,{id:I.id},TABVIEWS[V.v]&&V.v!=="zeile")});
+function ctxLine(){var n=I.maengel.filter(function(m){return m.stufe}).length;return [I.kunde||I.standort||"Inspektion",fDate(I.datum),n+" Mängel","nächster Regal-Kleber "+kNr(nextPlak())].join(" · ")}
+function logoMark(){var m=$("#mark");if(SET.logo){m.className="mark haslogo";m.innerHTML='<img src="'+SET.logo+'" alt="Logo">'}else{m.className="mark";m.textContent="DT"}}
+function setHeader(t,back){$("#ttl").textContent=t;$("#back").hidden=!back;$("#saved").hidden=!I;$("#ctx").textContent=I?ctxLine():"DIN EN 15635 · "+(SET.firma.name||"");renderTabs();logoMark();document.body.classList.toggle("gross",SET.gross!==false)}
+
+/* ---------- Navigation ---------- */
+function go(v,p,replace){ leaving(); V=Object.assign({v:v},p||{}); history[replace?"replaceState":"pushState"](V,""); render(); window.scrollTo(0,0); }
+addEventListener("popstate",function(e){ leaving(); V=e.state||{v:"home"}; render(); });
+$("#back").addEventListener("click",function(){history.back()});
+function leaving(){
+  if(V.v==="mangel"&&I){ var m=findM(V.mid); if(isBlank(m)){ I.maengel=I.maengel.filter(function(x){return x!==m}); save(); } }
+  pump();
+}
+function findM(id){if(!I)return null;for(var i=0;i<I.maengel.length;i++)if(I.maengel[i].id===id)return I.maengel[i];return null}
+
+function render(){
+  var need=V.id&&(!I||I.id!==V.id);
+  (need?dget("insp",V.id).then(function(x){I=pickNewest(x,V.id);PH=new Map();if(I&&(!x||x.updated<I.updated)){save();toast("✓ Letzte Eingaben wiederhergestellt",2500)}}):Promise.resolve()).then(function(){
+    if(V.id&&!I){V={v:"home"};history.replaceState(V,"")}
+    $("#rptview").hidden=true;$("#hdr").hidden=false;main.hidden=false;
+    var f=VIEWS[V.v]||VIEWS.home; f();
+  }).catch(function(e){main.innerHTML='<div class="card"><b>Fehler beim Laden:</b> '+esc(e.message||e)+'</div>'});
+}
+var VIEWS={};
+function readMirror(id){try{var t=localStorage.getItem("ri_spiegel_"+id);return t?JSON.parse(t):null}catch(e){return null}}
+function pickNewest(x,id){var m=readMirror(id);if(m&&(!x||(m.updated||0)>(x.updated||0)))return m;return x||null}
+
+/* ---------- Startseite ---------- */
+VIEWS.home=function(){
+  I=null;setHeader("Regalinspektion",false);
+  dall("insp").then(function(list){
+    var ids=list.map(function(x){return x.id});
+    try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf("ri_spiegel_")===0&&ids.indexOf(k.slice(11))<0){var mm=readMirror(k.slice(11));if(mm)list.push(mm)}}}catch(e){}
+    list.sort(function(a,b){return (b.updated||0)-(a.updated||0)});
+    var h='';
+    if(/^(file|content):/.test(location.protocol))h+='<div class="warnbox"><b>Achtung:</b> Die App ist als Datei geöffnet. Auf manchen Handys wird so nicht zuverlässig gespeichert. Bitte über den Link öffnen.</div>';
+    h+='<button class="gross-aktion" data-act="newInsp"><svg viewBox="0 0 24 24"><path d="M4 21V5l8-3 8 3v16"/><path d="M4 11h16M4 16h16M9 21v-5M15 21v-5"/></svg><div><b>Neue Inspektion</b><small>Regalzeilen anlegen und losgehen</small></div></button>';
+    h+='<div class="card flush"><div style="padding:12px 13px 6px"><h2>Gespeicherte Inspektionen</h2></div><div class="list">';
+    if(!list.length)h+='<p class="hint" style="padding:0 13px 13px">Noch keine Inspektion. Tipp: Zuerst im Büro eine Probe mit 2–3 Mängeln und Fotos machen und den Bericht erzeugen.</p>';
+    list.forEach(function(x){var c=countStufen(x.maengel.filter(function(m){return m.stufe}));
+      h+='<button class="item" data-act="open" data-id="'+x.id+'"><div class="t"><b>'+esc(x.kunde||x.standort||("Inspektion "+fDate(x.datum)))+'</b><span>'+fDate(x.datum)+' · '+x.zeilen.length+' Regale · '+x.maengel.filter(function(m){return m.stufe}).length+' Mängel</span></div><div class="dots">'+dots(c)+'</div></button>'});
+    h+='</div></div>';
+    h+='<div class="card"><h2>Daten</h2><div class="row"><button class="btn" data-act="importJson">Sicherung importieren</button><button class="btn" data-act="settings">Einstellungen / Logo</button></div><p class="hint" id="stor"></p></div>';
+    main.innerHTML=h;
+    var st=[];
+    Promise.all([
+      navigator.storage&&navigator.storage.estimate?navigator.storage.estimate().catch(function(){return null}):null,
+      navigator.storage&&navigator.storage.persisted?navigator.storage.persisted().catch(function(){return null}):null
+    ]).then(function(r){var el=$("#stor");if(!el)return;
+      if(r[0])st.push((r[0].usage/1048576).toFixed(1)+" MB belegt, "+Math.round((r[0].quota-r[0].usage)/1048576)+" MB frei");
+      if(r[1]!=null)st.push(r[1]?"Speicher vom Browser geschützt ✓":"Speicher nicht geschützt – Sicherungsdatei machen");
+      el.textContent=st.join(" · ");});
+  });
+};
+
+/* ---------- Einstellungen ---------- */
+VIEWS.settings=function(){
+  setHeader("Einstellungen",true);
+  var F=SET.firma;
+  main.innerHTML='<div class="card"><h2>Firma und Prüfer (Standardwerte)</h2>'
+  +'<label class="f">Firma<input type="text" id="s_name" value="'+esc(F.name)+'"></label>'
+  +'<label class="f">Prüfer<input type="text" id="s_pruefer" value="'+esc(F.pruefer)+'"></label>'
+  +'<label class="f">E-Mail<input type="email" id="s_email" value="'+esc(F.email)+'"></label></div>'
+  +'<div class="card"><h2>Bedienung</h2><div class="chips"><button class="chip'+(SET.gross!==false?" on":"")+'" data-act="gross" data-v="1">Handschuhmodus (grosse Knöpfe)</button><button class="chip'+(SET.gross===false?" on":"")+'" data-act="gross" data-v="0">Normal</button></div></div>'
+  +'<div class="card"><h2>Logo für Berichte</h2>'+(SET.logo?'<img src="'+SET.logo+'" alt="Logo" style="max-height:80px;max-width:100%;object-fit:contain;align-self:flex-start">':'<p class="hint">Noch kein Logo. Ohne Logo steht der Firmenname im Bericht.</p>')
+  +'<div class="row"><button class="btn" data-act="pickLogo">Logo wählen</button>'+(SET.logo?'<button class="btn warn" data-act="delLogo">Logo entfernen</button>':'')+'</div></div>'
+  +'<div class="card"><h2>Hinweis</h2><p class="hint">Alle Daten bleiben auf diesem Gerät im Browser. Nach jeder Inspektion eine JSON-Sicherung exportieren – Browserdaten können beim Aufräumen des Handys gelöscht werden.</p></div>';
+  ["name","pruefer","email"].forEach(function(k){$("#s_"+k).addEventListener("input",function(e){SET.firma[k]=e.target.value;saveMeta("settings",SET)})});
+};
+
+/* ---------- Stammdaten ---------- */
+var HERSTELLER=["SSI Schäfer","Jungheinrich","Stow","Mecalux","Dexion","Kasten","BITO","META","Nedcon","AR Racking","Polypal","OHRA","Schulte","unbekannt","anderer"];
+function numOpts(from,to,val,empty){var h='<option value="">'+(empty||"–")+'</option>';for(var i=from;i<=to;i++)h+='<option'+(String(val)===String(i)?' selected':'')+'>'+i+'</option>';return h}
+function listOpts(list,val,empty){return (empty!=null?'<option value="">'+esc(empty)+'</option>':'')+list.map(function(v){var k=Array.isArray(v)?v[0]:v,l=Array.isArray(v)?v[1]:v;return '<option value="'+esc(k)+'"'+(String(val)===String(k)?' selected':'')+'>'+esc(l)+'</option>'}).join("")}
+function lbl(t){return '<div class="lb">'+t+'</div>'}
+VIEWS.stamm=function(){
+  setHeader(V.neu?"Neue Inspektion":"Stammdaten",true);
+  var h=(V.neu?'<p class="hint">Alles optional ausser Regaltyp. Kunde und Standort kannst du auch später am PC in der Bericht-Datei ergänzen.</p>':'');
+  h+='<div class="card"><h2>Regalanlage</h2>'
+  +'<label class="f">Regaltyp (Standard für neue Regale)<select data-b="typ">'+listOpts(TYPEN,typKey(I.typ))+'</select></label>'
+  +'<label class="f">Hersteller<select data-b="hersteller">'+listOpts(HERSTELLER,I.hersteller,"– wählen –")+'</select></label>'
+  +'<label class="f">Erste Kleber-Nr. (Regal-Nummer)<input type="number" inputmode="numeric" min="1" data-b="plakStart" value="'+esc(I.plakStart||1)+'"></label>'
+  +'<p class="hint">Jedes Regal bekommt die nächste Nummer – auch ohne Mangel. Die Nummer auf dem Kleber am Regal ist die Regal-Nummer im Bericht.</p></div>';
+  h+='<div class="card"><h2>Kunde und Ort (optional)</h2>'
+  +'<label class="f">Kunde<input type="text" data-b="kunde" value="'+esc(I.kunde)+'" autocomplete="organization"></label>'
+  +'<label class="f">Standort / Halle<input type="text" data-b="standort" value="'+esc(I.standort)+'"></label>'
+  +'<div class="two"><label class="f">Datum<input type="date" data-b="datum" value="'+esc(I.datum)+'"></label><label class="f">Prüfer<input type="text" data-b="pruefer" value="'+esc(I.pruefer)+'"></label></div>'
+  +'<label class="f">Bemerkung<textarea data-b="bemerkung" rows="2">'+esc(I.bemerkung)+'</textarea></label></div>';
+  h+='<button class="btn pri big" data-act="'+(V.neu?"stammWeiter":"back")+'">'+(V.neu?"Weiter zur Inspektion":"Fertig")+'</button>';
+  main.innerHTML=h;
+};
+main.addEventListener("input",function(e){
+  var el=e.target,k=el.dataset.b;
+  if(k&&I){I[k]=el.value;if(k==="datum"&&!I.naechsteManuell)I.naechste=addMonths(I.datum,12);save();return}
+  var mk=el.dataset.m;
+  if(mk&&I){var m=findM(V.mid);if(!m)return;m[mk]=mk==="nr"?(parseInt(el.value,10)||""):el.value;if(mk==="massnahme")m.massAuto=false;save();return}
+  var zk=el.dataset.z;
+  if(zk&&I){var z=zeileOf(I,V.zid);if(z){z[zk]=zk==="plakette"?(parseInt(el.value,10)||""):el.value;save();if(zk==="name"||zk==="plakette")setHeader(rName(z),true);if(zk==="plakette"&&I.zeilen.some(function(x){return x!==z&&x.plakette===z.plakette}))toast("Kleber "+kNr(z.plakette)+" ist schon vergeben");if(zk==="typ"&&e.type==="input")VIEWS.zeile()}return}
+  var at=el.dataset.at;
+  if(at&&I){I.allg=I.allg||{};I.allg[at]=I.allg[at]||{};I.allg[at].t=el.value;save();return}
+});
+main.addEventListener("change",function(e){var el=e.target;if(el.dataset.mc&&I)mangelChange(el.dataset.mc,el.value)});
+
+/* ---------- Übersicht ---------- */
+VIEWS.insp=function(){
+  setHeader(I.kunde||I.standort||("Inspektion "+fDate(I.datum)),true);
+  var c=mcount(null),nz=I.zeilen.length,fertig=I.zeilen.filter(function(z){return zStand(I,z).fertig}).length;
+  var A=I.allg||{},na=0,nt=0;ALLG.forEach(function(g){g.items.forEach(function(it){nt++;if((A[it.k]||{}).s)na++})});
+  var h='<div class="stats">'
+   +'<button class="stat rot" data-act="alleF" data-f="rot"><span class="n">'+c.rot+'</span><span class="l">Rot</span></button>'
+   +'<button class="stat gelb" data-act="alleF" data-f="gelb"><span class="n">'+c.gelb+'</span><span class="l">Gelb</span></button>'
+   +'<button class="stat gruen" data-act="alleF" data-f="gruen"><span class="n">'+c.gruen+'</span><span class="l">Grün</span></button>'
+   +'<button class="stat z" data-act="alleF" data-f=""><span class="n">'+(c.rot+c.gelb+c.gruen)+'</span><span class="l">Mängel total</span></button></div>';
+  h+='<div class="progress"><div class="bar"><i style="width:'+(nz?Math.round(fertig/nz*100):0)+'%"></i></div><span class="zahl">'+fertig+' / '+nz+' Regale fertig</span></div>';
+  h+=bkHtml();
+  h+='<button class="item card" data-act="anlage" style="border-radius:var(--r)"><div class="t"><b>Allgemeine Prüfpunkte</b><span>Dokumentation, Boden, Anfahrschutz, Betrieb</span></div><span class="pill '+(na===nt?'io':na?'gp':'offen')+'">'+na+' / '+nt+'</span></button>';
+  h+='<button class="btn pri big" data-act="nextRegal">+ Nächstes Regal · Kleber '+kNr(nextPlak())+'</button>';
+  h+='<div class="card flush"><div style="padding:12px 13px 6px"><h2>Regale · antippen = Bauteile beurteilen</h2></div><div class="list">';
+  if(!nz)h+='<p class="hint" style="padding:0 13px 12px">Noch keine Regale. Kleber aufs erste Regal kleben und oben «Nächstes Regal» tippen.</p>';
+  I.zeilen.forEach(function(z){
+    var zc=mcount(z.id),n=zc.rot+zc.gelb+zc.gruen,st=zStand(I,z);
+    var tag=st.fertig?(n?'<span class="pill gp">fertig</span>':'<span class="pill io">i. O.</span>'):'<span class="pill offen">'+st.done+'/'+st.total+'</span>';
+    h+='<div class="zrow"><button class="item" data-act="zeile" data-zid="'+z.id+'"><div class="t"><b>'+esc(rName(z))+'</b><span>'+esc(typName(typKey(z.typ)))+(z.felder?' · '+z.felder+' Felder':'')+'</span></div><div class="dots">'+dots(zc)+'</div>'+tag+'</button>'
+      +(!st.done&&!n?'<button class="qio" data-act="quickIO" data-zid="'+z.id+'" aria-label="'+esc(rName(z))+' komplett i. O.">alles<br>i. O.</button>':'')+'</div>';
+  });
+  h+='</div><div style="padding:10px 13px 13px"><button class="btn" data-act="addZeilen" style="width:100%">+ Mehrere Regale auf einmal</button></div></div>';
+  main.innerHTML=h;
+};
+function bkHtml(){
+  var nm=I.maengel.filter(function(m){return m.stufe}).length,seit=nm-(I.backupN||0);
+  return '<div class="bk'+(I.lastBackup&&seit<10?' ok':'')+'"><div><b>'+(I.lastBackup?'Sicherungsdatei '+new Date(I.lastBackup).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})+(seit>0?' · '+seit+' Mängel seither':' ✓'):'Noch keine Sicherungsdatei')+'</b><span>Auf dem Gerät ist alles laufend gespeichert.</span></div><button class="btn" data-act="exportJson">Sicherung jetzt</button></div>';
+}
+
+/* ---------- Allgemeine Prüfpunkte ---------- */
+VIEWS.anlage=function(){
+  setHeader("Allgemeine Prüfpunkte",true);
+  var A=I.allg||{};
+  var h='<p class="hint">Gilt für die ganze Anlage. Bei «Mangel» oder «fehlt» steht die Empfehlung schon im Bericht – du kannst sie anpassen.</p>';
+  ALLG.forEach(function(g){
+    h+='<div class="card flush"><div style="padding:12px 13px 4px"><h2>'+esc(g.g)+'</h2></div>';
+    g.items.forEach(function(it){var a=A[it.k]||{},s=a.s||"";
+      h+='<div class="check" id="a_'+it.k+'"><div class="q"><span class="lt">'+esc(it.l)+'</span><button class="ib" data-act="help" aria-label="Hilfe">ⓘ</button></div><div class="hp" hidden>'+esc(it.p)+'</div>'
+       +'<div class="seg s4">'+["ok","mangel","fehlt","nv"].map(function(v){return '<button data-act="achk" data-k="'+it.k+'" data-v="'+v+'"'+(s===v?' data-on="'+v+'"':'')+'>'+ASTATUS[v]+'</button>'}).join("")+'</div>'
+       +((s==="mangel"||s==="fehlt")?'<textarea data-at="'+it.k+'" rows="2">'+esc(a.t!=null?a.t:it.e)+'</textarea>':'')+'</div>';
+    });
+    h+='</div>';
+  });
+  h+='<button class="btn" data-act="newMangelAllg">+ Mangel mit Foto (Allgemein, z. B. Boden)</button>';
+  main.innerHTML=h;
+};
+
+/* ---------- Mängel, Abschluss ---------- */
+VIEWS.alle=function(){
+  setHeader("Mängel",true);
+  var f=V.f||"",c=mcount(null);
+  var l=I.maengel.filter(function(m){return f==="ohne"?!m.stufe:(!f||m.stufe===f)}).sort(function(a,b){return (b.nr||0)-(a.nr||0)});
+  var ohne=I.maengel.filter(function(m){return !m.stufe}).length;
+  function fc(v,t){return '<button class="chip'+(f===v?" on":"")+'" data-act="alleF" data-f="'+v+'">'+t+'</button>'}
+  main.innerHTML='<div class="filterchips">'+fc("","Alle "+(c.rot+c.gelb+c.gruen))+fc("rot","Rot "+c.rot)+fc("gelb","Gelb "+c.gelb)+fc("gruen","Grün "+c.gruen)+(ohne?fc("ohne","Ohne Stufe "+ohne):"")+'</div>'
+   +'<div class="card flush"><div class="list">'+(l.map(mItem).join("")||'<p class="hint" style="padding:14px">Keine Mängel in dieser Auswahl.</p>')+'</div></div><p class="hint">Höchste Klebernummer zuoberst. Antippen zum Bearbeiten.</p>';
+  fillThumbs();
+};
+VIEWS.mehr=function(){
+  setHeader("Abschluss",true);
+  var offen=I.zeilen.filter(function(z){return !zStand(I,z).fertig});
+  var h=bkHtml();
+  if(offen.length)h+='<div class="warnbox">Noch nicht fertig beurteilt: '+offen.map(function(z){return esc(rName(z))}).join(", ")+'</div>';
+  h+='<div class="card"><h2>1 · Abschluss vor Ort</h2><button class="btn big" data-act="abschluss">Gesamtbeurteilung &amp; Unterschriften</button>'+((I.sigP&&I.sigK)?'<p class="hint">Unterschriften vorhanden ✓</p>':'<p class="hint">Unterschriften fehlen noch.</p>')+'</div>';
+  h+='<div class="card"><h2>2 · Versand an den PC</h2><button class="btn pri big" data-act="kunde">Bericht-Datei senden (HTML)</button><p class="hint">Am PC öffnen → «Bearbeiten» → Kunde, Standort usw. ergänzen → «Drucken / PDF». Dieselbe Datei kann der Kunde öffnen und Pendenzen abhaken.</p><button class="btn" data-act="report">PDF direkt vom Handy</button></div>';
+  h+='<div class="card"><h2>Daten</h2><div class="row"><button class="btn" data-act="stamm">Stammdaten</button><button class="btn" data-act="hilfe">Norm-Hilfe</button></div><div class="row"><button class="btn" data-act="exportJson">Sicherungsdatei</button><button class="btn" data-act="importRM">Rückmeldung Kunde</button></div><div class="row"><button class="btn" data-act="settings">Einstellungen</button><button class="btn warn" data-act="delInsp">Inspektion löschen</button></div></div>';
+  main.innerHTML=h;
+};
+
+/* ---------- Zeilen hinzufügen ---------- */
+function parseNames(s){
+  var out=[];String(s).split(/[,;\n]+/).forEach(function(t){
+    t=t.trim();if(!t)return;var m;
+    if((m=t.match(/^([A-Za-z])\s*-\s*([A-Za-z])$/))){var a=m[1].toUpperCase().charCodeAt(0),b=m[2].toUpperCase().charCodeAt(0);if(a<=b)for(var i=a;i<=b;i++)out.push(String.fromCharCode(i));return}
+    if((m=t.match(/^(\D*?)(\d+)\s*-\s*\D*?(\d+)$/))){var x=+m[2],y=+m[3];if(x<=y&&y-x<500)for(var j=x;j<=y;j++)out.push(m[1]+j);return}
+    out.push(t);
+  });return out;
+}
+VIEWS.addZeilen=function(){
+  setHeader("Regale anlegen",true);
+  main.innerHTML='<div class="card"><label class="f">Anzahl Regale<select id="za">'+numOpts(1,80,I.zeilen.length?1:1)+'</select></label>'
+  +'<label class="f">Regaltyp<select id="zt">'+listOpts(TYPEN,typKey(LAST.typ||I.typ))+'</select></label>'
+  +'<div class="two"><label class="f">Felder je Regal<select id="zf">'+numOpts(1,40,LAST.felder)+'</select></label><label class="f">Ebenen<select id="ze">'+numOpts(1,20,LAST.ebenen)+'</select></label></div>'
+  +'<label class="f">Bezeichnung beim Kunden (optional)<input type="text" id="zn" placeholder="z. B. A-F oder 1-12" autocapitalize="characters"></label>'
+  +'<p class="sub" id="zprev"></p></div><button class="btn pri big" data-act="doAddZeilen">Regale anlegen</button>';
+  var up=function(){var l=parseNames($("#zn").value),n=l.length||(+$("#za").value||1),a=nextPlak();
+    $("#zprev").textContent=n+" Regal"+(n>1?"e":"")+" · Kleber "+kNr(a)+(n>1?" bis "+kNr(a+n-1):"")+(l.length?" ("+l.slice(0,12).join(", ")+(l.length>12?" …":"")+")":"");};
+  $("#zn").addEventListener("input",up);$("#za").addEventListener("change",up);up();
+};
+function nextPlak(){var mx=(parseInt(I.plakStart,10)||1)-1;I.zeilen.forEach(function(z){if(z.plakette>mx)mx=z.plakette});return mx+1}
+function nextNr(){var mx=0;I.maengel.forEach(function(m){if(m.nr>mx)mx=m.nr});return mx+1}
+
+/* ---------- Zeile: Bauteil-Checkliste ---------- */
+VIEWS.zeile=function(){
+  var z=zeileOf(I,V.zid);if(!z){history.back();return}
+  z.checks=z.checks||{};
+  setHeader(rName(z),true);
+  var list=btFor(z.typ),st=zStand(I,z);
+  var h='<div class="card tight"><div class="two"><label class="f">Kleber-Nr.<input type="number" inputmode="numeric" data-z="plakette" value="'+esc(z.plakette||"")+'" style="font:700 1.3rem var(--f-mono)"></label><label class="f">Bezeichnung (optional)<input type="text" data-z="name" value="'+esc(z.name===String(z.plakette)?"":z.name)+'" placeholder="z. B. A"></label></div>'
+   +'<label class="f">Regaltyp<select data-z="typ">'+listOpts(TYPEN,typKey(z.typ))+'</select></label>'
+   +'<div class="two"><label class="f">Felder<select data-z="felder">'+numOpts(1,40,z.felder)+'</select></label><label class="f">Ebenen<select data-z="ebenen">'+numOpts(1,20,z.ebenen)+'</select></label></div></div>';
+  h+='<div class="progress"><div class="bar"><i style="width:'+Math.round(st.done/Math.max(1,st.total)*100)+'%"></i></div><span class="zahl">'+st.done+' / '+st.total+' Bauteile beurteilt</span></div>';
+  if(!st.fertig)h+='<button class="btn ok big" data-act="allOk">Alle übrigen Bauteile i. O.</button>';
+  h+='<div class="card flush">';
+  list.forEach(function(b){
+    var r=zCheck(I,z,b.k),ms=I.maengel.filter(function(m){return m.zeileId===z.id&&m.bk===b.k}).sort(function(a,c){return (a.nr||0)-(c.nr||0)});
+    h+='<div class="check'+(r.s==="mangel"?' hatm':'')+'"><div class="q"><span class="code">'+b.c+'</span><span class="lt">'+esc(b.l)+'</span><button class="ib" data-act="help" aria-label="Norm-Hilfe">ⓘ</button></div><div class="hp" hidden><b>Prüfen:</b> '+esc(b.p)+'<br><b>Einstufung:</b> '+esc(b.g)+'</div>'
+     +'<div class="seg">'
+     +'<button data-act="chk" data-k="'+b.k+'" data-v="ok"'+(r.s==="ok"?' data-on="ok"':'')+'>i. O.</button>'
+     +'<button data-act="chkM" data-k="'+b.k+'"'+(r.s==="mangel"?' data-on="mangel"':'')+'>'+(r.s==="mangel"?'+ Mangel':'Mangel')+'</button>'
+     +'<button data-act="chk" data-k="'+b.k+'" data-v="nv"'+(r.s==="nv"?' data-on="na"':'')+'>n. v.</button></div>';
+    if(ms.length)h+='<div class="mchips">'+ms.map(function(m){return '<button class="mchip '+(m.stufe||"")+'" data-act="editMangel" data-mid="'+m.id+'"><b>'+nrText(m.nr)+'</b> '+esc(m.art||"Befund?")+(m.stufe?'':' · Stufe fehlt')+'</button>'}).join("")+'</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  var nx=nextRegalFrom(z);
+  h+='<button class="btn pri big" data-act="nextRegal" data-from="'+z.id+'">'+(st.fertig?'✓ ':'')+'Weiter zu Regal '+kNr(nx.nr)+(nx.neu?' (neu)':'')+'</button>';
+  h+='<button class="btn warn" data-act="delZeile">Regal löschen</button>';
+  main.innerHTML=h;
+};
+function nextRegalFrom(z){var n=(z&&z.plakette?z.plakette:nextPlak()-1)+1,ex=null;I.zeilen.forEach(function(x){if(x.plakette===n)ex=x});if(ex)return {nr:n,z:ex};var free=nextPlak();return {nr:Math.max(n,free),neu:true}}
+function addRegal(nr){var r={id:uid(),name:"",typ:LAST.typ||I.typ||"P",felder:LAST.felder||"",ebenen:LAST.ebenen||"",plakette:nr||nextPlak(),checks:{}};I.zeilen.push(r);save();return r}
+function mItem(m){
+  var f=(m.fotos||[])[0];
+  return '<button class="item mg '+(m.stufe||"")+'" data-act="editMangel" data-mid="'+m.id+'">'+(f?'<img data-ph="'+f+'" alt="">':'')+'<div class="t"><b><span class="nr">'+nrText(m.nr)+'</span>'+esc(m.bauteil||"Bauteil?")+(m.stufe?'':' <span class="pill crit">Stufe fehlt</span>')+'</b><span>'+esc(posText(m,I))+' · '+esc(m.art||"")+((m.fotos||[]).length?' · '+m.fotos.length+' Foto(s)':'')+(m.kunde&&m.kunde.status?' · Kunde: '+esc(KSTATUS[m.kunde.status]||m.kunde.status):'')+'</span></div></button>';
+}
+function fillThumbs(){document.querySelectorAll("img[data-ph]").forEach(function(im){getPhoto(im.dataset.ph).then(function(d){if(d)im.src=d})})}
+
+/* ---------- Mangel erfassen ---------- */
+VIEWS.mangel=function(){
+  var m=findM(V.mid);if(!m){history.back();return}
+  var z=zeileOf(I,m.zeileId),b=btByKey(m.bk),blist=z?btFor(z.typ):BT;
+  if(b&&blist.indexOf(b)<0)blist=blist.concat([b]);
+  setHeader(nrText(m.nr)+" · "+(z?rName(z):"Allgemein"),true);
+  var h='<div class="card tight"><div class="row"><button class="btn pri" data-act="cam" style="flex:2 1 160px;min-height:58px;font-size:1.05rem">📷 Foto</button><button class="btn" data-act="gal">Galerie</button></div><div class="photos" id="phs"></div></div>';
+  h+='<div class="card tight">'
+   +'<label class="f">Regal<select data-mc="zeileId">'+listOpts([["","Allgemein (ganze Anlage)"]].concat(I.zeilen.map(function(x){return [x.id,rName(x)+" · "+typName(typKey(x.typ))]})),m.zeileId)+'</select></label>'
+   +'<label class="f">Bauteil<select data-mc="bk" id="m_bk">'+listOpts(blist.map(function(x){return [x.k,x.l]}),m.bk,"– Bauteil wählen –")+'</select></label>'
+   +(b?'<label class="f">Befund<select data-mc="art" id="m_art">'+listOpts(b.a.map(function(x){return x[0]}),m.art,"– Befund wählen –")+'</select></label>':'')
+   +'</div>';
+  if(b&&b.mess){
+    var mi=Math.min(m.messRi||0,b.mess.length-1);
+    h+='<div class="card tight help"><h2>Messung 1 m Richtscheit</h2>'+(b.mess.length>1?'<select data-mc="messRi">'+listOpts(b.mess.map(function(x,i){return [i,x.l+" (Grenzwert "+x.g+" mm)"]}),mi)+'</select>':'')
+     +'<div class="two"><input type="number" inputmode="decimal" step="0.5" id="m_mm" placeholder="mm gemessen" value="'+esc(m.messMm||"")+'"><button class="btn pri" data-act="messOk">Einstufen</button></div></div>';
+  }
+  h+='<div class="card tight"><h2>Gefährdungsstufe</h2><div class="amps" id="amps">'
+   +'<button class="amp rot'+(m.stufe==="rot"?" on":"")+'" data-act="mset" data-v="rot">ROT<small>sofort sperren</small></button>'
+   +'<button class="amp gelb'+(m.stufe==="gelb"?" on":"")+'" data-act="mset" data-v="gelb">GELB<small>innert 4 Wochen</small></button>'
+   +'<button class="amp gruen'+(m.stufe==="gruen"?" on":"")+'" data-act="mset" data-v="gruen">GRÜN<small>beobachten</small></button></div>'
+   +(m.stufeVorschlag&&m.stufe===m.stufeVorschlag?'<p class="sub" style="margin:0">Vorauswahl nach Norm-Hilfe – bitte prüfen.</p>':'')+'</div>';
+  if(m.zeileId)h+='<div class="card tight"><h2>Position</h2><div class="three">'
+   +'<label class="f">Feld<select data-mc="feld">'+numOpts(1,Math.max(+(z&&z.felder)||0,1)+(z&&z.felder?0:29),m.feld)+'</select></label>'
+   +'<label class="f">Ebene<select data-mc="ebene">'+numOpts(0,Math.max(+(z&&z.ebenen)||0,0)+(z&&z.ebenen?0:15),m.ebene)+'</select></label>'
+   +'<label class="f">Seite<select data-mc="seite">'+listOpts(SEITEN,m.seite,"–")+'</select></label></div></div>';
+  var vor=massVorschlag(m.art,m.stufe,m.bauteil),mo=[vor].concat(MASS_OPTS).filter(function(x,i,a){return x&&a.indexOf(x)===i});
+  h+='<div class="card tight"><label class="f">Massnahme<select data-mc="massSel">'+listOpts(mo,"","– Vorschlag wählen –")+'</select></label>'
+   +'<textarea data-m="massnahme" id="m_mass" rows="2">'+esc(m.massnahme)+'</textarea>'
+   +'<label class="f">Bemerkung (optional, Mikrofon der Tastatur)<textarea data-m="beschreibung" id="m_besch" rows="2">'+esc(m.beschreibung)+'</textarea></label>'
+   +(m.stufe?'<p class="sub" style="margin:0">Frist: <b>'+esc(fristText(m,I))+'</b></p>':'')+'</div>';
+  if(b)h+='<details class="card tight help"><summary><h2 style="margin:0">Norm-Hilfe: '+esc(b.l)+'</h2></summary><p><b>Prüfen:</b> '+esc(b.p)+'</p><p><b>Einstufung:</b> '+esc(b.g)+'</p></details>';
+  if(m.kunde&&(m.kunde.status||m.kunde.notiz))h+='<div class="card"><h2>Rückmeldung Kunde</h2><p style="margin:0">'+esc(KSTATUS[m.kunde.status]||"offen")+(m.kunde.datum?' · '+fDate(m.kunde.datum):'')+(m.kunde.notiz?'<br>'+nl(m.kunde.notiz):'')+'</p></div>';
+  h+='<button class="btn warn" data-act="delMangel">Mangel löschen</button>';
+  h+='<div class="bar"><button class="btn" data-act="saveNext">✓ + nächster</button><button class="btn pri" data-act="saveDone">✓ Fertig</button></div>';
+  main.innerHTML=h;
+  renderPhotos(m);
+};
+function mangelChange(f,v){
+  var m=findM(V.mid);if(!m)return;var re=false;
+  if(f==="zeileId"){m.zeileId=v;if(v){LAST.zeileId=v;saveMeta("last",LAST)}re=true}
+  else if(f==="bk"){var b=btByKey(v);m.bk=v;m.bauteil=b?b.l:"";m.art="";if(m.stufe===m.stufeVorschlag){m.stufe="";m.stufeVorschlag=""}LAST.bk=v;saveMeta("last",LAST);re=true}
+  else if(f==="art"){m.art=v;var bb=btByKey(m.bk),pre="";if(bb)bb.a.forEach(function(x){if(x[0]===v)pre=x[1]});
+    if(pre&&pre!=="mess"&&(!m.stufe||m.stufe===m.stufeVorschlag)){m.stufe=pre;m.stufeVorschlag=pre}re=true}
+  else if(f==="messRi"){m.messRi=+v}
+  else if(f==="massSel"){if(v){m.massnahme=v;m.massAuto=false;var t=$("#m_mass");if(t)t.value=v}}
+  else m[f]=v;
+  if((f==="bk"||f==="art")&&(m.massAuto||!m.massnahme)){m.massnahme=massVorschlag(m.art,m.stufe,m.bauteil);m.massAuto=true}
+  save();
+  if(re){var y=window.scrollY;VIEWS.mangel();window.scrollTo(0,y);if(f==="bk"){var a=$("#m_art");if(a)a.focus()}}
+}
+function messEinstufen(){
+  var m=findM(V.mid),b=btByKey(m.bk);if(!b||!b.mess)return;
+  var mm=parseFloat(String($("#m_mm").value).replace(",","."));if(isNaN(mm)){toast("Messwert in mm eingeben");return}
+  var ri=b.mess[Math.min(m.messRi||0,b.mess.length-1)],g=ri.g,st=mm<=g?"gruen":mm<=2*g?"gelb":"rot";
+  m.messMm=String(mm);m.stufe=st;m.stufeVorschlag="";if(!m.art)m.art=b.a[0][0];
+  var txt="Gemessen "+mm+" mm auf 1 m ("+ri.l+", Grenzwert "+g+" mm).";
+  m.beschreibung=m.beschreibung&&/Gemessen [^\n]* mm auf 1 m/.test(m.beschreibung)?m.beschreibung.replace(/Gemessen [^\n]* mm auf 1 m[^\n]*/,txt):(m.beschreibung?m.beschreibung+"\n"+txt:txt);
+  if(m.massAuto||!m.massnahme){m.massnahme=massVorschlag(m.art,m.stufe,m.bauteil);m.massAuto=true}
+  save();var y=window.scrollY;VIEWS.mangel();window.scrollTo(0,y);
+  toast("Einstufung: "+STUFEN[st].l+" ("+mm+" mm, Grenzwert "+g+" mm)",3000);
+}
+VIEWS.hilfe=function(){
+  setHeader("Norm-Hilfe",true);
+  var h='<div class="card"><h2>Ampelsystem</h2><p style="margin:0"><b style="color:var(--crit)">ROT</b> – '+esc(STUFEN.rot.t)+'<br><b style="color:var(--warn)">GELB</b> – '+esc(STUFEN.gelb.t)+'<br><b style="color:var(--ok)">GRÜN</b> – '+esc(STUFEN.gruen.t)+'</p><p class="sub" style="margin:0">Messregel Verformung (Stützen, Fachwerk): bis Grenzwert Grün · bis doppelter Grenzwert Gelb · darüber Rot.</p></div>';
+  h+='<div class="card flush"><div style="padding:12px 16px 4px"><h2>Bauteile</h2></div>'+BT.map(function(b){return '<details class="hilfe"><summary>'+b.c+' · '+esc(b.l)+'</summary><div><p><b>Prüfen:</b> '+esc(b.p)+'</p><p><b>Einstufung:</b> '+esc(b.g)+'</p><p><b>Gilt für:</b> '+(b.t==="*"?"alle Regaltypen":b.t.split("").map(typName).join(", "))+'</p></div></details>'}).join("")+'</div>';
+  ALLG.forEach(function(g){h+='<div class="card flush"><div style="padding:12px 16px 4px"><h2>'+esc(g.g)+'</h2></div>'+g.items.map(function(it){return '<details class="hilfe"><summary>'+esc(it.l)+'</summary><div><p>'+esc(it.p)+'</p><p><b>Empfehlung, wenn nicht erfüllt:</b> '+esc(it.e)+'</p></div></details>'}).join("")+'</div>'});
+  h+='<p class="hint">Richtwerte zur Unterstützung vor Ort. Massgebend sind SN EN 15635 / DIN EN 15635 und die Angaben des Regalherstellers.</p>';
+  main.innerHTML=h;
+};
+function renderPhotos(m){
+  var el=$("#phs");if(!el)return;
+  el.innerHTML=(m.fotos||[]).map(function(id){return '<div class="ph"><img data-ph="'+id+'" data-act="lb" alt="Foto"><button data-act="delPhoto" data-pid="'+id+'" aria-label="Foto löschen">×</button></div>'}).join("");
+  fillThumbs();
+}
+function newMangel(zid,bk){
+  var z=zid===""?"":(zid||(zeileOf(I,LAST.zeileId)?LAST.zeileId:(I.zeilen[0]?I.zeilen[0].id:"")));
+  var b=btByKey(bk||"");
+  var m={id:uid(),nr:nextNr(),zeileId:z,bk:b?b.k:"",bauteil:b?b.l:"",art:"",stufe:"",stufeVorschlag:"",feld:"",ebene:"",seite:"",beschreibung:"",massnahme:"",massAuto:true,fotos:[],created:Date.now()};
+  I.maengel.push(m);save();
+  go("mangel",{id:I.id,mid:m.id});
+}
+function isBlank(m){return m&&!m.stufe&&!(m.fotos||[]).length&&!m.beschreibung&&!m.art&&!m.feld&&!m.seite&&!m.messMm}
+function checkMangel(m){
+  if(!m.bk){var s=$("#m_bk");if(s){s.scrollIntoView({block:"center"});s.focus()}toast("Bitte Bauteil wählen");return false}
+  if(!m.stufe){var a=$("#amps");if(a){a.classList.add("missing");a.scrollIntoView({behavior:"smooth",block:"center"})}toast("Bitte Gefährdungsstufe wählen");return false}
+  return true;
+}
+
+/* ---------- Abschluss ---------- */
+VIEWS.abschluss=function(){
+  setHeader("Abschluss",true);
+  if(!I.naechste)I.naechste=addMonths(I.datum,12);
+  var c=mcount(null),offen=I.zeilen.filter(function(z){return !zStand(I,z).fertig});
+  var h=offen.length?'<div class="warnbox">Noch nicht fertig beurteilt: '+offen.map(function(z){return esc(rName(z))}).join(", ")+'</div>':'';
+  h+='<div class="card"><label class="f">Gesamtbeurteilung<textarea data-b="gesamt" id="ges">'+esc(I.gesamt)+'</textarea></label><button class="btn" data-act="gesVorschlag">Vorschlag einsetzen</button></div>';
+  h+='<div class="card"><label class="f">Nächste Inspektion<input type="date" data-b="naechste" id="nx" value="'+esc(I.naechste)+'"></label></div>';
+  h+='<div class="card"><h2>Unterschrift Prüfer – '+esc(I.pruefer)+'</h2><canvas class="sig" id="sigP"></canvas><button class="btn" data-act="sigClear" data-k="sigP">Löschen</button></div>';
+  h+='<div class="card"><h2>Unterschrift Kunde</h2><label class="f">Name Kunde (Vertreter)<input type="text" data-b="kundeName" value="'+esc(I.kundeName)+'"></label><canvas class="sig" id="sigK"></canvas><button class="btn" data-act="sigClear" data-k="sigK">Löschen</button></div>';
+  h+='<div class="row"><button class="btn pri big" data-act="report">PDF-Bericht anzeigen</button></div>';
+  main.innerHTML=h;
+  $("#nx").addEventListener("change",function(){I.naechsteManuell=true;save()});
+  sigPad("sigP");sigPad("sigK");
+  void c;
+};
+function sigPad(k){
+  var cv=$("#"+k),ctx=cv.getContext("2d"),dpr=window.devicePixelRatio||1,draw=false,dirty=false,lx=0,ly=0;
+  function size(){var r=cv.getBoundingClientRect();cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineWidth=2.4;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#0f2233";
+    if(I[k]){var im=new Image();im.onload=function(){ctx.drawImage(im,0,0,r.width,r.height)};im.src=I[k]}}
+  size();
+  function pos(e){var r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
+  cv.addEventListener("pointerdown",function(e){e.preventDefault();cv.setPointerCapture(e.pointerId);draw=true;var p=pos(e);lx=p[0];ly=p[1];ctx.beginPath();ctx.arc(lx,ly,1.2,0,7);ctx.fill()});
+  cv.addEventListener("pointermove",function(e){if(!draw)return;e.preventDefault();var p=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p[0],p[1]);ctx.stroke();lx=p[0];ly=p[1];dirty=true});
+  function end(){if(!draw)return;draw=false;if(dirty||true){I[k]=cv.toDataURL("image/png");save()}}
+  cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);
+}
+
+/* ---------- Bericht ---------- */
+VIEWS.report=function(){
+  var rv=$("#rptview");
+  loadPhotos(allPhotoIds(I)).then(function(P){
+    I.firma=Object.assign({},SET.firma);
+    rv.innerHTML='<div class="rptbar"><button class="btn" data-act="back" style="background:#fff">‹ Zurück</button><button class="btn pri" data-act="print" style="flex:1;border-color:#fff">Drucken / Als PDF sichern</button></div>'
+      +'<p class="noprint hint" style="padding:10px 12px 0">Im Druckdialog «Als PDF speichern» wählen (iPhone: Teilen → Drucken → mit zwei Fingern aufziehen → Teilen → In Dateien sichern).</p>'
+      +buildReport(I,P,SET.logo);
+    $("#hdr").hidden=true;main.hidden=true;rv.hidden=false;window.scrollTo(0,0);
+  });
+};
+rptBind();
+function rptBind(){$("#rptview").addEventListener("click",function(e){var b=e.target.closest("[data-act]");if(!b)return;if(b.dataset.act==="back")history.back();if(b.dataset.act==="print")window.print()})}
+
+/* ---------- Kundenbericht ---------- */
+function buildKunde(){
+  return loadPhotos(allPhotoIds(I)).then(function(P){
+    var insp=JSON.parse(JSON.stringify(I));insp.firma=Object.assign({},SET.firma);
+    delete insp.massAuto;
+    var data=JSON.stringify({insp:insp,photos:P,logo:SET.logo||""}).replace(/</g,"\\u003c");
+    var html='<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+      +'<title>Regalinspektion '+esc(I.kunde)+' '+fDate(I.datum)+'</title><style id="kst">'+$("#kcss").textContent+$("#rptcss").textContent+'</style></head><body>'
+      +'<div class="app"></div><div id="print"></div><div id="lb" hidden><img alt="Foto gross"></div>'
+      +'<script type="application/json" id="data">'+data+'<\/script>'
+      +'<script id="shared">'+$("#shared").textContent+'<\/script><script id="kjs">'+$("#kjs").textContent+'<\/script></body></html>';
+    return html;
+  });
+}
+
+/* ---------- Datei speichern / teilen ---------- */
+function saveFile(name,text,mime){
+  var blob=new Blob([text],{type:mime});
+  var file;try{file=new File([blob],name,{type:mime})}catch(e){file=null}
+  if(file&&navigator.canShare&&navigator.share){try{if(navigator.canShare({files:[file]})){return navigator.share({files:[file],title:name}).then(function(){toast("Geteilt")}).catch(function(e){if(e&&e.name==="AbortError")throw e;download(blob,name)})}}catch(e){}}
+  download(blob,name);return Promise.resolve();
+}
+function download(blob,name){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000);toast("Gespeichert: "+name,3500)}
+function exportJson(){
+  return loadPhotos(allPhotoIds(I)).then(function(P){
+    var n=I.maengel.length,miss=allPhotoIds(I).filter(function(id){return !P[id]}).length;
+    var out={format:"regalinspektion-v1",exportiert:new Date().toISOString(),insp:I,photos:P};
+    var hm=new Date().toTimeString().slice(0,5).replace(":","");
+    return saveFile("Regalinspektion_"+slug(I.kunde||I.standort||"Sicherung")+"_"+I.datum+"_"+hm+".json",JSON.stringify(out),"application/json").then(function(){
+      I.lastBackup=Date.now();I.backupN=I.maengel.filter(function(m){return m.stufe}).length;save();if(V.v==="insp")render();
+      if(miss)errBanner(miss+" Foto(s) fehlen im Speicher und sind nicht in der Sicherung.");void n;
+    });
+  });
+}
+function readDataUrl(f){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result)};r.onerror=function(){rej(r.error)};r.readAsDataURL(f)})}
+function readFile(f){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result)};r.onerror=function(){rej(r.error)};r.readAsText(f)})}
+var jsonMode="insp";
+$("#fjson").addEventListener("change",function(e){
+  var f=e.target.files[0];e.target.value="";if(!f)return;
+  readFile(f).then(function(t){var d=JSON.parse(t);
+    if(jsonMode==="rm"){
+      if(d.format!=="regalinspektion-rueckmeldung-v1")throw new Error("Das ist keine Rückmeldungs-Datei.");
+      if(d.inspId!==I.id&&!confirm("Die Rückmeldung gehört zu einer anderen Inspektion ("+(d.kunde||"")+"). Trotzdem einlesen?"))return;
+      var n=0;I.maengel.forEach(function(m){var s=d.status&&d.status[m.id];if(s){m.kunde={status:s.status||"offen",datum:s.datum||"",notiz:s.notiz||""};n++}});
+      save();toast(n+" Rückmeldungen eingelesen",3000);render();return;
+    }
+    if(d.format!=="regalinspektion-v1"||!d.insp)throw new Error("Das ist keine Inspektions-Sicherung.");
+    return dget("insp",d.insp.id).then(function(ex){
+      var X=d.insp;
+      if(ex&&!confirm("Diese Inspektion ist schon vorhanden. OK = überschreiben, Abbrechen = als Kopie importieren.")){
+        var map={};X=JSON.parse(JSON.stringify(X));X.id=uid();X.kunde=(X.kunde||"")+" (Kopie)";
+        X.maengel.forEach(function(m){m.fotos=(m.fotos||[]).map(function(pid){var nid=uid();map[nid]=d.photos[pid];return nid})});
+        d.photos=map;
+      }
+      var ps=Object.keys(d.photos||{}).map(function(pid){return dput("photos",{id:pid,insp:X.id,data:d.photos[pid]})});
+      return Promise.all(ps).then(function(){return dput("insp",X)}).then(function(){toast("Importiert: "+(X.kunde||"Inspektion"),3000);PH=new Map();render()});
+    });
+  }).catch(function(err){toast("Import fehlgeschlagen: "+(err.message||err),5000)});
+});
+$("#flogo").addEventListener("change",function(e){var f=e.target.files[0];e.target.value="";if(!f)return;resizeImg(f,800,.9).then(function(d){SET.logo=d;return saveMeta("settings",SET)}).then(function(){render()}).catch(function(err){toast(err.message)})});
+function onPhotoFiles(e){
+  var files=[].slice.call(e.target.files||[]);e.target.value="";var m=findM(V.mid);if(!m||!files.length)return;
+  toast("Foto wird gespeichert …",1500);
+  var inspId=I.id;
+  files.reduce(function(p,f){return p.then(function(){
+      return resizeImg(f,1600,.75).catch(function(){return readDataUrl(f)}).then(function(d){
+        var id=uid();return dput("photos",{id:id,insp:inspId,data:d}).then(function(){PH.set(id,d);m.fotos.push(id);save();renderPhotos(m)});
+      });
+    })},Promise.resolve())
+    .then(function(){toast("✓ Foto gespeichert ("+m.fotos.length+" bei "+nrText(m.nr)+")")})
+    .catch(function(err){errBanner("Foto konnte NICHT gespeichert werden ("+(err&&err.name||err)+"). Bitte erneut aufnehmen und danach «Sicherung jetzt» machen.")});
+}
+$("#fcam").addEventListener("change",onPhotoFiles);$("#fgal").addEventListener("change",onPhotoFiles);
+
+/* ---------- Aktionen ---------- */
+var ACT={
+  back:function(){history.back()},
+  settings:function(){go("settings")},
+  pickLogo:function(){$("#flogo").click()},
+  delLogo:function(){SET.logo="";saveMeta("settings",SET).then(render)},
+  newInsp:function(){
+    var F=SET.firma;
+    I={id:uid(),version:2,kunde:"",standort:"",datum:todayIso(),pruefer:F.pruefer||"",typ:LAST.typ||"P",hersteller:"",plakStart:1,bemerkung:"",zeilen:[],maengel:[],allg:{},gesamt:"",naechste:addMonths(todayIso(),12),sigP:"",sigK:"",kundeName:"",created:Date.now(),updated:Date.now()};
+    PH=new Map();flushSave().then(function(){go("stamm",{id:I.id,neu:1})});
+  },
+  open:function(b){go("insp",{id:b.dataset.id})},
+  stamm:function(){go("stamm",{id:I.id})},
+  stammWeiter:function(){go("insp",{id:I.id},true)},
+  anlage:function(){go("anlage",{id:I.id})},
+  addZeilen:function(){go("addZeilen",{id:I.id})},
+  doAddZeilen:function(){
+    var l=parseNames($("#zn").value),n=l.length||(+$("#za").value||1),ty=$("#zt").value,fe=$("#zf").value,eb=$("#ze").value;
+    LAST.typ=ty;LAST.felder=fe;LAST.ebenen=eb;saveMeta("last",LAST);
+    for(var i=0;i<n;i++){var r=addRegal(nextPlak());r.typ=ty;r.felder=fe;r.ebenen=eb;r.name=l[i]||""}
+    save();toast(n===1?"1 Regal angelegt":n+" Regale angelegt");
+    if(V.v==="addZeilen"){history.replaceState({v:"insp",id:I.id},"");V={v:"insp",id:I.id};render()}
+  },
+  nextRegal:function(b){var from=b.dataset.from?zeileOf(I,b.dataset.from):null,nx=nextRegalFrom(from),z=nx.z||addRegal(nx.nr);
+    if(V.v==="zeile"){V={v:"zeile",id:I.id,zid:z.id};history.replaceState(V,"");render();window.scrollTo(0,0)}else go("zeile",{id:I.id,zid:z.id});
+    if(nx.neu)toast("Regal "+kNr(z.plakette)+" angelegt – Kleber aufkleben")},
+  zeile:function(b){go("zeile",{id:I.id,zid:b.dataset.zid})},
+  quickIO:function(b){var z=zeileOf(I,b.dataset.zid);z.checks=z.checks||{};btFor(z.typ).forEach(function(x){if(!zCheck(I,z,x.k).s)z.checks[x.k]="ok"});save();toast(rName(z)+": alle Bauteile i. O.");render()},
+  allOk:function(){var z=zeileOf(I,V.zid);z.checks=z.checks||{};var n=0;btFor(z.typ).forEach(function(x){if(!zCheck(I,z,x.k).s){z.checks[x.k]="ok";n++}});save();toast(n+" Bauteile auf i. O. gesetzt");VIEWS.zeile()},
+  chk:function(b){var z=zeileOf(I,V.zid),k=b.dataset.k,v=b.dataset.v;z.checks=z.checks||{};
+    if(zCheck(I,z,k).s==="mangel"){toast("Hier sind Mängel erfasst – zuerst die Mängel löschen");return}
+    z.checks[k]=z.checks[k]===v?"":v;save();var y=window.scrollY;VIEWS.zeile();window.scrollTo(0,y)},
+  chkM:function(b){newMangel(V.zid,b.dataset.k)},
+  help:function(b){var h=b.closest(".check").querySelector(".hp");if(h)h.hidden=!h.hidden},
+  achk:function(b){I.allg=I.allg||{};var a=I.allg[b.dataset.k]=I.allg[b.dataset.k]||{};a.s=a.s===b.dataset.v?"":b.dataset.v;save();var y=window.scrollY;VIEWS.anlage();window.scrollTo(0,y)},
+  newMangelAllg:function(){newMangel("","sonst")},
+  delZeile:function(){var z=zeileOf(I,V.zid),n=I.maengel.filter(function(m){return m.zeileId===z.id}).length;
+    if(!confirm(rName(z)+(n?" mit "+n+" Mängeln":"")+" löschen?"))return;
+    I.maengel.filter(function(m){return m.zeileId===z.id}).forEach(function(m){(m.fotos||[]).forEach(function(p){ddel("photos",p)})});
+    I.maengel=I.maengel.filter(function(m){return m.zeileId!==z.id});I.zeilen=I.zeilen.filter(function(x){return x!==z});save();history.back()},
+  newMangel:function(b){newMangel(b.dataset.zid||V.zid)},
+  editMangel:function(b){go("mangel",{id:I.id,mid:b.dataset.mid})},
+  mset:function(b){var m=findM(V.mid);m.stufe=b.dataset.v;m.stufeVorschlag="";
+    if(m.massAuto||!m.massnahme){m.massnahme=massVorschlag(m.art,m.stufe,m.bauteil);m.massAuto=true}
+    save();var y=window.scrollY;VIEWS.mangel();window.scrollTo(0,y)},
+  step:function(b){var m=findM(V.mid),v=(parseInt(m.nr,10)||0)+(+b.dataset.d);if(v<1)v=1;
+    if(I.maengel.some(function(x){return x!==m&&x.nr===v})&&!confirm("Kleber "+nrText(v)+" ist schon vergeben. Trotzdem verwenden?"))return;
+    m.nr=v;$("#m_nr").value=v;save();setHeader("Kleber "+nrText(v),true)},
+  messOk:function(){messEinstufen()},
+  hilfe:function(){go("hilfe",{id:I.id})},
+  cam:function(){$("#fcam").click()},
+  gal:function(){$("#fgal").click()},
+  lb:function(b){if(b.src)lightbox(b.src)},
+  delPhoto:function(b){if(!confirm("Foto löschen?"))return;var m=findM(V.mid);m.fotos=m.fotos.filter(function(p){return p!==b.dataset.pid});ddel("photos",b.dataset.pid);save();renderPhotos(m)},
+  delMangel:function(){if(!confirm("Diesen Mangel löschen?"))return;var m=findM(V.mid);(m.fotos||[]).forEach(function(p){ddel("photos",p)});I.maengel=I.maengel.filter(function(x){return x!==m});save();history.back()},
+  saveNext:function(){var m=findM(V.mid);if(!checkMangel(m))return;LAST.zeileId=m.zeileId;LAST.bk=m.bk;saveMeta("last",LAST);flushSave();toast("✓ "+nrText(m.nr)+" gespeichert");
+    var n={id:uid(),nr:nextNr(),zeileId:m.zeileId,bk:m.bk,bauteil:m.bauteil,art:"",stufe:"",stufeVorschlag:"",feld:m.feld,ebene:"",seite:"",beschreibung:"",massnahme:"",massAuto:true,fotos:[],created:Date.now()};
+    I.maengel.push(n);save();V={v:"mangel",id:I.id,mid:n.id};history.replaceState(V,"");render();window.scrollTo(0,0)},
+  saveDone:function(){var m=findM(V.mid);if(isBlank(m)){history.back();return}if(!checkMangel(m))return;LAST.zeileId=m.zeileId;LAST.bk=m.bk;saveMeta("last",LAST);flushSave();toast("✓ "+nrText(m.nr)+" gespeichert");history.back()},
+  abschluss:function(){go("abschluss",{id:I.id})},
+  mehr:function(){go("mehr",{id:I.id})},
+  gesVorschlag:function(){var c=mcount(null),g=gesamtErgebnis(c);
+    var t=g.t+". Festgestellt: "+c.rot+" rote, "+c.gelb+" gelbe, "+c.gruen+" grüne Mängel.";
+    if(c.rot)t+=" Die rot markierten Bereiche sind sofort zu entladen und bis zur Instandsetzung zu sperren.";
+    if(c.gelb)t+=" Gelb markierte Mängel sind innert 4 Wochen instand zu stellen; betroffene Fächer nicht neu beladen.";
+    t+=" Der Betreiber hat regelmässige Sichtkontrollen durchzuführen und Schäden sofort zu melden.";
+    I.gesamt=t;$("#ges").value=t;save()},
+  sigClear:function(b){I[b.dataset.k]="";save();var y=window.scrollY;VIEWS.abschluss();window.scrollTo(0,y)},
+  report:function(){flushSave().then(function(){go("report",{id:I.id})})},
+  kunde:function(){toast("Bericht-Datei wird erstellt …",2000);buildKunde().then(function(h){return saveFile("Regalinspektion_"+slug(I.kunde||I.standort||"Bericht")+"_"+I.datum+".html",h,"text/html")}).catch(function(e){if(e&&e.name==="AbortError")return;toast("Fehler: "+(e.message||e),5000)})},
+  exportJson:function(){exportJson().catch(function(e){if(e&&e.name==="AbortError"){toast("Sicherung abgebrochen");return}toast("Fehler: "+(e.message||e),5000)})},
+  alle:function(){go("alle",{id:I.id})},
+  alleF:function(b){if(V.v==="alle"){V.f=b.dataset.f;history.replaceState(V,"");VIEWS.alle()}else go("alle",{id:I.id,f:b.dataset.f})},
+  gross:function(b){SET.gross=b.dataset.v==="1";saveMeta("settings",SET);render()},
+  importJson:function(){jsonMode="insp";$("#fjson").click()},
+  importRM:function(){jsonMode="rm";$("#fjson").click()},
+  delInsp:function(){if(!confirm("Inspektion «"+(I.kunde||I.standort||fDate(I.datum))+"» mit allen Fotos endgültig löschen? Vorher Sicherungsdatei machen!"))return;
+    var ids=allPhotoIds(I),id=I.id;Promise.all(ids.map(function(p){return ddel("photos",p)})).then(function(){return ddel("insp",id)}).then(function(){try{localStorage.removeItem("ri_spiegel_"+id)}catch(e){}I=null;go("home",{},true)})}
+};
+main.addEventListener("click",function(e){
+  var b=e.target.closest("[data-act]");if(!b||!main.contains(b))return;
+  var f=ACT[b.dataset.act];if(f){e.preventDefault();f(b)}
+});
+
+/* ---------- Start ---------- */
+dput("meta",{k:"selbsttest",v:Date.now()}).then(function(){return dget("meta","selbsttest")}).then(function(x){if(!x)throw new Error("Selbsttest fehlgeschlagen")})
+.then(function(){return Promise.all([dget("meta","settings"),dget("meta","last")])}).then(function(r){
+  if(r[0]&&r[0].v)SET=r[0].v;SET.firma=Object.assign({},DEF_FIRMA,SET.firma||{});
+  if(r[1]&&r[1].v)LAST=r[1].v;
+}).catch(function(e){errBanner("Gerätespeicher nicht verfügbar ("+(e&&e.message||e)+"). So NICHT erfassen – nicht im privaten Modus öffnen, anderen Browser verwenden.");throw e}).then(function(){
+  wake();
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
+  if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"))navigator.serviceWorker.register("sw.js").catch(function(){});
+  V=history.state&&history.state.v?history.state:{v:"home"};
+  if(V.v==="report")V={v:"insp",id:V.id};
+  history.replaceState(V,"");render();
+});
+</script>
+</body>
+</html>
