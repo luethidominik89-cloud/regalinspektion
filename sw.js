@@ -1,6 +1,6 @@
 /* Offline-Speicher der App. Version hochzählen, wenn eine neue Fassung hochgeladen wird.
    Die erfassten Daten liegen NICHT hier, sondern im Gerätespeicher der App (IndexedDB). */
-const VERSION = 'regal-v3';
+const VERSION = 'regal-v4';
 const DATEIEN = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

@@ -444,6 +444,12 @@ var ALLG=[
 ];
 var ASTATUS={ok:"i. O.",mangel:"Mangel",fehlt:"fehlt",nv:"n. v."};
 var SEITEN=["vorne","hinten","links","rechts"];
+/* Einzel- oder Doppelregal je Regal; beim Doppelregal Mangel einer Regalzeile zuordnen (A = Seite mit dem Kleber) */
+var AUSF=[["einzel","Einzelregal"],["doppel","Doppelregal"]];
+var ZEILEN_AB=[["A","Regalzeile A (Seite mit Kleber)"],["B","Regalzeile B (Rückseite)"],["AB","beide Regalzeilen"]];
+function istDoppel(z){return !!z&&z.ausf==="doppel"}
+function zHersteller(z){return (z&&z.hersteller)||(I&&I.hersteller)||""}
+function zInfo(z){var t=[typName(typKey(z.typ))];if(istDoppel(z))t.push("Doppelregal");var hs=zHersteller(z);if(hs)t.push(hs);return t.join(" · ")}
 var STUFEN={
   rot:{l:"Rot",kurz:"Sofort sperren",t:"Sofort entladen und sperren. Instandsetzung vor Wiederbenutzung."},
   gelb:{l:"Gelb",kurz:"Innert 4 Wochen",t:"Schaden. Instandsetzung innert 4 Wochen. Betroffenen Bereich nicht neu beladen."},
@@ -495,6 +501,7 @@ function posText(m,I){
   var p=[zName(I,m.zeileId)];
   if(m.feld)p.push("Feld "+m.feld);
   if(m.ebene!==""&&m.ebene!=null)p.push("Ebene "+m.ebene);
+  if(m.zab)p.push(m.zab==="AB"?"beide Regalzeilen":"Regalzeile "+m.zab);
   if(m.seite)p.push(m.seite);
   return p.join(" · ");
 }
@@ -531,11 +538,14 @@ function buildReport(I,P,logo,opt){
   var fertig=I.zeilen.filter(function(z){return zStand(I,z).fertig}).length;
   var io=I.zeilen.filter(function(z){return zStand(I,z).fertig&&!I.maengel.some(function(m){return m.stufe&&m.zeileId===z.id})});
   var typen=[];I.zeilen.forEach(function(z){var t=typName(typKey(z.typ));if(typen.indexOf(t)<0)typen.push(t)});
+  var herst=[];I.zeilen.forEach(function(z){var x=zHersteller(z);if(x&&herst.indexOf(x)<0)herst.push(x)});if(!herst.length&&I.hersteller)herst.push(I.hersteller);
+  var nD=I.zeilen.filter(istDoppel).length,nE=I.zeilen.length-nD;
+  var ausfText=!I.zeilen.length?"–":[nE?nE+" Einzelregal"+(nE>1?"e":""):"",nD?nD+" Doppelregal"+(nD>1?"e":""):""].filter(Boolean).join(", ");
   var A=I.allg||{};
   var brand=logo?'<img class="logo" src="'+logo+'" alt="Logo">':'<div class="wm">'+esc(F.name||"DETEC Facility Services")+'</div>';
   var h='<div class="rp">';
   h+='<section class="pg cover">'+brand+'<div><h1>Inspektionsbericht Regalanlage</h1><div class="norm">Regalinspektion nach SN EN 15635 / DIN EN 15635</div></div>';
-  h+='<table class="kv"><tr><th>Kunde</th><td>'+esc(I.kunde)+'</td></tr><tr><th>Standort / Halle</th><td>'+esc(I.standort)+'</td></tr><tr><th>Datum Inspektion</th><td>'+fDate(I.datum)+'</td></tr><tr><th>Prüfer</th><td>'+esc(I.pruefer)+(F.name?', '+esc(F.name):'')+'</td></tr><tr><th>Regaltypen</th><td>'+esc(typen.join(", ")||"–")+'</td></tr><tr><th>Hersteller</th><td>'+esc(I.hersteller||"–")+'</td></tr><tr><th>Regale</th><td>'+I.zeilen.length+' (vollständig beurteilt: '+fertig+')</td></tr><tr><th>Nächste Inspektion</th><td>'+fDate(I.naechste||addMonths(I.datum,12))+'</td></tr></table>';
+  h+='<table class="kv"><tr><th>Kunde</th><td>'+esc(I.kunde)+'</td></tr><tr><th>Standort / Halle</th><td>'+esc(I.standort)+'</td></tr><tr><th>Datum Inspektion</th><td>'+fDate(I.datum)+'</td></tr><tr><th>Prüfer</th><td>'+esc(I.pruefer)+(F.name?', '+esc(F.name):'')+'</td></tr><tr><th>Regaltypen</th><td>'+esc(typen.join(", ")||"–")+'</td></tr><tr><th>Hersteller</th><td>'+esc(herst.join(", ")||"–")+'</td></tr><tr><th>Ausführung</th><td>'+esc(ausfText)+'</td></tr><tr><th>Regale</th><td>'+I.zeilen.length+' (vollständig beurteilt: '+fertig+')</td></tr><tr><th>Nächste Inspektion</th><td>'+fDate(I.naechste||addMonths(I.datum,12))+'</td></tr></table>';
   h+='<div class="big"><div class="c-rot"><b>'+c.rot+'</b><span>Rot · sofort</span></div><div class="c-gelb"><b>'+c.gelb+'</b><span>Gelb · 4 Wochen</span></div><div class="c-gruen"><b>'+c.gruen+'</b><span>Grün · beobachten</span></div></div>';
   h+='<div class="res '+g.k+'">Gesamtergebnis: '+esc(g.t)+'</div>';
   h+='<div class="small">'+esc(F.name||"")+(F.email?' · '+esc(F.email):'')+'</div></section>';
@@ -563,7 +573,7 @@ function buildReport(I,P,logo,opt){
   var used=BT.filter(function(b){return I.zeilen.some(function(z){return btFor(z.typ).indexOf(b)>=0})});
   h+='<section><h2>4. Beurteilung je Regal</h2><div class="mtx"><table class="mx"><tr><th class="num">Regal</th><th>Bez.</th><th>Typ</th>'+used.map(function(b){return '<th class="num" title="'+esc(b.l)+'">'+b.c+'</th>'}).join("")+'</tr>';
   I.zeilen.forEach(function(z){var app=btFor(z.typ);
-    var nm=String(z.name||"");h+='<tr><td class="num"><b>'+kNr(z.plakette)+'</b></td><td>'+esc(nm===kNr(z.plakette)||nm===String(z.plakette)?"":nm)+'</td><td>'+esc(typName(typKey(z.typ)))+'</td>';
+    var nm=String(z.name||"");h+='<tr><td class="num"><b>'+kNr(z.plakette)+'</b></td><td>'+esc(nm===kNr(z.plakette)||nm===String(z.plakette)?"":nm)+'</td><td>'+esc(zInfo(z))+'</td>';
     used.forEach(function(b){
       if(app.indexOf(b)<0){h+='<td class="num na"></td>';return}
       var r=zCheck(I,z,b.k);
@@ -989,7 +999,7 @@ VIEWS.stamm=function(){
   var h=(V.neu?'<p class="hint">Alles optional ausser Regaltyp. Kunde und Standort kannst du auch später am PC in der Bericht-Datei ergänzen.</p>':'');
   h+='<div class="card"><h2>Regalanlage</h2>'
   +'<label class="f">Regaltyp (Standard für neue Regale)<select data-b="typ">'+listOpts(TYPEN,typKey(I.typ))+'</select></label>'
-  +'<label class="f">Hersteller<select data-b="hersteller">'+listOpts(HERSTELLER,I.hersteller,"– wählen –")+'</select></label>'
+  +'<label class="f">Hersteller (Standard für neue Regale)<select data-b="hersteller">'+listOpts(HERSTELLER,I.hersteller,"– wählen –")+'</select></label>'
   +'<label class="f">Erste Kleber-Nr. (Regal-Nummer)<input type="number" inputmode="numeric" min="1" data-b="plakStart" value="'+esc(I.plakStart||1)+'"></label>'
   +'<p class="hint">Jedes Regal bekommt die nächste Nummer – auch ohne Mangel. Die Nummer auf dem Kleber am Regal ist die Regal-Nummer im Bericht.</p></div>';
   h+='<div class="card"><h2>Kunde und Ort (optional)</h2>'
@@ -1006,7 +1016,7 @@ main.addEventListener("input",function(e){
   var mk=el.dataset.m;
   if(mk&&I){var m=findM(V.mid);if(!m)return;m[mk]=mk==="nr"?(parseInt(el.value,10)||""):el.value;if(mk==="massnahme")m.massAuto=false;save();return}
   var zk=el.dataset.z;
-  if(zk&&I){var z=zeileOf(I,V.zid);if(z){z[zk]=zk==="plakette"?(parseInt(el.value,10)||""):el.value;save();if(zk==="name"||zk==="plakette")setHeader(rName(z),true);if(zk==="plakette"&&I.zeilen.some(function(x){return x!==z&&x.plakette===z.plakette}))toast("Kleber "+kNr(z.plakette)+" ist schon vergeben");if(zk==="typ"&&e.type==="input")VIEWS.zeile()}return}
+  if(zk&&I){var z=zeileOf(I,V.zid);if(z){z[zk]=zk==="plakette"?(parseInt(el.value,10)||""):el.value;save();if(zk==="name"||zk==="plakette")setHeader(rName(z),true);if(zk==="plakette"&&I.zeilen.some(function(x){return x!==z&&x.plakette===z.plakette}))toast("Kleber "+kNr(z.plakette)+" ist schon vergeben");if(zk==="ausf"||zk==="hersteller"){LAST[zk]=z[zk];saveMeta("last",LAST)}if(zk==="typ"&&e.type==="input")VIEWS.zeile()}return}
   var at=el.dataset.at;
   if(at&&I){I.allg=I.allg||{};I.allg[at]=I.allg[at]||{};I.allg[at].t=el.value;save();return}
 });
@@ -1031,7 +1041,7 @@ VIEWS.insp=function(){
   I.zeilen.forEach(function(z){
     var zc=mcount(z.id),n=zc.rot+zc.gelb+zc.gruen,st=zStand(I,z);
     var tag=st.fertig?(n?'<span class="pill gp">fertig</span>':'<span class="pill io">i. O.</span>'):'<span class="pill offen">'+st.done+'/'+st.total+'</span>';
-    h+='<div class="zrow"><button class="item" data-act="zeile" data-zid="'+z.id+'"><div class="t"><b>'+esc(rName(z))+'</b><span>'+esc(typName(typKey(z.typ)))+(z.felder?' · '+z.felder+' Felder':'')+'</span></div><div class="dots">'+dots(zc)+'</div>'+tag+'</button>'
+    h+='<div class="zrow"><button class="item" data-act="zeile" data-zid="'+z.id+'"><div class="t"><b>'+esc(rName(z))+'</b><span>'+esc(zInfo(z))+(z.felder?' · '+z.felder+' Felder':'')+'</span></div><div class="dots">'+dots(zc)+'</div>'+tag+'</button>'
       +(!st.done&&!n?'<button class="qio" data-act="quickIO" data-zid="'+z.id+'" aria-label="'+esc(rName(z))+' komplett i. O.">alles<br>i. O.</button>':'')+'</div>';
   });
   h+='</div><div style="padding:10px 13px 13px"><button class="btn" data-act="addZeilen" style="width:100%">+ Mehrere Regale auf einmal</button></div></div>';
@@ -1096,6 +1106,8 @@ VIEWS.addZeilen=function(){
   main.innerHTML='<div class="card"><label class="f">Anzahl Regale<select id="za">'+numOpts(1,80,I.zeilen.length?1:1)+'</select></label>'
   +'<label class="f">Regaltyp<select id="zt">'+listOpts(TYPEN,typKey(LAST.typ||I.typ))+'</select></label>'
   +'<div class="two"><label class="f">Felder je Regal<select id="zf">'+numOpts(1,40,LAST.felder)+'</select></label><label class="f">Ebenen<select id="ze">'+numOpts(1,20,LAST.ebenen)+'</select></label></div>'
+  +'<label class="f">Ausführung (Doppelregal = zwei Regalzeilen Rücken an Rücken)<select id="zx">'+listOpts(AUSF,LAST.ausf||"einzel")+'</select></label>'
+  +'<label class="f">Hersteller (optional)<select id="zh">'+listOpts(HERSTELLER,LAST.hersteller||I.hersteller||"","– wählen –")+'</select></label>'
   +'<label class="f">Bezeichnung beim Kunden (optional)<input type="text" id="zn" placeholder="z. B. A-F oder 1-12" autocapitalize="characters"></label>'
   +'<p class="sub" id="zprev"></p></div><button class="btn pri big" data-act="doAddZeilen">Regale anlegen</button>';
   var up=function(){var l=parseNames($("#zn").value),n=l.length||(+$("#za").value||1),a=nextPlak();
@@ -1113,7 +1125,8 @@ VIEWS.zeile=function(){
   var list=btFor(z.typ),st=zStand(I,z);
   var h='<div class="card tight"><div class="two"><label class="f">Kleber-Nr.<input type="number" inputmode="numeric" data-z="plakette" value="'+esc(z.plakette||"")+'" style="font:700 1.3rem var(--f-mono)"></label><label class="f">Bezeichnung (optional)<input type="text" data-z="name" value="'+esc(z.name===String(z.plakette)?"":z.name)+'" placeholder="z. B. A"></label></div>'
    +'<label class="f">Regaltyp<select data-z="typ">'+listOpts(TYPEN,typKey(z.typ))+'</select></label>'
-   +'<div class="two"><label class="f">Felder<select data-z="felder">'+numOpts(1,40,z.felder)+'</select></label><label class="f">Ebenen<select data-z="ebenen">'+numOpts(1,20,z.ebenen)+'</select></label></div></div>';
+   +'<div class="two"><label class="f">Felder<select data-z="felder">'+numOpts(1,40,z.felder)+'</select></label><label class="f">Ebenen<select data-z="ebenen">'+numOpts(1,20,z.ebenen)+'</select></label></div>'
+   +'<div class="two"><label class="f">Ausführung<select data-z="ausf">'+listOpts(AUSF,z.ausf||"einzel")+'</select></label><label class="f">Hersteller (optional)<select data-z="hersteller">'+listOpts(HERSTELLER,z.hersteller||"","– wählen –")+'</select></label></div></div>';
   h+='<div class="progress"><div class="bar"><i style="width:'+Math.round(st.done/Math.max(1,st.total)*100)+'%"></i></div><span class="zahl">'+st.done+' / '+st.total+' Bauteile beurteilt</span></div>';
   if(!st.fertig)h+='<button class="btn ok big" data-act="allOk">Alle übrigen Bauteile i. O.</button>';
   h+='<div class="card flush">';
@@ -1134,7 +1147,7 @@ VIEWS.zeile=function(){
   main.innerHTML=h;
 };
 function nextRegalFrom(z){var n=(z&&z.plakette?z.plakette:nextPlak()-1)+1,ex=null;I.zeilen.forEach(function(x){if(x.plakette===n)ex=x});if(ex)return {nr:n,z:ex};var free=nextPlak();return {nr:Math.max(n,free),neu:true}}
-function addRegal(nr){var r={id:uid(),name:"",typ:LAST.typ||I.typ||"P",felder:LAST.felder||"",ebenen:LAST.ebenen||"",plakette:nr||nextPlak(),checks:{}};I.zeilen.push(r);save();return r}
+function addRegal(nr){var r={id:uid(),name:"",typ:LAST.typ||I.typ||"P",felder:LAST.felder||"",ebenen:LAST.ebenen||"",ausf:LAST.ausf||"einzel",hersteller:LAST.hersteller||I.hersteller||"",plakette:nr||nextPlak(),checks:{}};I.zeilen.push(r);save();return r}
 function mItem(m){
   var f=(m.fotos||[])[0];
   return '<button class="item mg '+(m.stufe||"")+'" data-act="editMangel" data-mid="'+m.id+'">'+(f?'<img data-ph="'+f+'" alt="">':'')+'<div class="t"><b><span class="nr">'+nrText(m.nr)+'</span>'+esc(m.bauteil||"Bauteil?")+(m.stufe?'':' <span class="pill crit">Stufe fehlt</span>')+'</b><span>'+esc(posText(m,I))+' · '+esc(m.art||"")+((m.fotos||[]).length?' · '+m.fotos.length+' Foto(s)':'')+(m.kunde&&m.kunde.status?' · Kunde: '+esc(KSTATUS[m.kunde.status]||m.kunde.status):'')+'</span></div></button>';
@@ -1149,7 +1162,7 @@ VIEWS.mangel=function(){
   setHeader(nrText(m.nr)+" · "+(z?rName(z):"Allgemein"),true);
   var h='<div class="card tight"><div class="row"><button class="btn pri" data-act="cam" style="flex:2 1 160px;min-height:58px;font-size:1.05rem">📷 Foto</button><button class="btn" data-act="gal">Galerie</button></div><div class="photos" id="phs"></div></div>';
   h+='<div class="card tight">'
-   +'<label class="f">Regal<select data-mc="zeileId">'+listOpts([["","Allgemein (ganze Anlage)"]].concat(I.zeilen.map(function(x){return [x.id,rName(x)+" · "+typName(typKey(x.typ))]})),m.zeileId)+'</select></label>'
+   +'<label class="f">Regal<select data-mc="zeileId">'+listOpts([["","Allgemein (ganze Anlage)"]].concat(I.zeilen.map(function(x){return [x.id,rName(x)+" · "+zInfo(x)]})),m.zeileId)+'</select></label>'
    +'<label class="f">Bauteil<select data-mc="bk" id="m_bk">'+listOpts(blist.map(function(x){return [x.k,x.l]}),m.bk,"– Bauteil wählen –")+'</select></label>'
    +(b?'<label class="f">Befund<select data-mc="art" id="m_art">'+listOpts(b.a.map(function(x){return x[0]}),m.art,"– Befund wählen –")+'</select></label>':'')
    +'</div>';
@@ -1163,6 +1176,7 @@ VIEWS.mangel=function(){
    +'<button class="amp gelb'+(m.stufe==="gelb"?" on":"")+'" data-act="mset" data-v="gelb">GELB<small>innert 4 Wochen</small></button>'
    +'<button class="amp gruen'+(m.stufe==="gruen"?" on":"")+'" data-act="mset" data-v="gruen">GRÜN<small>beobachten</small></button></div>'
    +(m.stufeVorschlag&&m.stufe===m.stufeVorschlag?'<p class="sub" style="margin:0">Vorauswahl nach Norm-Hilfe – bitte prüfen.</p>':'')+'</div>';
+  if(m.zeileId&&istDoppel(z))h+='<div class="card tight"><h2>Doppelregal</h2><label class="f">Regalzeile<select data-mc="zab">'+listOpts(ZEILEN_AB,m.zab||"","– wählen –")+'</select></label></div>';
   if(m.zeileId)h+='<div class="card tight"><h2>Position</h2><div class="three">'
    +'<label class="f">Feld<select data-mc="feld">'+numOpts(1,Math.max(+(z&&z.felder)||0,1)+(z&&z.felder?0:29),m.feld)+'</select></label>'
    +'<label class="f">Ebene<select data-mc="ebene">'+numOpts(0,Math.max(+(z&&z.ebenen)||0,0)+(z&&z.ebenen?0:15),m.ebene)+'</select></label>'
@@ -1223,7 +1237,7 @@ function newMangel(zid,bk){
   I.maengel.push(m);save();
   go("mangel",{id:I.id,mid:m.id});
 }
-function isBlank(m){return m&&!m.stufe&&!(m.fotos||[]).length&&!m.beschreibung&&!m.art&&!m.feld&&!m.seite&&!m.messMm}
+function isBlank(m){return m&&!m.stufe&&!(m.fotos||[]).length&&!m.beschreibung&&!m.art&&!m.feld&&!m.seite&&!m.zab&&!m.messMm}
 function checkMangel(m){
   if(!m.bk){var s=$("#m_bk");if(s){s.scrollIntoView({block:"center"});s.focus()}toast("Bitte Bauteil wählen");return false}
   if(!m.stufe){var a=$("#amps");if(a){a.classList.add("missing");a.scrollIntoView({behavior:"smooth",block:"center"})}toast("Bitte Gefährdungsstufe wählen");return false}
@@ -1363,9 +1377,9 @@ var ACT={
   anlage:function(){go("anlage",{id:I.id})},
   addZeilen:function(){go("addZeilen",{id:I.id})},
   doAddZeilen:function(){
-    var l=parseNames($("#zn").value),n=l.length||(+$("#za").value||1),ty=$("#zt").value,fe=$("#zf").value,eb=$("#ze").value;
-    LAST.typ=ty;LAST.felder=fe;LAST.ebenen=eb;saveMeta("last",LAST);
-    for(var i=0;i<n;i++){var r=addRegal(nextPlak());r.typ=ty;r.felder=fe;r.ebenen=eb;r.name=l[i]||""}
+    var l=parseNames($("#zn").value),n=l.length||(+$("#za").value||1),ty=$("#zt").value,fe=$("#zf").value,eb=$("#ze").value,ax=$("#zx").value,hs=$("#zh").value;
+    LAST.typ=ty;LAST.felder=fe;LAST.ebenen=eb;LAST.ausf=ax;LAST.hersteller=hs;saveMeta("last",LAST);
+    for(var i=0;i<n;i++){var r=addRegal(nextPlak());r.typ=ty;r.felder=fe;r.ebenen=eb;r.ausf=ax;r.hersteller=hs;r.name=l[i]||""}
     save();toast(n===1?"1 Regal angelegt":n+" Regale angelegt");
     if(V.v==="addZeilen"){history.replaceState({v:"insp",id:I.id},"");V={v:"insp",id:I.id};render()}
   },
