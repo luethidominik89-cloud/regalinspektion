@@ -67,6 +67,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .synckn.laeuft .punkt{background:var(--accent);animation:puls 1s ease-in-out infinite}
 .synckn.crit{color:var(--crit);background:var(--crit-soft);border-color:transparent}.synckn.crit .punkt{background:var(--crit)}
 @keyframes puls{50%{opacity:.25}}
+#upd{position:sticky;top:0;z-index:49;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;gap:10px;padding:8px 12px;font-weight:600}
+#upd span{flex:1}
+#upd button{min-height:44px;border:0;border-radius:var(--r);background:var(--accent-ink);color:var(--accent);font:700 .95rem var(--f-disp);padding:0 14px;cursor:pointer}
 #err{position:sticky;top:0;z-index:50;background:var(--crit);color:var(--status-ink);font-weight:600;padding:12px 14px;font-size:.95rem}
 
 main{padding:12px 12px 110px;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
@@ -321,6 +324,7 @@ body.gross .qio{min-width:86px}
 </head>
 <body>
 <div id="err" role="alert" hidden></div>
+<div id="upd" hidden><span>Neue Version verfügbar</span><button type="button" id="updBtn">Jetzt aktualisieren</button></div>
 <header class="topbar" id="hdr"><button class="back" id="back" aria-label="Zurück" hidden>‹</button><div class="mark" id="mark">DT</div><div class="tt"><h1 id="ttl">Regalinspektion</h1><div class="sub" id="ctx">DIN EN 15635</div></div><span class="synckn" id="saved" hidden><span class="punkt"></span><span id="savedT"></span></span></header>
 <main id="main"></main>
 <nav class="tabbar" id="tabs" hidden></nav>
@@ -874,8 +878,29 @@ function pump(){
 function flushSave(){ if(!writing&&!dirty)return Promise.resolve(); return new Promise(function(res){waiters.push(res);pump()}); }
 function saveMeta(k,v){return dput("meta",{k:k,v:v}).catch(function(){})}
 function errBanner(t){var b=$("#err");b.textContent=t;b.hidden=!t}
-document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden"){pump()}else{wake()}});
+/* ---------- Updates ----------
+   WICHTIG bei jedem Update: APP_V hier UND VERSION in sw.js gleich hochzählen. */
+var APP_V="regal-v5",SWREG=null,updT=0;
+function vNr(v){return String(v||"").replace(/^regal-v/,"")}
+function updCheck(manuell){
+  if(!navigator.onLine){if(manuell)toast("Kein Netz – Update später prüfen");return}
+  if(!manuell&&Date.now()-updT<60000)return;updT=Date.now();
+  fetch("sw.js?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){
+    var m=t.match(/VERSION\s*=\s*'([^']+)'/);if(!m)return;
+    if(m[1]!==APP_V){var b=$("#upd");b.querySelector("span").textContent="Neue Version "+vNr(m[1])+" verfügbar";b.hidden=false}
+    else if(manuell)toast("Die App ist aktuell (Version "+vNr(APP_V)+")");
+  }).catch(function(){if(manuell)toast("Update-Prüfung nicht möglich")});
+}
+function updJetzt(){
+  var b=$("#upd");b.querySelector("span").textContent="Wird aktualisiert …";
+  flushSave().then(function(){return SWREG?SWREG.update().catch(function(){}):null}).then(function(){
+    setTimeout(function(){location.reload()},800);
+  });
+}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden"){pump()}else{wake();updCheck()}});
 addEventListener("pagehide",function(){pump()});
+addEventListener("online",function(){updCheck()});
+$("#updBtn").addEventListener("click",updJetzt);
 var wl=null;function wake(){try{if(navigator.wakeLock&&!wl)navigator.wakeLock.request("screen").then(function(x){wl=x;x.addEventListener("release",function(){wl=null})}).catch(function(){})}catch(e){}}
 
 /* ---------- Fotos ---------- */
@@ -922,7 +947,7 @@ $("#tabs").addEventListener("click",function(e){var b=e.target.closest("[data-ta
   if(v===V.v)return;go(v,{id:I.id},TABVIEWS[V.v]&&V.v!=="zeile")});
 function ctxLine(){var n=I.maengel.filter(function(m){return m.stufe}).length;return [I.kunde||I.standort||"Inspektion",fDate(I.datum),n+" Mängel","nächster Regal-Kleber "+kNr(nextPlak())].join(" · ")}
 function logoMark(){var m=$("#mark");if(SET.logo){m.className="mark haslogo";m.innerHTML='<img src="'+SET.logo+'" alt="Logo">'}else{m.className="mark";m.textContent="DT"}}
-function setHeader(t,back){$("#ttl").textContent=t;$("#back").hidden=!back;$("#saved").hidden=!I;$("#ctx").textContent=I?ctxLine():"DIN EN 15635 · "+(SET.firma.name||"");renderTabs();logoMark();document.body.classList.toggle("gross",SET.gross!==false)}
+function setHeader(t,back){$("#ttl").textContent=t;$("#back").hidden=!back;$("#saved").hidden=!I;$("#ctx").textContent=I?ctxLine():"DIN EN 15635 · Version "+vNr(APP_V);renderTabs();logoMark();document.body.classList.toggle("gross",SET.gross!==false)}
 
 /* ---------- Navigation ---------- */
 function go(v,p,replace){ leaving(); V=Object.assign({v:v},p||{}); history[replace?"replaceState":"pushState"](V,""); render(); window.scrollTo(0,0); }
@@ -985,6 +1010,7 @@ VIEWS.settings=function(){
   +'<div class="card"><h2>Bedienung</h2><div class="chips"><button class="chip'+(SET.gross!==false?" on":"")+'" data-act="gross" data-v="1">Handschuhmodus (grosse Knöpfe)</button><button class="chip'+(SET.gross===false?" on":"")+'" data-act="gross" data-v="0">Normal</button></div></div>'
   +'<div class="card"><h2>Logo für Berichte</h2>'+(SET.logo?'<img src="'+SET.logo+'" alt="Logo" style="max-height:80px;max-width:100%;object-fit:contain;align-self:flex-start">':'<p class="hint">Noch kein Logo. Ohne Logo steht der Firmenname im Bericht.</p>')
   +'<div class="row"><button class="btn" data-act="pickLogo">Logo wählen</button>'+(SET.logo?'<button class="btn warn" data-act="delLogo">Logo entfernen</button>':'')+'</div></div>'
+  +'<div class="card"><h2>App-Version</h2><p class="hint">Installiert: Version '+vNr(APP_V)+'. Updates werden beim Öffnen automatisch gesucht.</p><button class="btn" data-act="updSuchen">Nach Update suchen</button></div>'
   +'<div class="card"><h2>Hinweis</h2><p class="hint">Alle Daten bleiben auf diesem Gerät im Browser. Nach jeder Inspektion eine JSON-Sicherung exportieren – Browserdaten können beim Aufräumen des Handys gelöscht werden.</p></div>';
   ["name","pruefer","email"].forEach(function(k){$("#s_"+k).addEventListener("input",function(e){SET.firma[k]=e.target.value;saveMeta("settings",SET)})});
 };
@@ -1433,6 +1459,7 @@ var ACT={
   exportJson:function(){exportJson().catch(function(e){if(e&&e.name==="AbortError"){toast("Sicherung abgebrochen");return}toast("Fehler: "+(e.message||e),5000)})},
   alle:function(){go("alle",{id:I.id})},
   alleF:function(b){if(V.v==="alle"){V.f=b.dataset.f;history.replaceState(V,"");VIEWS.alle()}else go("alle",{id:I.id,f:b.dataset.f})},
+  updSuchen:function(){updCheck(true)},
   gross:function(b){SET.gross=b.dataset.v==="1";saveMeta("settings",SET);render()},
   importJson:function(){jsonMode="insp";$("#fjson").click()},
   importRM:function(){jsonMode="rm";$("#fjson").click()},
@@ -1452,7 +1479,10 @@ dput("meta",{k:"selbsttest",v:Date.now()}).then(function(){return dget("meta","s
 }).catch(function(e){errBanner("Gerätespeicher nicht verfügbar ("+(e&&e.message||e)+"). So NICHT erfassen – nicht im privaten Modus öffnen, anderen Browser verwenden.");throw e}).then(function(){
   wake();
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
-  if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"))navigator.serviceWorker.register("sw.js").catch(function(){});
+  if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){
+    navigator.serviceWorker.register("sw.js").then(function(reg){SWREG=reg}).catch(function(){});
+    setTimeout(updCheck,2500);
+  }
   V=history.state&&history.state.v?history.state:{v:"home"};
   if(V.v==="report")V={v:"insp",id:V.id};
   history.replaceState(V,"");render();
