@@ -163,6 +163,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-
 .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .pill.offen{background:var(--surface-2);color:var(--ink-2)}.pill.io{background:var(--ok-soft);color:var(--ok)}.pill.gp{background:var(--accent-soft);color:var(--accent)}.pill.crit{background:var(--crit-soft);color:var(--crit)}
 .qio{min-width:74px;border:0;border-left:1px solid var(--line);background:var(--ok-soft);color:var(--ok);font:700 .9rem var(--f-disp);cursor:pointer}
+.qio.del{background:var(--crit-soft,#FBE7EA);color:var(--crit)}
+.loeschfrage{border:2px solid var(--crit)}.loeschfrage h2{color:var(--crit)}.loeschfrage .row{margin-top:10px}
+.btn.krit{background:var(--crit);border-color:var(--crit);color:#fff}
 .mg{box-shadow:inset 6px 0 0 var(--line-strong)}
 .mg.rot{box-shadow:inset 6px 0 0 var(--rot)}.mg.gelb{box-shadow:inset 6px 0 0 var(--gelb)}.mg.gruen{box-shadow:inset 6px 0 0 var(--gruen)}
 .mg img{width:52px;height:52px;object-fit:cover;border-radius:4px;flex:none;border:1px solid var(--line)}
@@ -881,7 +884,7 @@ function saveMeta(k,v){return dput("meta",{k:k,v:v}).catch(function(){})}
 function errBanner(t){var b=$("#err");b.textContent=t;b.hidden=!t}
 /* ---------- Updates ----------
    WICHTIG bei jedem Update: APP_V hier UND VERSION in sw.js gleich hochzählen. */
-var APP_V="regal-v6",SWREG=null,updT=0;
+var APP_V="regal-v7",SWREG=null,updT=0;
 function vNr(v){return String(v||"").replace(/^regal-v/,"")}
 function updCheck(manuell){
   if(!navigator.onLine){if(manuell)toast("Kein Netz – Update später prüfen");return}
@@ -973,6 +976,14 @@ function readMirror(id){try{var t=localStorage.getItem("ri_spiegel_"+id);return 
 function pickNewest(x,id){var m=readMirror(id);if(m&&(!x||(m.updated||0)>(x.updated||0)))return m;return x||null}
 
 /* ---------- Startseite ---------- */
+var LISTE=[];
+function inspName(x){return x.kunde||x.standort||("Inspektion "+fDate(x.datum))}
+/* Inspektion endgültig löschen: Fotos, Datensatz und Spiegel. Erst nach der Rückfrage im Bildschirm. */
+function inspLoeschen(x){
+  return (I?flushSave():Promise.resolve()).then(function(){return Promise.all(allPhotoIds(x).map(function(p){return ddel("photos",p)}))})
+    .then(function(){return ddel("insp",x.id)})
+    .then(function(){try{localStorage.removeItem("ri_spiegel_"+x.id)}catch(e){}});
+}
 VIEWS.home=function(){
   I=null;setHeader("Regalinspektion",false);
   dall("insp").then(function(list){
@@ -984,8 +995,12 @@ VIEWS.home=function(){
     h+='<button class="gross-aktion" data-act="newInsp"><svg viewBox="0 0 24 24"><path d="M4 21V5l8-3 8 3v16"/><path d="M4 11h16M4 16h16M9 21v-5M15 21v-5"/></svg><div><b>Neue Inspektion</b><small>Regalzeilen anlegen und losgehen</small></div></button>';
     h+='<div class="card flush"><div style="padding:12px 13px 6px"><h2>Gespeicherte Inspektionen</h2></div><div class="list">';
     if(!list.length)h+='<p class="hint" style="padding:0 13px 13px">Noch keine Inspektion. Tipp: Zuerst im Büro eine Probe mit 2–3 Mängeln und Fotos machen und den Bericht erzeugen.</p>';
+    LISTE=list;
+    var zuLoeschen=V.delId?list.filter(function(x){return x.id===V.delId})[0]:null;
+    if(zuLoeschen){var nm=zuLoeschen.maengel.filter(function(m){return m.stufe}).length,nf=allPhotoIds(zuLoeschen).length;
+      h='<div class="card loeschfrage" id="loeschfrage"><h2>Inspektion löschen?</h2><p><b>'+esc(inspName(zuLoeschen))+'</b> vom '+fDate(zuLoeschen.datum)+': '+zuLoeschen.zeilen.length+' Regale, '+nm+' Mängel, '+nf+' Fotos.</p><p class="hint">Wird auf diesem Gerät endgültig gelöscht. Brauchst du sie noch, zuerst öffnen und «Sicherung jetzt» machen.</p><div class="row"><button class="btn krit big" data-act="delJa" data-id="'+zuLoeschen.id+'">Ja, endgültig löschen</button><button class="btn big" data-act="delNein">Abbrechen</button></div></div>'+h;}
     list.forEach(function(x){var c=countStufen(x.maengel.filter(function(m){return m.stufe}));
-      h+='<button class="item" data-act="open" data-id="'+x.id+'"><div class="t"><b>'+esc(x.kunde||x.standort||("Inspektion "+fDate(x.datum)))+'</b><span>'+fDate(x.datum)+' · '+x.zeilen.length+' Regale · '+x.maengel.filter(function(m){return m.stufe}).length+' Mängel</span></div><div class="dots">'+dots(c)+'</div></button>'});
+      h+='<div class="zrow"><button class="item" data-act="open" data-id="'+x.id+'"><div class="t"><b>'+esc(inspName(x))+'</b><span>'+fDate(x.datum)+' · '+x.zeilen.length+' Regale · '+x.maengel.filter(function(m){return m.stufe}).length+' Mängel</span></div><div class="dots">'+dots(c)+'</div></button><button class="qio del" data-act="askDel" data-id="'+x.id+'" aria-label="'+esc(inspName(x))+' löschen">Löschen</button></div>'});
     h+='</div></div>';
     h+='<div class="card"><h2>Daten</h2><div class="row"><button class="btn" data-act="importJson">Sicherung importieren</button><button class="btn" data-act="settings">Einstellungen / Logo</button></div><p class="hint" id="stor"></p></div>';
     main.innerHTML=h;
@@ -1465,8 +1480,12 @@ var ACT={
   gross:function(b){SET.gross=b.dataset.v==="1";saveMeta("settings",SET);render()},
   importJson:function(){jsonMode="insp";$("#fjson").click()},
   importRM:function(){jsonMode="rm";$("#fjson").click()},
-  delInsp:function(){if(!confirm("Inspektion «"+(I.kunde||I.standort||fDate(I.datum))+"» mit allen Fotos endgültig löschen? Vorher Sicherungsdatei machen!"))return;
-    var ids=allPhotoIds(I),id=I.id;Promise.all(ids.map(function(p){return ddel("photos",p)})).then(function(){return ddel("insp",id)}).then(function(){try{localStorage.removeItem("ri_spiegel_"+id)}catch(e){}I=null;go("home",{},true)})}
+  delInsp:function(){var id=I.id;flushSave().then(function(){I=null;go("home",{delId:id},true)})},
+  askDel:function(b){V.delId=b.dataset.id;history.replaceState(V,"");render();window.scrollTo(0,0)},
+  delNein:function(){V.delId=null;history.replaceState(V,"");render()},
+  delJa:function(b){var x=LISTE.filter(function(y){return y.id===b.dataset.id})[0];if(!x)return;
+    b.disabled=true;inspLoeschen(x).then(function(){V.delId=null;history.replaceState(V,"");toast("Inspektion gelöscht");render()})
+      .catch(function(e){b.disabled=false;toast("Löschen fehlgeschlagen: "+(e&&e.message||e),5000)})}
 };
 main.addEventListener("click",function(e){
   var b=e.target.closest("[data-act]");if(!b||!main.contains(b))return;
