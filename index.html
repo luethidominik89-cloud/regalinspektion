@@ -22,7 +22,7 @@
   --accent:#0B6E77; --accent-ink:#FFFFFF; --accent-soft:#DCEDEE;
   --ok:#2C7A52; --ok-soft:#DCEDE3; --warn:#9C6B00; --warn-soft:#F7EBCE; --crit:#B3122C; --crit-soft:#F8DCE1;
   --tape:#F2C230; --tape-ink:#1B211F; --status-ink:#FFFFFF;
-  --rot:var(--crit); --gelb:var(--tape); --gruen:var(--ok);
+  --rot:var(--crit); --gelb:#C45F00; --gruen:var(--ok);
   --shadow:0 1px 2px rgba(15,22,24,.08),0 6px 18px rgba(15,22,24,.06);
   --r:6px;
   --f-ui:"IBM Plex Sans","Segoe UI",Roboto,system-ui,sans-serif;
@@ -123,7 +123,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-
 .stat .n{display:block;font:700 1.7rem/1 var(--f-disp);font-variant-numeric:tabular-nums}
 .stat .l{display:block;font-size:.68rem;color:var(--ink-2);margin-top:5px;line-height:1.2;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
 .stat.rot{border-top-color:var(--rot)}.stat.rot .n{color:var(--crit)}
-.stat.gelb{border-top-color:var(--gelb)}.stat.gelb .n{color:var(--warn)}
+.stat.gelb{border-top-color:var(--gelb)}.stat.gelb .n{color:var(--gelb)}
 .stat.gruen{border-top-color:var(--gruen)}.stat.gruen .n{color:var(--ok)}
 .stat.z{border-top-color:var(--accent)}
 .progress{display:flex;align-items:center;gap:10px}
@@ -139,7 +139,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-
 .amp{min-height:74px;border-radius:8px;border:2px solid transparent;font:700 1.1rem var(--f-disp);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;padding:6px}
 .amp small{font:600 .72rem var(--f-ui);margin-top:4px}
 .amp.rot{background:var(--crit-soft);color:var(--crit)} .amp.rot.on{background:var(--rot);color:#fff;border-color:var(--ink)}
-.amp.gelb{background:var(--warn-soft);color:var(--warn)} .amp.gelb.on{background:var(--gelb);color:var(--tape-ink);border-color:var(--ink)}
+.amp.gelb{background:#FDE9DA;color:#8A3F00} .amp.gelb.on{background:var(--gelb);color:#fff;border-color:var(--ink)}
 .amp.gruen{background:var(--ok-soft);color:var(--ok)} .amp.gruen.on{background:var(--gruen);color:#fff;border-color:var(--ink)}
 .amps.missing .amp{border-color:var(--crit);border-style:dashed}
 .stepper{display:grid;grid-template-columns:50px 1fr 50px;gap:6px;align-items:center}
@@ -158,7 +158,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-
 .zrow .item{border-bottom:0}
 .dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 .dot{min-width:28px;height:28px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font:700 .85rem var(--f-disp);padding:0 6px}
-.dot.rot{background:var(--rot);color:#fff}.dot.gelb{background:var(--gelb);color:var(--tape-ink)}.dot.gruen{background:var(--gruen);color:#fff}
+.dot.rot{background:var(--rot);color:#fff}.dot.gelb{background:var(--gelb);color:#fff}.dot.gruen{background:var(--gruen);color:#fff}
 .pill{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;font:600 .68rem var(--f-disp);letter-spacing:.03em;text-transform:uppercase;white-space:nowrap}
 .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .pill.offen{background:var(--surface-2);color:var(--ink-2)}.pill.io{background:var(--ok-soft);color:var(--ok)}.pill.gp{background:var(--accent-soft);color:var(--accent)}.pill.crit{background:var(--crit-soft);color:var(--crit)}
@@ -287,19 +287,19 @@ body.gross .qio{min-width:86px}
 .rp .big div{border-radius:3mm;padding:4mm;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .rp .big b{display:block;font-size:30pt;line-height:1}
 .rp .big span{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.rp .c-rot{background:#B3122C;color:#fff}.rp .c-gelb{background:#e8a400;color:#1d1600}.rp .c-gruen{background:#2C7A52;color:#fff}
+.rp .c-rot{background:#B3122C;color:#fff}.rp .c-gelb{background:#c45f00;color:#fff}.rp .c-gruen{background:#2C7A52;color:#fff}
 .rp .res{font-size:13pt;font-weight:800;padding:3mm 4mm;border-radius:2mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.rp .res.rot{background:#fde8e8;color:#B3122C;border:1pt solid #B3122C}.rp .res.gelb{background:#fff4d1;color:#6b4d00;border:1pt solid #e8a400}.rp .res.gruen{background:#e3f3e4;color:#2C7A52;border:1pt solid #2C7A52}
+.rp .res.rot{background:#fde8e8;color:#B3122C;border:1pt solid #B3122C}.rp .res.gelb{background:#fde9da;color:#8a3f00;border:1pt solid #c45f00}.rp .res.gruen{background:#e3f3e4;color:#2C7A52;border:1pt solid #2C7A52}
 .rp .amp td:first-child{width:24mm;font-weight:800;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.rp td.s-rot{background:#B3122C;color:#fff}.rp td.s-gelb{background:#e8a400;color:#1d1600}.rp td.s-gruen{background:#2C7A52;color:#fff}
+.rp td.s-rot{background:#B3122C;color:#fff}.rp td.s-gelb{background:#c45f00;color:#fff}.rp td.s-gruen{background:#2C7A52;color:#fff}
 .rp .mgl{border:.8pt solid #b8c3ce;border-left:4mm solid #999;border-radius:1.5mm;padding:3mm;margin:0 0 4mm;break-inside:avoid;page-break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .rp .mgl.rot{border-left-color:#B3122C;background:#fff5f5;border-color:#B3122C}
-.rp .mgl.gelb{border-left-color:#e8a400}
+.rp .mgl.gelb{border-left-color:#c45f00}
 .rp .mgl.gruen{border-left-color:#2C7A52}
 .rp .mgh{display:flex;gap:3mm;align-items:baseline;flex-wrap:wrap;margin-bottom:2mm}
 .rp .mgh b{font-size:12pt}
 .rp .badge{font-size:8.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:.8mm 2mm;border-radius:1mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.rp .badge.rot{background:#B3122C;color:#fff}.rp .badge.gelb{background:#e8a400;color:#1d1600}.rp .badge.gruen{background:#2C7A52;color:#fff}
+.rp .badge.rot{background:#B3122C;color:#fff}.rp .badge.gelb{background:#c45f00;color:#fff}.rp .badge.gruen{background:#2C7A52;color:#fff}
 .rp .mgd{display:grid;grid-template-columns:30mm 1fr;gap:1mm 3mm;font-size:10pt}
 .rp .mgd dt{color:#56687a;font-weight:600}.rp .mgd dd{margin:0}
 .rp .fotos{display:flex;flex-wrap:wrap;gap:2mm;margin-top:2.5mm}
@@ -317,7 +317,7 @@ body.gross .qio{min-width:86px}
 .rp table.mx{font-size:8.5pt}.rp table.mx th,.rp table.mx td{padding:1.2mm 1mm}
 .rp td.ok{color:#2C7A52;font-weight:700}.rp td.na{background:#F3F6F6}.rp td.open{color:#9C6B00}
 .rp td.m-rot,.rp td.m-gelb,.rp td.m-gruen{font-weight:800;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.rp td.m-rot{background:#B3122C;color:#fff}.rp td.m-gelb{background:#F2C230;color:#1B211F}.rp td.m-gruen{background:#2C7A52;color:#fff}
+.rp td.m-rot{background:#B3122C;color:#fff}.rp td.m-gelb{background:#c45f00;color:#fff}.rp td.m-gruen{background:#2C7A52;color:#fff}
 .rp ol.emp{margin:0;padding-left:6mm}.rp ol.emp li{margin-bottom:1.5mm}
 @page{size:A4 portrait;margin:13mm 12mm 14mm}
 </style>
@@ -345,73 +345,73 @@ function typKey(v){if(!v)return "P";for(var i=0;i<TYPEN.length;i++)if(TYPEN[i][0
 /* t: Regaltypen, für die das Bauteil gilt ("*" = alle). a: [Schadensart, Vorauswahl Ampel] – "mess" = Einstufung über Messung */
 var BT=[
  {k:"stuetze",c:"ST",l:"Rahmen / Stützen",t:"PFWKEDMRS",mess:[{l:"in Traversenrichtung",g:5},{l:"quer zur Traverse",g:3}],
-  a:[["Verformung / Anfahrschaden","mess"],["Riss / Knick","rot"],["Lochung eingerissen","rot"],["Lotabweichung (Schiefstand)","gelb"],["Korrosion","gelb"],["Sonstiges",""]],
-  p:"Stützen vor allem im Anfahrbereich (unten bis ca. 1.5 m) auf Beulen, Knicke, Risse und eingerissene Lochung prüfen. Rahmen im Lot? Richtwert Lotabweichung je nach Hersteller H/350 bis H/500.",
-  g:"Verformung mit 1 m Richtscheit messen: in Traversenrichtung max. 5 mm, quer zur Traverse max. 3 mm. Bis Grenzwert = Grün · bis doppelter Grenzwert = Gelb · darüber = Rot. Risse, Knicke und eingerissene Lochung immer Rot."},
+  a:[["Verformung / Anfahrschaden","mess"],["Riss / Knick","rot"],["Lochung eingerissen","rot"],["Lotabweichung (Schiefstand)","gelb","Ursache abklären (Anfahrschaden, Boden, Montage). Über Höhe/200 (beladen) den Lieferanten informieren; er prüft die Bemessung (DIN EN 15635 9.4.8)."],["Korrosion","gelb"],["Sonstiges",""]],
+  p:"Stützen vor allem im Anfahrbereich (unten bis ca. 1.5 m) auf Beulen, Knicke, Risse und eingerissene Lochung prüfen. Rahmen im Lot? Beladen höchstens Höhe/200 (DIN EN 15635 9.4.8), bei Schmalgang deutlich weniger – Wert des Lieferanten.",
+  g:"Verformung mit 1 m Richtscheit messen: in Traversenrichtung max. 5 mm, quer zur Traverse max. 3 mm; kürzer gemessen anteilig (0,5 m = halber Wert). Bis Grenzwert = Grün · über dem Grenzwert = Orange · ab dem Doppelten = Rot (DIN EN 15635 9.5). Risse nicht messen, Bauteil immer ersetzen. Schiefstand beladen max. Höhe/200, sonst Lieferant informieren (9.4.8)."},
  {k:"fachwerk",c:"FW",l:"Fachwerk (Diagonalen / Horizontalen)",t:"PWKEDMRS",mess:[{l:"Verbiegung",g:10}],
   a:[["Verbogen","mess"],["Abgerissen / fehlt","rot"],["Schraube lose / fehlt","gelb","Fehlende Schrauben ergänzen bzw. lose Schrauben nachziehen (Originalschrauben, Anzugsmoment gemäss Hersteller)."],["Korrosion","gelb"],["Sonstiges",""]],
   p:"Verbände zwischen den Stützen: verbogen, abgerissen, Schrauben lose oder fehlend?",
-  g:"Verbiegung mit 1 m Richtscheit: max. 10 mm (beide Richtungen). Bis 10 mm Grün · bis 20 mm Gelb · darüber Rot. Abgerissener Verband: Rot."},
+  g:"Verbiegung mit 1 m Richtscheit: max. 10 mm (beide Ebenen), kürzer gemessen anteilig. Bis 10 mm Grün · über 10 mm Orange · ab 20 mm Rot (DIN EN 15635 9.5). Abgerissener Verband: Rot."},
  {k:"fuss",c:"FP",l:"Fussplatten / Bodenanker",t:"*",
   a:[["Anker fehlt","gelb","Fehlende Bodenanker gemäss Herstellerangabe setzen."],["Anker lose / ausgerissen","gelb","Anker nachziehen bzw. neu setzen gemäss Herstellerangabe. Bei ausgebrochenem Boden Fachfirma beiziehen."],["Fussplatte verformt","gelb"],["Fussplatte gerissen / fehlt","rot"],["Unterlegplatten unzulässig","gelb"],["Sonstiges",""]],
   p:"Jede Stütze mit Fussplatte, vollflächig aufliegend. Bodenanker gemäss Hersteller vollständig und fest. Unterlegplatten nur nach Herstellerangabe.",
-  g:"Fehlender oder loser Anker: Gelb. Gerissene oder fehlende Fussplatte, ausgebrochener Boden unter der Stütze: Rot."},
+  g:"Fehlender oder loser Anker: Orange. Gerissene oder fehlende Fussplatte, ausgebrochener Boden unter der Stütze: Rot."},
  {k:"traverse",c:"TR",l:"Traversen",t:"PWEDR",
-  a:[["Bleibende Durchbiegung","gelb"],["Seitlich angefahren / verformt","gelb"],["Riss an Schweissnaht / Haken","rot"],["Haken verbogen / nicht voll eingehängt","rot"],["Überladung","rot"],["Höhe weicht vom Plan / Schild ab","gelb"],["Korrosion","gelb"],["Sonstiges",""]],
+  a:[["Bleibende Durchbiegung","rot","Träger entlasten und Lieferant beiziehen (bleibende Verformung über 20 % der normalen Durchbiegung, DIN EN 15635 9.6)."],["Seitlich angefahren / verformt","rot","Träger entlasten und Lieferant beiziehen (seitliche Verformung über 50 % der normalen Durchbiegung, DIN EN 15635 9.6)."],["Riss an Schweissnaht / Haken","rot"],["Haken verbogen / nicht voll eingehängt","rot"],["Überladung","rot"],["Höhe weicht vom Plan / Schild ab","gelb"],["Korrosion","gelb"],["Sonstiges",""]],
   p:"Durchbiegung unter Last, bleibende Verformung nach Entladen, Anfahrschäden, Einhängehaken und Schweissnähte, Traversenhöhen gemäss Belastungsschild.",
-  g:"Zulässige Durchbiegung unter Nennlast L/200 (z. B. 2700 mm → 13.5 mm). Bleibende Verformung = Schaden. Risse an Schweissnaht oder Haken, verbogene Haken: Rot."},
+  g:"Durchbiegung unter Nennlast typisch L/200 (z. B. 2700 mm → 13.5 mm), massgebend ist der Lieferant (9.4.6). Bleibend vertikal über 20 %, seitlich über 50 % davon, deutlich verformte Haken oder Riss an der Schweissnaht: entlasten und Lieferant beiziehen = Rot (DIN EN 15635 9.6)."},
  {k:"sicherung",c:"SI",l:"Traversensicherung (Sicherungsstifte)",t:"PWEDMR",
-  a:[["Fehlt","gelb","Fehlende Sicherungsstifte ergänzen (Originalteil des Herstellers)."],["Falsch / nicht passend","gelb","Durch passenden Original-Sicherungsstift des Herstellers ersetzen."],["Sonstiges",""]],
+  a:[["Fehlt","gelb","Fehlende Sicherungsstifte sofort ersetzen (Originalteil des Herstellers), Vorrat halten (DIN EN 15635 9.4.7)."],["Falsch / nicht passend","gelb","Durch passenden Original-Sicherungsstift des Herstellers ersetzen."],["Sonstiges",""]],
   p:"Jede Traverse an beiden Enden mit Sicherungsstift (Aushebesicherung).",
-  g:"Fehlende Sicherung: Gelb. Meist sofort vor Ort ergänzbar – dann in der Bemerkung vermerken."},
+  g:"Fehlende Sicherung sofort ersetzen (DIN EN 15635 9.4.7). Meist vor Ort ergänzbar – dann in der Bemerkung vermerken."},
  {k:"reihenverb",c:"RV",l:"Reihenverbinder / Wandanker",t:"PFWEDMR",
   a:[["Fehlt","gelb"],["Lose","gelb"],["Verformt","gelb"],["Sonstiges",""]],
   p:"Doppelregale mit Reihenverbindern, Einzelregale an der Wand gemäss Hersteller verankert.",
-  g:"Fehlend, lose oder verformt: Gelb."},
+  g:"Fehlend, lose oder verformt: Orange."},
  {k:"durchschub",c:"DS",l:"Durchschubsicherung",t:"PED",
   a:[["Fehlt (erforderlich)","gelb"],["Beschädigt","gelb"],["Lose / falsch montiert","gelb"],["Sonstiges",""]],
   p:"Erforderlich, wo Ladeeinheiten auf der Rückseite in Gänge, Verkehrswege oder Arbeitsplätze geschoben werden können.",
-  g:"Fehlt an gefährdeter Stelle oder beschädigt: Gelb."},
+  g:"Fehlt an gefährdeter Stelle oder beschädigt: Orange."},
  {k:"rueckwand",c:"GR",l:"Gitterrückwand",t:"PFWR",
   a:[["Fehlt (erforderlich)","gelb"],["Beschädigt","gelb"],["Befestigung lose / fehlt","gelb","Befestigung der Gitterrückwand ergänzen bzw. nachziehen."],["Sonstiges",""]],
   p:"Schutz gegen herabfallende Ware über Verkehrswegen, Durchgängen und Arbeitsplätzen.",
-  g:"Fehlt an gefährdeter Stelle, beschädigt oder lose: Gelb."},
+  g:"Fehlt an gefährdeter Stelle, beschädigt oder lose: Orange."},
  {k:"gitterrost",c:"RO",l:"Gitterroste / Palettenauflagen",t:"PWE",
   a:[["Verformt","gelb"],["Nicht gesichert / verrutscht","gelb"],["Nicht vollflächig aufliegend","gelb"],["Unzulässiger Typ / zu schwach","rot"],["Sonstiges",""]],
   p:"Gitterroste und Auflagen passend zur Traverse, gegen Verschieben gesichert, Tragfähigkeit passend zur Fachlast.",
-  g:"Verformt oder verrutscht: Gelb. Unzulässiger oder zu schwacher Rost unter Last: Rot."},
+  g:"Verformt oder verrutscht: Orange. Unzulässiger oder zu schwacher Rost unter Last: Rot."},
  {k:"holz",c:"HE",l:"Holzeinlagen / Spanplatten",t:"PFWM",
   a:[["Gebrochen / eingerissen","rot","Einlage sofort entfernen und durch eine vom Hersteller freigegebene Ausführung ersetzen."],["Durchgebogen","gelb","Einlage durch eine vom Hersteller freigegebene, ausreichend tragfähige Ausführung ersetzen."],["Nicht vollflächig aufliegend / verrutscht","gelb"],["Nicht vom Hersteller freigegeben","gelb"],["Feucht / beschädigt","gelb","Beschädigte Einlage ersetzen (vom Hersteller freigegebene Ausführung)."],["Sonstiges",""]],
   p:"Nur vom Hersteller freigegebene Einlagen, vollflächig aufliegend, nicht durchgebogen oder gebrochen.",
-  g:"Gebrochen unter Last: Rot. Durchgebogen, verrutscht, feucht oder nicht freigegeben: Gelb."},
+  g:"Gebrochen unter Last: Rot. Durchgebogen, verrutscht, feucht oder nicht freigegeben: Orange."},
  {k:"fachboden",c:"FB",l:"Fachböden / Fachbodenträger",t:"FWMS",
   a:[["Verformt","gelb"],["Träger / Einhängung beschädigt","rot"],["Überladung","rot"],["Sicherung fehlt","gelb","Fachbodensicherung ergänzen (Originalteil des Herstellers)."],["Sonstiges",""]],
   p:"Fachböden richtig eingehängt und gesichert, keine bleibende Durchbiegung, Fachlast eingehalten.",
-  g:"Bleibend verformt: Gelb. Beschädigte Einhängung oder Überladung: Rot."},
+  g:"Bleibend verformt: Orange. Beschädigte Einhängung oder Überladung: Rot."},
  {k:"kragarm",c:"KA",l:"Kragarme",t:"K",
   a:[["Verformt","gelb"],["Riss","rot"],["Endanschlag fehlt","gelb","Endanschlag an den Kragarmen nachrüsten (Originalteil des Herstellers)."],["Sicherung fehlt","gelb","Kragarm-Sicherung ergänzen (Originalteil des Herstellers)."],["Überladung","rot"],["Sonstiges",""]],
   p:"Kragarme gerade, gesichert, mit Endanschlag. Armlast und Ständerlast gemäss Schild.",
-  g:"Verformt oder Anschlag fehlt: Gelb. Riss oder Überladung: Rot."},
+  g:"Verformt oder Anschlag fehlt: Orange. Riss oder Überladung: Rot."},
  {k:"rollen",c:"RB",l:"Rollenbahnen / Bremsen",t:"D",
   a:[["Rollen blockiert / beschädigt","gelb"],["Bremse / Vereinzeler defekt","rot"],["Endanschlag defekt","rot"],["Sonstiges",""]],
   p:"Rollen leichtgängig, Bremsrollen und Vereinzeler funktionsfähig, Endanschläge intakt.",
-  g:"Blockierte Rollen: Gelb. Defekte Bremse oder Endanschlag: Rot."},
+  g:"Blockierte Rollen: Orange. Defekte Bremse oder Endanschlag: Rot."},
  {k:"buehne",c:"BU",l:"Bühne: Belag, Geländer, Treppe",t:"M",
   a:[["Geländer / Fussleiste fehlt oder beschädigt","rot","Bereich sofort sperren. Geländer mit Knie- und Fussleiste durch Fachfirma instand stellen bzw. nachrüsten."],["Belag beschädigt","gelb"],["Treppe beschädigt","gelb"],["Übergabestelle ungesichert","rot","Übergabestelle sofort sichern (Schranke bzw. Sicherung gegen Absturz nachrüsten)."],["Flächenlast nicht angeschrieben","gelb","Zulässige Flächenlast der Bühne gut sichtbar anschreiben."],["Sonstiges",""]],
   p:"Geländer mit Knie- und Fussleiste, Belag intakt, Treppe und Übergabestellen gesichert, Flächenlast angeschrieben.",
-  g:"Absturzgefahr (Geländer, Übergabe): Rot. Übrige Schäden: Gelb."},
+  g:"Absturzgefahr (Geländer, Übergabe): Rot. Übrige Schäden: Orange."},
  {k:"anfahr",c:"AS",l:"Anfahrschutz / Rammschutz",t:"*",
-  a:[["Fehlt (erforderlich)","gelb","Anfahrschutz nachrüsten (mind. 400 mm hoch, am Boden verankert)."],["Beschädigt","gelb","Beschädigten Anfahrschutz ersetzen."],["Nicht verankert / lose","gelb"],["Zu niedrig (unter 400 mm)","gelb"],["Sonstiges",""]],
+  a:[["Fehlt (erforderlich)","gelb","Anfahrschutz nachrüsten, Ausführung und Verankerung nach Angabe des Lieferanten."],["Beschädigt","gelb","Beschädigten Anfahrschutz ersetzen."],["Nicht verankert / lose","gelb"],["Zu niedrig","gelb","Anfahrschutz in der vom Lieferanten angegebenen Ausführung einsetzen."],["Sonstiges",""]],
   p:"Anfahrschutz an Gangenden, Kreuzungen und Durchfahrten, Stützenschutz an gefährdeten Stützen, frei stehend verankert.",
-  g:"Stützen- und Eckschutz mind. 400 mm hoch (DIN EN 15635). Fehlend an gefährdeter Stelle oder beschädigt: Gelb."},
+  g:"Stützenschutz, wo nötig (DIN EN 15635 9.2 o), empfohlen an Endstützen bei Hauptgängen (Anhang D.2.1); Ausführung nach Lieferant. Fehlend an gefährdeter Stelle oder beschädigt: Orange."},
  {k:"schild",c:"BS",l:"Belastungsschild",t:"*",
   a:[["Fehlt","gelb","Belastungsschild mit zulässiger Fach- und Feldlast beim Hersteller bestellen und gut sichtbar anbringen."],["Unlesbar","gelb","Belastungsschild erneuern (lesbar, gut sichtbar)."],["Angaben falsch / passen nicht zum Aufbau","gelb","Aufbau mit dem Hersteller abgleichen und korrektes Belastungsschild anbringen."],["Sonstiges",""]],
   p:"Belastungsschild an jeder Regalzeile gut sichtbar: Hersteller, zulässige Fach- und Feldlast, Anzahl Ebenen bzw. Traversenhöhen.",
-  g:"Pflicht nach DIN EN 15635. Fehlt, unlesbar oder passt nicht zum Aufbau: Gelb."},
+  g:"Pflicht nach DIN EN 15635. Fehlt, unlesbar oder passt nicht zum Aufbau: Orange."},
  {k:"beladung",c:"LG",l:"Beladung / Lagergut / Paletten",t:"*",
   a:[["Überladung","rot"],["Palette beschädigt","gelb"],["Falsch aufgelegt / Überstand","gelb"],["Ware quer über Traversen / ungesichert","gelb","Ware korrekt einlagern und sichern; ohne geeignete Auflage nicht quer über Traversen lagern."],["Sonstiges",""]],
   p:"Lasten innerhalb der Angaben, Paletten intakt, mittig und mit korrektem Überstand aufgelegt.",
-  g:"Überladung: Rot. Beschädigte oder falsch aufgelegte Paletten: Gelb."},
+  g:"Überladung: Rot. Beschädigte oder falsch aufgelegte Paletten: Orange."},
  {k:"kennz",c:"KZ",l:"Kennzeichnung Feld / Platz",t:"*",
   a:[["Fehlt","gruen","Regalzeilen und Felder eindeutig kennzeichnen."],["Unlesbar","gruen","Kennzeichnung erneuern."],["Sonstiges",""]],
   p:"Regalzeilen und Felder eindeutig gekennzeichnet.",
@@ -455,9 +455,9 @@ function istDoppel(z){return !!z&&z.ausf==="doppel"}
 function zHersteller(z){return (z&&z.hersteller)||(I&&I.hersteller)||""}
 function zInfo(z){var t=[typName(typKey(z.typ))];if(istDoppel(z))t.push("Doppelregal");var hs=zHersteller(z);if(hs)t.push(hs);return t.join(" · ")}
 var STUFEN={
-  rot:{l:"Rot",kurz:"Sofort sperren",t:"Sofort entladen und sperren. Instandsetzung vor Wiederbenutzung."},
-  gelb:{l:"Gelb",kurz:"Innert 4 Wochen",t:"Schaden. Instandsetzung innert 4 Wochen. Betroffenen Bereich nicht neu beladen."},
-  gruen:{l:"Grün",kurz:"Beobachten",t:"Beobachten. Keine Massnahme nötig, bei der nächsten Inspektion erneut prüfen."}
+  rot:{l:"Rot",kurz:"Umgehend",t:"Umgehend: Bereich sofort entladen und sperren, erst nach der Reparatur (in der Regel Austausch) wieder benutzen (DIN EN 15635 Abschn. 9.5.4)."},
+  gelb:{l:"Orange",kurz:"Baldmöglichst",t:"Baldmöglichst: Bauteil ersetzen, Bereich kennzeichnen (z.B. datierter Kleber); einmal entladen erst nach der Reparatur wieder beladen. Ohne Reparatur innert 4 Wochen gilt Rot (DIN EN 15635 Abschn. 9.5.3)."},
+  gruen:{l:"Grün",kurz:"Überwachen",t:"Überwachen: Grenzwert eingehalten, festhalten und kennzeichnen, bei der nächsten Inspektion gezielt erneut beurteilen (DIN EN 15635 Abschn. 9.5.2)."}
 };
 var ORDER={rot:0,gelb:1,gruen:2};
 function massVorschlag(art,stufe,bauteil){
@@ -476,15 +476,15 @@ function massVorschlag(art,stufe,bauteil){
   else if(/Palette beschädigt/.test(a))t="Beschädigte Palette entfernen und Ware umlagern.";
   else if(/aufgelegt|quer über/.test(a))t="Ware korrekt einlagern: Palette mittig, Überstand gemäss Herstellerangabe, Ware gesichert.";
   else if(/Unlesbar|Angaben falsch/.test(a))t="Belastungsschild mit korrekten, lesbaren Angaben anbringen.";
-  else if(/zu niedrig|unter 400/.test(a))t="Anfahrschutz mit mindestens 400 mm Höhe einsetzen.";
+  else if(/zu niedrig|unter 400/i.test(a))t="Anfahrschutz in der vom Lieferanten angegebenen Ausführung einsetzen.";
   else if(/Rollen|Bremse|Endanschlag/.test(a))t="Durch Hersteller bzw. Fachfirma instand stellen lassen.";
   else if(/Geländer|Übergabestelle|Belag|Treppe|Flächenlast/.test(a))t="Durch Fachfirma instand stellen bzw. nachrüsten.";
   else if(a&&a!=="Sonstiges")t="«"+b+"» durch Originalteil des Herstellers ersetzen. Nicht richten oder schweissen.";
   if(stufe==="rot")t="Sofort entladen und sperren. "+t;
-  if(stufe==="gruen"&&/Verformung|Verbogen|Durchbiegung/.test(a))t="Beobachten, bei der nächsten Inspektion erneut messen.";
+  if(stufe==="gruen"&&/Verformung|Verbogen|Durchbiegung/.test(a))t="Überwachen, bei der nächsten Inspektion erneut messen.";
   return t.trim();
 }
-var MASS_OPTS=["Beobachten, bei der nächsten Inspektion erneut beurteilen.","Sofort entladen und sperren bis zur Instandsetzung.","Durch Originalteil des Herstellers ersetzen.","Nachrüsten (Originalzubehör des Herstellers).","Befestigung instand stellen bzw. nachziehen.","Vor Ort erledigt."];
+var MASS_OPTS=["Überwachen, bei der nächsten Inspektion erneut beurteilen.","Sofort entladen und sperren bis zur Instandsetzung.","Durch Originalteil des Herstellers ersetzen.","Nachrüsten (Originalzubehör des Herstellers).","Befestigung instand stellen bzw. nachziehen.","Vor Ort erledigt."];
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function nl(s){return esc(s).replace(/\n/g,"<br>")}
 function pad(n){return String(n).padStart(2,"0")}
@@ -495,7 +495,8 @@ function fDate(iso){var d=isoToDate(iso);return d?pad(d.getDate())+"."+pad(d.get
 function addDays(iso,n){var d=isoToDate(iso)||new Date();d.setDate(d.getDate()+n);return dateToIso(d)}
 function addMonths(iso,n){var d=isoToDate(iso)||new Date();d.setMonth(d.getMonth()+n);return dateToIso(d)}
 function fristIso(m,I){if(m.stufe==="rot")return I.datum||todayIso();if(m.stufe==="gelb")return addDays(I.datum,28);return I.naechste||addMonths(I.datum,12)}
-function fristText(m,I){if(m.stufe==="rot")return "sofort";if(m.stufe==="gelb")return fDate(addDays(I.datum,28));return "nächste Inspektion"}
+function fristSpez(m){var k=m.bk||(btByLabel(m.bauteil)||{}).k;if(k==="sicherung"&&m.art==="Fehlt")return "sofort ersetzen (9.4.7)";if(k==="stuetze"&&/Lotabweichung/.test(m.art||"")&&m.stufe==="gelb")return "Lieferant informieren (9.4.8)";return ""}
+function fristText(m,I){var sp=fristSpez(m);if(sp)return sp;if(m.stufe==="rot")return "umgehend";if(m.stufe==="gelb")return "baldmöglichst, spätestens "+fDate(addDays(I.datum,28));return "nächste Inspektion"}
 function zeileOf(I,id){for(var i=0;i<I.zeilen.length;i++)if(I.zeilen[i].id===id)return I.zeilen[i];return null}
 function kNr(n){return n==null||n===""?"–":String(n).padStart(3,"0")}
 function rName(z){if(!z)return "Allgemein";var k=kNr(z.plakette),nm=String(z.name||"");return "Regal "+k+(nm&&nm!==k&&nm!==String(z.plakette)?" ("+nm+")":"")}
@@ -520,9 +521,9 @@ function nrText(n){return n==null||n===""?"–":"M"+String(n).padStart(2,"0")}
 function nummern(I){var r={};I.maengel.forEach(function(m){r[m.id]=nrText(m.nr)});return r}
 function countStufen(list){var c={rot:0,gelb:0,gruen:0};list.forEach(function(m){if(c[m.stufe]!=null)c[m.stufe]++});return c}
 function gesamtErgebnis(c){
-  if(c.rot)return {k:"rot",t:"Nicht in Ordnung – sofortige Massnahmen erforderlich"};
-  if(c.gelb)return {k:"gelb",t:"Mängel vorhanden – Instandsetzung innert 4 Wochen"};
-  if(c.gruen)return {k:"gruen",t:"In Ordnung – mit Beobachtungspunkten"};
+  if(c.rot)return {k:"rot",t:"Nicht in Ordnung – umgehend handeln (entladen, sperren)"};
+  if(c.gelb)return {k:"gelb",t:"Mängel vorhanden – baldmöglichst beheben, sonst nach 4 Wochen Rot"};
+  if(c.gruen)return {k:"gruen",t:"In Ordnung – mit Punkten zur Überwachung"};
   return {k:"gruen",t:"In Ordnung – keine Mängel festgestellt"};
 }
 /* Beurteilung eines Bauteils in einer Zeile: aus Mängeln abgeleitet, sonst aus der Checkliste */
@@ -550,19 +551,19 @@ function buildReport(I,P,logo,opt){
   var h='<div class="rp">';
   h+='<section class="pg cover">'+brand+'<div><h1>Inspektionsbericht Regalanlage</h1><div class="norm">Regalinspektion nach SN EN 15635 / DIN EN 15635</div></div>';
   h+='<table class="kv"><tr><th>Kunde</th><td>'+esc(I.kunde)+'</td></tr><tr><th>Standort / Halle</th><td>'+esc(I.standort)+'</td></tr><tr><th>Datum Inspektion</th><td>'+fDate(I.datum)+'</td></tr><tr><th>Prüfer</th><td>'+esc(I.pruefer)+(F.name?', '+esc(F.name):'')+'</td></tr><tr><th>Regaltypen</th><td>'+esc(typen.join(", ")||"–")+'</td></tr><tr><th>Hersteller</th><td>'+esc(herst.join(", ")||"–")+'</td></tr><tr><th>Ausführung</th><td>'+esc(ausfText)+'</td></tr><tr><th>Regale</th><td>'+I.zeilen.length+' (vollständig beurteilt: '+fertig+')</td></tr><tr><th>Nächste Inspektion</th><td>'+fDate(I.naechste||addMonths(I.datum,12))+'</td></tr></table>';
-  h+='<div class="big"><div class="c-rot"><b>'+c.rot+'</b><span>Rot · sofort</span></div><div class="c-gelb"><b>'+c.gelb+'</b><span>Gelb · 4 Wochen</span></div><div class="c-gruen"><b>'+c.gruen+'</b><span>Grün · beobachten</span></div></div>';
+  h+='<div class="big"><div class="c-rot"><b>'+c.rot+'</b><span>Rot · umgehend</span></div><div class="c-gelb"><b>'+c.gelb+'</b><span>Orange · baldmöglichst</span></div><div class="c-gruen"><b>'+c.gruen+'</b><span>Grün · überwachen</span></div></div>';
   h+='<div class="res '+g.k+'">Gesamtergebnis: '+esc(g.t)+'</div>';
   h+='<div class="small">'+esc(F.name||"")+(F.email?' · '+esc(F.email):'')+'</div></section>';
   // 1 Zusammenfassung
   h+='<section><h2>1. Zusammenfassung</h2>';
   h+='<p>Am '+fDate(I.datum)+' wurde die Regalanlage'+(I.kunde?' beim Kunden '+esc(I.kunde):'')+(I.standort?', Standort '+esc(I.standort):'')+' durch '+esc(I.pruefer)+' visuell inspiziert. Beurteilt wurden '+I.zeilen.length+' Regale ('+esc(typen.join(", "))+') mit allen zugänglichen tragenden Bauteilen, Sicherungen und Schutzeinrichtungen sowie die allgemeinen Prüfpunkte zu Dokumentation, Umgebung und Betrieb.</p>';
-  h+='<p>Festgestellt wurden <b>'+c.rot+' rote</b>, <b>'+c.gelb+' gelbe</b> und <b>'+c.gruen+' grüne</b> Mängel. Jedes beurteilte Regal ist vor Ort mit einem nummerierten Kleber gekennzeichnet; die Regal-Nummer in diesem Bericht entspricht der Nummer auf dem Kleber.</p>';
+  h+='<p>Festgestellt wurden <b>'+c.rot+' rote</b>, <b>'+c.gelb+' orange</b> und <b>'+c.gruen+' grüne</b> Mängel. Jedes beurteilte Regal ist vor Ort mit einem nummerierten Kleber gekennzeichnet; die Regal-Nummer in diesem Bericht entspricht der Nummer auf dem Kleber.</p>';
   if(I.bemerkung)h+='<p><b>Bemerkung:</b> '+nl(I.bemerkung)+'</p>';
   if(I.gesamt)h+='<p><b>Gesamtbeurteilung:</b> '+nl(I.gesamt)+'</p>';
   // 2 Norm
   h+='<h2>2. Grundlagen und Ampelsystem</h2>';
   h+='<p>Die Inspektion erfolgt nach SN EN 15635 / DIN EN 15635 «Ortsfeste Regalsysteme aus Stahl – Anwendung und Wartung von Lagereinrichtungen». Die Norm verlangt eine Inspektion durch eine fachkundige Person in Abständen von höchstens 12 Monaten sowie regelmässige Sichtkontrollen durch den Betreiber. In der Schweiz gelten zudem die Pflichten des Arbeitgebers nach der Verordnung über die Unfallverhütung (VUV) und die EKAS-Richtlinie 6512 «Arbeitsmittel».</p>';
-  h+='<table class="amp"><tr><td class="s-rot">ROT</td><td>'+esc(STUFEN.rot.t)+'</td></tr><tr><td class="s-gelb">GELB</td><td>'+esc(STUFEN.gelb.t)+'</td></tr><tr><td class="s-gruen">GRÜN</td><td>'+esc(STUFEN.gruen.t)+'</td></tr></table>';
+  h+='<table class="amp"><tr><td class="s-rot">ROT</td><td>'+esc(STUFEN.rot.t)+'</td></tr><tr><td class="s-gelb">ORANGE</td><td>'+esc(STUFEN.gelb.t)+'</td></tr><tr><td class="s-gruen">GRÜN</td><td>'+esc(STUFEN.gruen.t)+'</td></tr></table>';
   h+='<p class="small" style="margin-top:2mm">Die Inspektion ist eine Sichtprüfung der zugänglichen Bauteile im Zustand am Prüftag. Sie ersetzt keine statische Berechnung und keine Belastungsprüfung.</p>';
   // 3 Allgemeine Prüfpunkte
   h+='<h2>3. Allgemeine Prüfpunkte</h2><table><tr><th>Prüfpunkt</th><th style="width:20mm">Ergebnis</th><th>Empfehlung / Bemerkung</th></tr>';
@@ -624,7 +625,7 @@ function buildReport(I,P,logo,opt){
 <!-- ============ KUNDENBERICHT: CSS und JS (wird nur in die exportierte Datei kopiert) ============ -->
 <script type="text/plain" id="kcss">
 [hidden]{display:none!important}
-:root{--bg:#eef2f6;--card:#fff;--ink:#0f2233;--mut:#56687a;--line:#cdd6e0;--brand:#0B6E77;--rot:#B3122C;--gelb:#F2C230;--gruen:#2C7A52;color-scheme:light}
+:root{--bg:#eef2f6;--card:#fff;--ink:#0f2233;--mut:#56687a;--line:#cdd6e0;--brand:#0B6E77;--rot:#B3122C;--gelb:#c45f00;--gruen:#2C7A52;color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 .app{max-width:1000px;margin:0 auto;padding:16px 16px 60px;display:flex;flex-direction:column;gap:14px}
@@ -640,7 +641,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system
 .kpi b{display:block;font-size:28px;font-variant-numeric:tabular-nums;line-height:1.1}
 .kpi span{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
 .kpi.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand) inset}
-.kpi.rot b{color:var(--rot)}.kpi.gelb b{color:#a37300}.kpi.gruen b{color:var(--gruen)}
+.kpi.rot b{color:var(--rot)}.kpi.gelb b{color:#c45f00}.kpi.gruen b{color:var(--gruen)}
 .flt{background:var(--card);border-radius:10px;padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .flt input,.flt select{min-height:44px;border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;background:#fff;width:100%}
 .flt .q{grid-column:1/-1}
@@ -651,9 +652,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system
 .mh{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .mh b{font-size:18px}
 .bd{font-size:12px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:5px;color:#fff}
-.bd.rot{background:var(--rot)}.bd.gelb{background:var(--gelb);color:#1d1600}.bd.gruen{background:var(--gruen)}
+.bd.rot{background:var(--rot)}.bd.gelb{background:var(--gelb);color:#fff}.bd.gruen{background:var(--gruen)}
 .st{font-size:12px;font-weight:800;padding:3px 8px;border-radius:5px;background:#dfe6ee;color:var(--mut);margin-left:auto}
-.st.arbeit{background:#fff4d1;color:#6b4d00}.st.behoben{background:#e3f3e4;color:var(--gruen)}
+.st.arbeit{background:#fde9da;color:#8a3f00}.st.behoben{background:#e3f3e4;color:var(--gruen)}
 .dl{display:grid;grid-template-columns:120px 1fr;gap:2px 10px;font-size:15px}
 .dl dt{color:var(--mut)}.dl dd{margin:0;min-width:0}
 .ph{display:flex;gap:6px;flex-wrap:wrap}
@@ -698,7 +699,7 @@ function uniq(a){return a.filter(function(v,i){return v&&a.indexOf(v)===i})}
 function init(){
   $(".app").innerHTML='<div class="hd" id="hd"></div><div class="edp" id="edp" hidden></div><div class="kpis" id="kpis"></div><details class="info" id="info"></details>'
   +'<div class="flt"><input class="q" id="fq" type="search" placeholder="Suchen: Nummer, Position, Bauteil, Beschreibung …">'
-  +'<select id="fstufe">'+opts([{v:"rot",l:"Rot"},{v:"gelb",l:"Gelb"},{v:"gruen",l:"Grün"}],"","Alle Stufen")+'</select>'
+  +'<select id="fstufe">'+opts([{v:"rot",l:"Rot"},{v:"gelb",l:"Orange"},{v:"gruen",l:"Grün"}],"","Alle Stufen")+'</select>'
   +'<select id="fzeile">'+opts(I.zeilen.map(function(z){return {v:z.id,l:rName(z)}}),"","Alle Regale")+'</select>'
   +'<select id="fbauteil">'+opts(uniq(L.map(function(m){return m.bauteil})),"","Alle Bauteile")+'</select>'
   +'<select id="fart">'+opts(uniq(L.map(function(m){return m.art})),"","Alle Schadensarten")+'</select>'
@@ -725,7 +726,7 @@ function head(){
 }
 function headText(){var t=document.querySelector("#hd .t");if(t)t.innerHTML='<h1>Regalinspektion '+esc(I.kunde||"")+'</h1><p>'+esc(I.standort||"")+(I.standort?' · ':'')+fDate(I.datum)+' · Prüfer '+esc(I.pruefer)+' · DIN EN 15635</p>'}
 function info(){
-  $("#info").innerHTML='<summary>Ampelsystem und Hinweise</summary><p><b style="color:var(--rot)">Rot:</b> '+esc(STUFEN.rot.t)+'<br><b style="color:#a37300">Gelb:</b> '+esc(STUFEN.gelb.t)+'<br><b style="color:var(--gruen)">Grün:</b> '+esc(STUFEN.gruen.t)+'</p><p>Sie können pro Mangel den Status, ein Erledigungsdatum und eine Notiz eintragen. Die Angaben bleiben in diesem Browser gespeichert. Mit «Rückmeldung exportieren» erhalten Sie eine Datei, die Sie an '+esc((I.firma&&I.firma.email)||"den Prüfer")+' zurücksenden.</p>'+(I.gesamt?'<p><b>Gesamtbeurteilung:</b> '+nl(I.gesamt)+'</p>':'')+'<p>Nächste Inspektion: <b>'+fDate(I.naechste||addMonths(I.datum,12))+'</b></p>';
+  $("#info").innerHTML='<summary>Ampelsystem und Hinweise</summary><p><b style="color:var(--rot)">Rot:</b> '+esc(STUFEN.rot.t)+'<br><b style="color:#c45f00">Orange:</b> '+esc(STUFEN.gelb.t)+'<br><b style="color:var(--gruen)">Grün:</b> '+esc(STUFEN.gruen.t)+'</p><p>Sie können pro Mangel den Status, ein Erledigungsdatum und eine Notiz eintragen. Die Angaben bleiben in diesem Browser gespeichert. Mit «Rückmeldung exportieren» erhalten Sie eine Datei, die Sie an '+esc((I.firma&&I.firma.email)||"den Prüfer")+' zurücksenden.</p>'+(I.gesamt?'<p><b>Gesamtbeurteilung:</b> '+nl(I.gesamt)+'</p>':'')+'<p>Nächste Inspektion: <b>'+fDate(I.naechste||addMonths(I.datum,12))+'</b></p>';
 }
 function panel(){
   function t(k,l,type){return '<label>'+l+'<input type="'+(type||"text")+'" data-p="'+k+'" value="'+esc(I[k]||"")+'"></label>'}
@@ -754,7 +755,7 @@ function onHead(e){
 function kpis(){
   var c=countStufen(L),s={offen:0,arbeit:0,behoben:0};L.forEach(function(m){s[kst(m)]++});
   function k(key,v,n,l,cls){var on=key==="all"?(!F.stufe&&!F.status):F[key]===v;return '<button class="kpi '+(cls||"")+(on?" on":"")+'" data-k="'+key+'" data-v="'+v+'"><b>'+n+'</b><span>'+l+'</span></button>'}
-  $("#kpis").innerHTML=k("all","",L.length,"Alle Mängel")+k("stufe","rot",c.rot,"Rot","rot")+k("stufe","gelb",c.gelb,"Gelb","gelb")+k("stufe","gruen",c.gruen,"Grün","gruen")+k("status","offen",s.offen,"Offen")+k("status","arbeit",s.arbeit,"In Arbeit")+k("status","behoben",s.behoben,"Behoben");
+  $("#kpis").innerHTML=k("all","",L.length,"Alle Mängel")+k("stufe","rot",c.rot,"Rot","rot")+k("stufe","gelb",c.gelb,"Orange","gelb")+k("stufe","gruen",c.gruen,"Grün","gruen")+k("status","offen",s.offen,"Offen")+k("status","arbeit",s.arbeit,"In Arbeit")+k("status","behoben",s.behoben,"Behoben");
 }
 function render(){
   kpis();
@@ -775,7 +776,7 @@ function card(m){
   var s=ST[m.id]||{},k=kst(m);
   var h='<article class="m '+m.stufe+'" data-id="'+m.id+'"><div class="mh"><b>'+NR[m.id]+'</b><span class="bd '+m.stufe+'">'+STUFEN[m.stufe].l+'</span><span>'+esc(posText(m,I))+'</span>'+(EDIT?'':'<span class="st '+k+'">'+KSTATUS[k]+'</span>')+'</div>';
   if(EDIT){
-    h+='<div class="dl"><dt>Stufe</dt><dd><select data-e="stufe">'+opts([{v:"rot",l:"Rot"},{v:"gelb",l:"Gelb"},{v:"gruen",l:"Grün"}],m.stufe)+'</select></dd>'
+    h+='<div class="dl"><dt>Stufe</dt><dd><select data-e="stufe">'+opts([{v:"rot",l:"Rot"},{v:"gelb",l:"Orange"},{v:"gruen",l:"Grün"}],m.stufe)+'</select></dd>'
      +'<dt>Bauteil</dt><dd><select data-e="bauteil">'+opts(BAUTEILE,m.bauteil)+'</select></dd><dt>Schadensart</dt><dd><select data-e="art">'+opts(ARTEN,m.art)+'</select></dd>'
      +'<dt>Beschreibung</dt><dd><textarea data-e="beschreibung">'+esc(m.beschreibung||"")+'</textarea></dd><dt>Massnahme</dt><dd><textarea data-e="massnahme">'+esc(m.massnahme||"")+'</textarea></dd><dt>Frist</dt><dd><b>'+esc(fristText(m,I))+'</b></dd></div>';
   }else{
@@ -880,7 +881,7 @@ function saveMeta(k,v){return dput("meta",{k:k,v:v}).catch(function(){})}
 function errBanner(t){var b=$("#err");b.textContent=t;b.hidden=!t}
 /* ---------- Updates ----------
    WICHTIG bei jedem Update: APP_V hier UND VERSION in sw.js gleich hochzählen. */
-var APP_V="regal-v5",SWREG=null,updT=0;
+var APP_V="regal-v6",SWREG=null,updT=0;
 function vNr(v){return String(v||"").replace(/^regal-v/,"")}
 function updCheck(manuell){
   if(!navigator.onLine){if(manuell)toast("Kein Netz – Update später prüfen");return}
@@ -1055,7 +1056,7 @@ VIEWS.insp=function(){
   var A=I.allg||{},na=0,nt=0;ALLG.forEach(function(g){g.items.forEach(function(it){nt++;if((A[it.k]||{}).s)na++})});
   var h='<div class="stats">'
    +'<button class="stat rot" data-act="alleF" data-f="rot"><span class="n">'+c.rot+'</span><span class="l">Rot</span></button>'
-   +'<button class="stat gelb" data-act="alleF" data-f="gelb"><span class="n">'+c.gelb+'</span><span class="l">Gelb</span></button>'
+   +'<button class="stat gelb" data-act="alleF" data-f="gelb"><span class="n">'+c.gelb+'</span><span class="l">Orange</span></button>'
    +'<button class="stat gruen" data-act="alleF" data-f="gruen"><span class="n">'+c.gruen+'</span><span class="l">Grün</span></button>'
    +'<button class="stat z" data-act="alleF" data-f=""><span class="n">'+(c.rot+c.gelb+c.gruen)+'</span><span class="l">Mängel total</span></button></div>';
   h+='<div class="progress"><div class="bar"><i style="width:'+(nz?Math.round(fertig/nz*100):0)+'%"></i></div><span class="zahl">'+fertig+' / '+nz+' Regale fertig</span></div>';
@@ -1103,7 +1104,7 @@ VIEWS.alle=function(){
   var l=I.maengel.filter(function(m){return f==="ohne"?!m.stufe:(!f||m.stufe===f)}).sort(function(a,b){return (b.nr||0)-(a.nr||0)});
   var ohne=I.maengel.filter(function(m){return !m.stufe}).length;
   function fc(v,t){return '<button class="chip'+(f===v?" on":"")+'" data-act="alleF" data-f="'+v+'">'+t+'</button>'}
-  main.innerHTML='<div class="filterchips">'+fc("","Alle "+(c.rot+c.gelb+c.gruen))+fc("rot","Rot "+c.rot)+fc("gelb","Gelb "+c.gelb)+fc("gruen","Grün "+c.gruen)+(ohne?fc("ohne","Ohne Stufe "+ohne):"")+'</div>'
+  main.innerHTML='<div class="filterchips">'+fc("","Alle "+(c.rot+c.gelb+c.gruen))+fc("rot","Rot "+c.rot)+fc("gelb","Orange "+c.gelb)+fc("gruen","Grün "+c.gruen)+(ohne?fc("ohne","Ohne Stufe "+ohne):"")+'</div>'
    +'<div class="card flush"><div class="list">'+(l.map(mItem).join("")||'<p class="hint" style="padding:14px">Keine Mängel in dieser Auswahl.</p>')+'</div></div><p class="hint">Höchste Klebernummer zuoberst. Antippen zum Bearbeiten.</p>';
   fillThumbs();
 };
@@ -1195,12 +1196,12 @@ VIEWS.mangel=function(){
   if(b&&b.mess){
     var mi=Math.min(m.messRi||0,b.mess.length-1);
     h+='<div class="card tight help"><h2>Messung 1 m Richtscheit</h2>'+(b.mess.length>1?'<select data-mc="messRi">'+listOpts(b.mess.map(function(x,i){return [i,x.l+" (Grenzwert "+x.g+" mm)"]}),mi)+'</select>':'')
-     +'<div class="two"><input type="number" inputmode="decimal" step="0.5" id="m_mm" placeholder="mm gemessen" value="'+esc(m.messMm||"")+'"><button class="btn pri" data-act="messOk">Einstufen</button></div></div>';
+     +'<div class="two"><input type="number" inputmode="decimal" step="0.5" id="m_mm" placeholder="mm gemessen" value="'+esc(m.messMm||"")+'"><input type="number" inputmode="numeric" step="50" min="100" max="1000" id="m_len" placeholder="Länge mm (1000)" value="'+esc(m.messLen||"")+'"></div><p class="hint">Kürzer als 1 m gemessen: Länge eintragen, der Grenzwert gilt anteilig (DIN EN 15635 9.5.1).</p><button class="btn pri" data-act="messOk">Einstufen</button></div>';
   }
   h+='<div class="card tight"><h2>Gefährdungsstufe</h2><div class="amps" id="amps">'
-   +'<button class="amp rot'+(m.stufe==="rot"?" on":"")+'" data-act="mset" data-v="rot">ROT<small>sofort sperren</small></button>'
-   +'<button class="amp gelb'+(m.stufe==="gelb"?" on":"")+'" data-act="mset" data-v="gelb">GELB<small>innert 4 Wochen</small></button>'
-   +'<button class="amp gruen'+(m.stufe==="gruen"?" on":"")+'" data-act="mset" data-v="gruen">GRÜN<small>beobachten</small></button></div>'
+   +'<button class="amp rot'+(m.stufe==="rot"?" on":"")+'" data-act="mset" data-v="rot">ROT<small>umgehend</small></button>'
+   +'<button class="amp gelb'+(m.stufe==="gelb"?" on":"")+'" data-act="mset" data-v="gelb">ORANGE<small>baldmöglichst</small></button>'
+   +'<button class="amp gruen'+(m.stufe==="gruen"?" on":"")+'" data-act="mset" data-v="gruen">GRÜN<small>überwachen</small></button></div>'
    +(m.stufeVorschlag&&m.stufe===m.stufeVorschlag?'<p class="sub" style="margin:0">Vorauswahl nach Norm-Hilfe – bitte prüfen.</p>':'')+'</div>';
   if(m.zeileId&&istDoppel(z))h+='<div class="card tight"><h2>Doppelregal</h2><label class="f">Regalzeile<select data-mc="zab">'+listOpts(ZEILEN_AB,m.zab||"","– wählen –")+'</select></label></div>';
   if(m.zeileId)h+='<div class="card tight"><h2>Position</h2><div class="three">'
@@ -1235,17 +1236,18 @@ function mangelChange(f,v){
 function messEinstufen(){
   var m=findM(V.mid),b=btByKey(m.bk);if(!b||!b.mess)return;
   var mm=parseFloat(String($("#m_mm").value).replace(",","."));if(isNaN(mm)){toast("Messwert in mm eingeben");return}
-  var ri=b.mess[Math.min(m.messRi||0,b.mess.length-1)],g=ri.g,st=mm<=g?"gruen":mm<=2*g?"gelb":"rot";
-  m.messMm=String(mm);m.stufe=st;m.stufeVorschlag="";if(!m.art)m.art=b.a[0][0];
-  var txt="Gemessen "+mm+" mm auf 1 m ("+ri.l+", Grenzwert "+g+" mm).";
-  m.beschreibung=m.beschreibung&&/Gemessen [^\n]* mm auf 1 m/.test(m.beschreibung)?m.beschreibung.replace(/Gemessen [^\n]* mm auf 1 m[^\n]*/,txt):(m.beschreibung?m.beschreibung+"\n"+txt:txt);
+  var len=parseFloat(String(($("#m_len")||{}).value||"").replace(",","."));if(isNaN(len)||len>=1000)len=1000;if(len<=0){toast("Länge über 0 mm eingeben");return}
+  var ri=b.mess[Math.min(m.messRi||0,b.mess.length-1)],g=Math.round(ri.g*len/1000*100)/100,st=mm<=g?"gruen":mm<2*g?"gelb":"rot";
+  m.messMm=String(mm);m.messLen=len<1000?String(len):"";m.stufe=st;m.stufeVorschlag="";if(!m.art)m.art=b.a[0][0];
+  var txt="Gemessen "+mm+" mm auf "+(len<1000?len+" mm":"1 m")+" ("+ri.l+", Grenzwert "+g+" mm"+(len<1000?" anteilig":"")+"; ab "+(2*g)+" mm Rot).";
+  m.beschreibung=m.beschreibung&&/Gemessen [^\n]* mm auf /.test(m.beschreibung)?m.beschreibung.replace(/Gemessen [^\n]* mm auf [^\n]*/,txt):(m.beschreibung?m.beschreibung+"\n"+txt:txt);
   if(m.massAuto||!m.massnahme){m.massnahme=massVorschlag(m.art,m.stufe,m.bauteil);m.massAuto=true}
   save();var y=window.scrollY;VIEWS.mangel();window.scrollTo(0,y);
   toast("Einstufung: "+STUFEN[st].l+" ("+mm+" mm, Grenzwert "+g+" mm)",3000);
 }
 VIEWS.hilfe=function(){
   setHeader("Norm-Hilfe",true);
-  var h='<div class="card"><h2>Ampelsystem</h2><p style="margin:0"><b style="color:var(--crit)">ROT</b> – '+esc(STUFEN.rot.t)+'<br><b style="color:var(--warn)">GELB</b> – '+esc(STUFEN.gelb.t)+'<br><b style="color:var(--ok)">GRÜN</b> – '+esc(STUFEN.gruen.t)+'</p><p class="sub" style="margin:0">Messregel Verformung (Stützen, Fachwerk): bis Grenzwert Grün · bis doppelter Grenzwert Gelb · darüber Rot.</p></div>';
+  var h='<div class="card"><h2>Ampelsystem</h2><p style="margin:0"><b style="color:var(--crit)">ROT</b> – '+esc(STUFEN.rot.t)+'<br><b style="color:var(--gelb)">ORANGE</b> – '+esc(STUFEN.gelb.t)+'<br><b style="color:var(--ok)">GRÜN</b> – '+esc(STUFEN.gruen.t)+'</p><p class="sub" style="margin:0">Messregel Verformung (Stützen, Fachwerk): bis Grenzwert Grün · bis doppelter Grenzwert Gelb · darüber Rot.</p></div>';
   h+='<div class="card flush"><div style="padding:12px 16px 4px"><h2>Bauteile</h2></div>'+BT.map(function(b){return '<details class="hilfe"><summary>'+b.c+' · '+esc(b.l)+'</summary><div><p><b>Prüfen:</b> '+esc(b.p)+'</p><p><b>Einstufung:</b> '+esc(b.g)+'</p><p><b>Gilt für:</b> '+(b.t==="*"?"alle Regaltypen":b.t.split("").map(typName).join(", "))+'</p></div></details>'}).join("")+'</div>';
   ALLG.forEach(function(g){h+='<div class="card flush"><div style="padding:12px 16px 4px"><h2>'+esc(g.g)+'</h2></div>'+g.items.map(function(it){return '<details class="hilfe"><summary>'+esc(it.l)+'</summary><div><p>'+esc(it.p)+'</p><p><b>Empfehlung, wenn nicht erfüllt:</b> '+esc(it.e)+'</p></div></details>'}).join("")+'</div>'});
   h+='<p class="hint">Richtwerte zur Unterstützung vor Ort. Massgebend sind SN EN 15635 / DIN EN 15635 und die Angaben des Regalherstellers.</p>';
@@ -1263,7 +1265,7 @@ function newMangel(zid,bk){
   I.maengel.push(m);save();
   go("mangel",{id:I.id,mid:m.id});
 }
-function isBlank(m){return m&&!m.stufe&&!(m.fotos||[]).length&&!m.beschreibung&&!m.art&&!m.feld&&!m.seite&&!m.zab&&!m.messMm}
+function isBlank(m){return m&&!m.stufe&&!(m.fotos||[]).length&&!m.beschreibung&&!m.art&&!m.feld&&!m.seite&&!m.zab&&!m.messMm&&!m.messLen}
 function checkMangel(m){
   if(!m.bk){var s=$("#m_bk");if(s){s.scrollIntoView({block:"center"});s.focus()}toast("Bitte Bauteil wählen");return false}
   if(!m.stufe){var a=$("#amps");if(a){a.classList.add("missing");a.scrollIntoView({behavior:"smooth",block:"center"})}toast("Bitte Gefährdungsstufe wählen");return false}
