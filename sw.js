@@ -1,7 +1,7 @@
 /* Offline-Speicher der App.
    WICHTIG bei jedem Update: VERSION hier UND APP_V in index.html gleich hochzählen.
    Die erfassten Daten liegen NICHT hier, sondern im Gerätespeicher der App (IndexedDB) – ein Update löscht sie nie. */
-const VERSION = 'regal-v6';
+const VERSION = 'regal-v7';
 const DATEIEN = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
