@@ -70,6 +70,33 @@ button,input,select,textarea{font:inherit;color:inherit}
 #upd{position:sticky;top:0;z-index:49;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;gap:10px;padding:8px 12px;font-weight:600}
 #upd span{flex:1}
 #upd button{min-height:44px;border:0;border-radius:var(--r);background:var(--accent-ink);color:var(--accent);font:700 .95rem var(--f-disp);padding:0 14px;cursor:pointer}
+.gross-aktion.zwei{background:var(--surface);color:var(--ink);border:2px solid var(--accent)}
+.gross-aktion.zwei svg{color:var(--accent)}
+em.art{font-style:normal;font:700 .62rem var(--f-disp);letter-spacing:.06em;text-transform:uppercase;background:var(--surface-2);color:var(--ink-2);border-radius:4px;padding:1px 6px;margin-right:6px}
+em.art.neu{background:var(--accent-soft);color:var(--accent)}
+.card.nkopf{flex-direction:row;align-items:center}.nkopf .btn{flex:none}.nkopf div{flex:1;min-width:0}.nkopf b{display:block;font-size:1.05rem}.nkopf span{font-size:.82rem;color:var(--ink-3)}
+.frow{display:flex;flex-direction:column;gap:5px}
+.flab{display:flex;align-items:center;gap:8px;font:600 .7rem var(--f-disp);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.flab span{flex:1}.flab .ib{width:34px;height:34px;font-size:1rem}
+.selx{display:flex;flex-direction:column;gap:6px}
+.seg.nseg.s2{grid-template-columns:1fr 1fr}.seg.nseg.s4{grid-template-columns:repeat(4,1fr)}
+.seg.nseg button{font-size:.82rem;line-height:1.15;padding:4px}
+.svgbox{border:1px solid var(--line);border-radius:var(--r);background:#fff;overflow:hidden}.svgbox svg{width:100%;height:auto;display:block}
+table.kz{width:100%;border-collapse:collapse;font-size:.88rem}table.kz td{padding:5px 2px;border-bottom:1px solid var(--line)}table.kz td:last-child{text-align:right;font-family:var(--f-mono);font-weight:600}
+.skthumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}.skthumbs:empty{display:none}
+.skth{border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;padding:4px;display:flex;flex-direction:column;gap:3px;align-items:center;cursor:pointer;font-size:.75rem;color:var(--ink-2)}
+.skth img{width:100%;aspect-ratio:1/1.414;object-fit:contain;background:#fff}
+.skbar{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:4px}
+.skbar.sk2{grid-template-columns:repeat(8,1fr)}
+.skbar button{min-height:48px;border:1px solid transparent;border-radius:6px;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--ink)}
+.skbar button b{font-size:1.2rem;line-height:1}.skbar button span{font-size:.6rem;font-weight:600;color:var(--ink-3)}
+.skbar button.on{background:var(--accent-soft);border-color:var(--accent)}
+.skbar .col i{width:24px;height:24px;border-radius:50%;display:block;border:2px solid #fff;box-shadow:0 0 0 1px var(--line-strong)}
+.skbar .wd i{width:24px;background:var(--ink);border-radius:4px;display:block}
+.skwrap{display:flex;justify-content:center;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);padding:4px}
+#skc{touch-action:none;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15);display:block}
+.sktext{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;gap:6px;background:var(--surface);border:2px solid var(--accent);border-radius:var(--r);padding:6px}
+.sktext input{flex:1;min-width:0}.sktext .btn{min-height:48px}
 #err{position:sticky;top:0;z-index:50;background:var(--crit);color:var(--status-ink);font-weight:600;padding:12px 14px;font-size:.95rem}
 
 main{padding:12px 12px 110px;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
@@ -338,6 +365,7 @@ body.gross .qio{min-width:86px}
 <input type="file" id="fgal" accept="image/*" multiple hidden>
 <input type="file" id="fjson" accept=".json,application/json,text/plain" hidden>
 <input type="file" id="flogo" accept="image/*" hidden>
+<input type="file" id="fbg" accept="image/*" hidden>
 
 <!-- ============ GEMEINSAMER CODE (wird auch in den Kundenbericht kopiert) ============ -->
 <script id="shared">
@@ -884,7 +912,7 @@ function saveMeta(k,v){return dput("meta",{k:k,v:v}).catch(function(){})}
 function errBanner(t){var b=$("#err");b.textContent=t;b.hidden=!t}
 /* ---------- Updates ----------
    WICHTIG bei jedem Update: APP_V hier UND VERSION in sw.js gleich hochzählen. */
-var APP_V="regal-v7",SWREG=null,updT=0;
+var APP_V="regal-v8",SWREG=null,updT=0;
 function vNr(v){return String(v||"").replace(/^regal-v/,"")}
 function updCheck(manuell){
   if(!navigator.onLine){if(manuell)toast("Kein Netz – Update später prüfen");return}
@@ -910,7 +938,7 @@ var wl=null;function wake(){try{if(navigator.wakeLock&&!wl)navigator.wakeLock.re
 /* ---------- Fotos ---------- */
 function getPhoto(id){ if(PH.has(id))return Promise.resolve(PH.get(id)); return dget("photos",id).then(function(p){var d=p?p.data:"";PH.set(id,d);return d}); }
 function loadPhotos(ids){return Promise.all(ids.map(getPhoto)).then(function(){var o={};ids.forEach(function(id){if(PH.get(id))o[id]=PH.get(id)});return o})}
-function allPhotoIds(X){var a=[];X.maengel.forEach(function(m){(m.fotos||[]).forEach(function(id){a.push(id)})});return a}
+function allPhotoIds(X){var a=[];(X.maengel||[]).forEach(function(m){(m.fotos||[]).forEach(function(id){a.push(id)})});if(X.art==="neu")a=a.concat(photoIdsNeu(X));return a}
 function resizeImg(file,max,q){
   return new Promise(function(res,rej){
     var url=URL.createObjectURL(file),img=new Image();
@@ -932,26 +960,31 @@ $("#lb").addEventListener("click",function(){this.hidden=true});
 function chips(field,list,val,act){return '<div class="chips">'+list.map(function(v){return '<button type="button" class="chip'+(val===v?" on":"")+'" data-act="'+act+'" data-f="'+field+'" data-v="'+esc(v)+'">'+esc(v)+'</button>'}).join("")+'</div>'}
 function mcount(zid){return countStufen(I.maengel.filter(function(m){return m.stufe&&(zid==null||m.zeileId===zid)}))}
 function dots(c){return (c.rot?'<span class="dot rot">'+c.rot+'</span>':'')+(c.gelb?'<span class="dot gelb">'+c.gelb+'</span>':'')+(c.gruen?'<span class="dot gruen">'+c.gruen+'</span>':'')}
-var TABVIEWS={insp:1,anlage:1,alle:1,mehr:1,zeile:1};
+var TABVIEWS={insp:1,anlage:1,alle:1,mehr:1,zeile:1},NTABV={nhome:1,nkunde:1,numg:1,nanfr:1,nanl:1};
 var ICON={
  insp:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 10h18M3 15h18M9 4v16"/></svg>',
  alle:'<svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1.2"/><circle cx="4" cy="12" r="1.2"/><circle cx="4" cy="18" r="1.2"/></svg>',
  plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
  anlage:'<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="1"/><path d="M9 4V3h6v1M8.5 10l1.5 1.5 3-3M8.5 16l1.5 1.5 3-3"/></svg>',
- mehr:'<svg viewBox="0 0 24 24"><path d="M4 20h16M6 16l4-4 3 3 5-6"/><path d="M14 4h6v6"/></svg>'
+ mehr:'<svg viewBox="0 0 24 24"><path d="M4 20h16M6 16l4-4 3 3 5-6"/><path d="M14 4h6v6"/></svg>',
+ nkunde:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+ numg:'<svg viewBox="0 0 24 24"><path d="M3 21V9l9-6 9 6v12"/><path d="M3 21h18M8 21v-6h8v6"/></svg>',
+ nanfr:'<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>'
 };
 function renderTabs(){
-  var t=$("#tabs"),show=!!(I&&TABVIEWS[V.v]);t.hidden=!show;if(!show)return;
-  var cur=V.v==="zeile"?"insp":V.v;
-  function b(v,l){return '<button data-tab="'+v+'"'+(cur===v?' aria-current="true"':'')+'>'+ICON[v]+'<span>'+l+'</span></button>'}
+  var t=$("#tabs"),neu=isNeu(I),show=!!(I&&(neu?NTABV[V.v]:TABVIEWS[V.v]));t.hidden=!show;if(!show)return;
+  var cur=V.v==="zeile"?"insp":(V.v==="nanl"?"nhome":V.v);
+  function b(v,l){return '<button data-tab="'+v+'"'+(cur===v?' aria-current="true"':'')+'>'+(ICON[v]||ICON.insp)+'<span>'+l+'</span></button>'}
+  if(neu){t.innerHTML=b("nhome","Übersicht")+b("nkunde","Kunde")+'<button class="plus" data-tab="plus" aria-label="Neue Anlage">'+ICON.plus+'<span>Anlage</span></button>'+b("numg","Raum")+b("nanfr","Anfrage");return}
   t.innerHTML=b("insp","Übersicht")+b("alle","Mängel")+'<button class="plus" data-tab="plus" aria-label="Neuer Mangel">'+ICON.plus+'<span>Mangel</span></button>'+b("anlage","Anlage")+b("mehr","Abschluss");
 }
 $("#tabs").addEventListener("click",function(e){var b=e.target.closest("[data-tab]");if(!b||!I)return;var v=b.dataset.tab;
+  if(isNeu(I)){if(v==="plus"){ACT.nAnlNeu();return}if(v===V.v)return;go(v,{id:I.id},NTABV[V.v]&&V.v!=="nanl");return}
   if(v==="plus"){newMangel(V.v==="zeile"?V.zid:(V.v==="anlage"?"":null));return}
   if(v===V.v)return;go(v,{id:I.id},TABVIEWS[V.v]&&V.v!=="zeile")});
-function ctxLine(){var n=I.maengel.filter(function(m){return m.stufe}).length;return [I.kunde||I.standort||"Inspektion",fDate(I.datum),n+" Mängel","nächster Regal-Kleber "+kNr(nextPlak())].join(" · ")}
+function ctxLine(){if(isNeu(I)){var na=(I.anlagen||[]).length;return [I.kunde||"Neuaufnahme",fDate(I.datum),na+" Anlage"+(na===1?"":"n")].join(" · ")}var n=I.maengel.filter(function(m){return m.stufe}).length;return [I.kunde||I.standort||"Inspektion",fDate(I.datum),n+" Mängel","nächster Regal-Kleber "+kNr(nextPlak())].join(" · ")}
 function logoMark(){var m=$("#mark");if(SET.logo){m.className="mark haslogo";m.innerHTML='<img src="'+SET.logo+'" alt="Logo">'}else{m.className="mark";m.textContent="DT"}}
-function setHeader(t,back){$("#ttl").textContent=t;$("#back").hidden=!back;$("#saved").hidden=!I;$("#ctx").textContent=I?ctxLine():"DIN EN 15635 · Version "+vNr(APP_V);renderTabs();logoMark();document.body.classList.toggle("gross",SET.gross!==false)}
+function setHeader(t,back){$("#ttl").textContent=t;$("#back").hidden=!back;$("#saved").hidden=!I;$("#ctx").textContent=I?ctxLine():"Inspektion · Neuaufnahme · Version "+vNr(APP_V);renderTabs();logoMark();document.body.classList.toggle("gross",SET.gross!==false)}
 
 /* ---------- Navigation ---------- */
 function go(v,p,replace){ leaving(); V=Object.assign({v:v},p||{}); history[replace?"replaceState":"pushState"](V,""); render(); window.scrollTo(0,0); }
@@ -977,7 +1010,7 @@ function pickNewest(x,id){var m=readMirror(id);if(m&&(!x||(m.updated||0)>(x.upda
 
 /* ---------- Startseite ---------- */
 var LISTE=[];
-function inspName(x){return x.kunde||x.standort||("Inspektion "+fDate(x.datum))}
+function inspName(x){return x.kunde||x.standort||((isNeu(x)?"Neuaufnahme ":"Inspektion ")+fDate(x.datum))}
 /* Inspektion endgültig löschen: Fotos, Datensatz und Spiegel. Erst nach der Rückfrage im Bildschirm. */
 function inspLoeschen(x){
   return (I?flushSave():Promise.resolve()).then(function(){return Promise.all(allPhotoIds(x).map(function(p){return ddel("photos",p)}))})
@@ -985,22 +1018,23 @@ function inspLoeschen(x){
     .then(function(){try{localStorage.removeItem("ri_spiegel_"+x.id)}catch(e){}});
 }
 VIEWS.home=function(){
-  I=null;setHeader("Regalinspektion",false);
+  I=null;setHeader("Regale DETEC",false);
   dall("insp").then(function(list){
     var ids=list.map(function(x){return x.id});
     try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf("ri_spiegel_")===0&&ids.indexOf(k.slice(11))<0){var mm=readMirror(k.slice(11));if(mm)list.push(mm)}}}catch(e){}
     list.sort(function(a,b){return (b.updated||0)-(a.updated||0)});
     var h='';
     if(/^(file|content):/.test(location.protocol))h+='<div class="warnbox"><b>Achtung:</b> Die App ist als Datei geöffnet. Auf manchen Handys wird so nicht zuverlässig gespeichert. Bitte über den Link öffnen.</div>';
-    h+='<button class="gross-aktion" data-act="newInsp"><svg viewBox="0 0 24 24"><path d="M4 21V5l8-3 8 3v16"/><path d="M4 11h16M4 16h16M9 21v-5M15 21v-5"/></svg><div><b>Neue Inspektion</b><small>Regalzeilen anlegen und losgehen</small></div></button>';
-    h+='<div class="card flush"><div style="padding:12px 13px 6px"><h2>Gespeicherte Inspektionen</h2></div><div class="list">';
-    if(!list.length)h+='<p class="hint" style="padding:0 13px 13px">Noch keine Inspektion. Tipp: Zuerst im Büro eine Probe mit 2–3 Mängeln und Fotos machen und den Bericht erzeugen.</p>';
+    h+='<button class="gross-aktion" data-act="newInsp"><svg viewBox="0 0 24 24"><path d="M4 21V5l8-3 8 3v16"/><path d="M4 11h16M4 16h16M9 21v-5M15 21v-5"/></svg><div><b>Regalinspektion</b><small>Bestehende Anlage prüfen nach SN EN 15635</small></div></button>';
+    h+='<button class="gross-aktion zwei" data-act="newAuf"><svg viewBox="0 0 24 24"><path d="M4 21V9h16v12"/><path d="M4 15h16M12 9v12"/><path d="M15 3h6v6M21 3l-7 7"/></svg><div><b>Neue Anlage aufnehmen</b><small>Bedarf beim Kunden erfassen – Anfrage an Dexion</small></div></button>';
+    h+='<div class="card flush"><div style="padding:12px 13px 6px"><h2>Gespeichert auf diesem Gerät</h2></div><div class="list">';
+    if(!list.length)h+='<p class="hint" style="padding:0 13px 13px">Noch nichts gespeichert. Tipp: Zuerst im Büro je eine Probe machen und Bericht bzw. Anfrage erzeugen.</p>';
     LISTE=list;
     var zuLoeschen=V.delId?list.filter(function(x){return x.id===V.delId})[0]:null;
     if(zuLoeschen){var nm=zuLoeschen.maengel.filter(function(m){return m.stufe}).length,nf=allPhotoIds(zuLoeschen).length;
-      h='<div class="card loeschfrage" id="loeschfrage"><h2>Inspektion löschen?</h2><p><b>'+esc(inspName(zuLoeschen))+'</b> vom '+fDate(zuLoeschen.datum)+': '+zuLoeschen.zeilen.length+' Regale, '+nm+' Mängel, '+nf+' Fotos.</p><p class="hint">Wird auf diesem Gerät endgültig gelöscht. Brauchst du sie noch, zuerst öffnen und «Sicherung jetzt» machen.</p><div class="row"><button class="btn krit big" data-act="delJa" data-id="'+zuLoeschen.id+'">Ja, endgültig löschen</button><button class="btn big" data-act="delNein">Abbrechen</button></div></div>'+h;}
+      h='<div class="card loeschfrage" id="loeschfrage"><h2>'+(isNeu(zuLoeschen)?"Aufnahme":"Inspektion")+' löschen?</h2><p><b>'+esc(inspName(zuLoeschen))+'</b> vom '+fDate(zuLoeschen.datum)+': '+(isNeu(zuLoeschen)?(zuLoeschen.anlagen||[]).length+' Anlagen':zuLoeschen.zeilen.length+' Regale, '+nm+' Mängel')+', '+nf+' Fotos.</p><p class="hint">Wird auf diesem Gerät endgültig gelöscht. Brauchst du sie noch, zuerst öffnen und «Sicherung jetzt» machen.</p><div class="row"><button class="btn krit big" data-act="delJa" data-id="'+zuLoeschen.id+'">Ja, endgültig löschen</button><button class="btn big" data-act="delNein">Abbrechen</button></div></div>'+h;}
     list.forEach(function(x){var c=countStufen(x.maengel.filter(function(m){return m.stufe}));
-      h+='<div class="zrow"><button class="item" data-act="open" data-id="'+x.id+'"><div class="t"><b>'+esc(inspName(x))+'</b><span>'+fDate(x.datum)+' · '+x.zeilen.length+' Regale · '+x.maengel.filter(function(m){return m.stufe}).length+' Mängel</span></div><div class="dots">'+dots(c)+'</div></button><button class="qio del" data-act="askDel" data-id="'+x.id+'" aria-label="'+esc(inspName(x))+' löschen">Löschen</button></div>'});
+      h+='<div class="zrow"><button class="item" data-act="open" data-id="'+x.id+'"><div class="t"><b>'+esc(inspName(x))+'</b><span>'+(isNeu(x)?'<em class="art neu">Neuaufnahme</em>':'<em class="art">Inspektion</em>')+fDate(x.datum)+' · '+(isNeu(x)?(x.anlagen||[]).length+' Anlagen':x.zeilen.length+' Regale · '+x.maengel.filter(function(m){return m.stufe}).length+' Mängel')+'</span></div><div class="dots">'+(isNeu(x)?'':dots(c))+'</div></button><button class="qio del" data-act="askDel" data-id="'+x.id+'" aria-label="'+esc(inspName(x))+' löschen">Löschen</button></div>'});
     h+='</div></div>';
     h+='<div class="card"><h2>Daten</h2><div class="row"><button class="btn" data-act="importJson">Sicherung importieren</button><button class="btn" data-act="settings">Einstellungen / Logo</button></div><p class="hint" id="stor"></p></div>';
     main.innerHTML=h;
@@ -1090,8 +1124,8 @@ VIEWS.insp=function(){
   main.innerHTML=h;
 };
 function bkHtml(){
-  var nm=I.maengel.filter(function(m){return m.stufe}).length,seit=nm-(I.backupN||0);
-  return '<div class="bk'+(I.lastBackup&&seit<10?' ok':'')+'"><div><b>'+(I.lastBackup?'Sicherungsdatei '+new Date(I.lastBackup).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})+(seit>0?' · '+seit+' Mängel seither':' ✓'):'Noch keine Sicherungsdatei')+'</b><span>Auf dem Gerät ist alles laufend gespeichert.</span></div><button class="btn" data-act="exportJson">Sicherung jetzt</button></div>';
+  var nm=isNeu(I)?(I.anlagen||[]).length:I.maengel.filter(function(m){return m.stufe}).length,seit=nm-(I.backupN||0);
+  return '<div class="bk'+(I.lastBackup&&seit<10?' ok':'')+'"><div><b>'+(I.lastBackup?'Sicherungsdatei '+new Date(I.lastBackup).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})+(seit>0?' · '+seit+(isNeu(I)?' Anlagen':' Mängel')+' seither':' ✓'):'Noch keine Sicherungsdatei')+'</b><span>Auf dem Gerät ist alles laufend gespeichert.</span></div><button class="btn" data-act="exportJson">Sicherung jetzt</button></div>';
 }
 
 /* ---------- Allgemeine Prüfpunkte ---------- */
@@ -1327,7 +1361,7 @@ VIEWS.report=function(){
   });
 };
 rptBind();
-function rptBind(){$("#rptview").addEventListener("click",function(e){var b=e.target.closest("[data-act]");if(!b)return;if(b.dataset.act==="back")history.back();if(b.dataset.act==="print")window.print()})}
+function rptBind(){$("#rptview").addEventListener("click",function(e){var b=e.target.closest("[data-act]");if(!b)return;if(b.dataset.act==="back")history.back();if(b.dataset.act==="print"){var fr=$("#anfFrame");if(fr&&fr.contentWindow){fr.contentWindow.focus();fr.contentWindow.print()}else window.print()}})}
 
 /* ---------- Kundenbericht ---------- */
 function buildKunde(){
@@ -1357,8 +1391,8 @@ function exportJson(){
     var n=I.maengel.length,miss=allPhotoIds(I).filter(function(id){return !P[id]}).length;
     var out={format:"regalinspektion-v1",exportiert:new Date().toISOString(),insp:I,photos:P};
     var hm=new Date().toTimeString().slice(0,5).replace(":","");
-    return saveFile("Regalinspektion_"+slug(I.kunde||I.standort||"Sicherung")+"_"+I.datum+"_"+hm+".json",JSON.stringify(out),"application/json").then(function(){
-      I.lastBackup=Date.now();I.backupN=I.maengel.filter(function(m){return m.stufe}).length;save();if(V.v==="insp")render();
+    return saveFile((isNeu(I)?"Neuaufnahme_":"Regalinspektion_")+slug(I.kunde||I.standort||"Sicherung")+"_"+I.datum+"_"+hm+".json",JSON.stringify(out),"application/json").then(function(){
+      I.lastBackup=Date.now();I.backupN=isNeu(I)?(I.anlagen||[]).length:I.maengel.filter(function(m){return m.stufe}).length;save();if(V.v==="insp"||V.v==="nhome")render();
       if(miss)errBanner(miss+" Foto(s) fehlen im Speicher und sind nicht in der Sicherung.");void n;
     });
   });
@@ -1380,17 +1414,20 @@ $("#fjson").addEventListener("change",function(e){
       var X=d.insp;
       if(ex&&!confirm("Diese Inspektion ist schon vorhanden. OK = überschreiben, Abbrechen = als Kopie importieren.")){
         var map={};X=JSON.parse(JSON.stringify(X));X.id=uid();X.kunde=(X.kunde||"")+" (Kopie)";
-        X.maengel.forEach(function(m){m.fotos=(m.fotos||[]).map(function(pid){var nid=uid();map[nid]=d.photos[pid];return nid})});
+        function nf(l){return (l||[]).map(function(pid){var nid=uid();map[nid]=d.photos[pid];return nid})}
+        function nb(sk){(sk||[]).forEach(function(k){if(k.bg){var nid=uid();map[nid]=d.photos[k.bg];k.bg=nid}})}
+        (X.maengel||[]).forEach(function(m){m.fotos=nf(m.fotos)});
+        (X.anlagen||[]).forEach(function(a){a.fotos=nf(a.fotos);nb(a.skizzen)});if(X.umg)X.umg.fotos=nf(X.umg.fotos);nb(X.skizzen);
         d.photos=map;
       }
       var ps=Object.keys(d.photos||{}).map(function(pid){return dput("photos",{id:pid,insp:X.id,data:d.photos[pid]})});
-      return Promise.all(ps).then(function(){return dput("insp",X)}).then(function(){toast("Importiert: "+(X.kunde||"Inspektion"),3000);PH=new Map();render()});
+      return Promise.all(ps).then(function(){return dput("insp",X)}).then(function(){toast("Importiert: "+(X.kunde||(isNeu(X)?"Neuaufnahme":"Inspektion")),3000);PH=new Map();render()});
     });
   }).catch(function(err){toast("Import fehlgeschlagen: "+(err.message||err),5000)});
 });
 $("#flogo").addEventListener("change",function(e){var f=e.target.files[0];e.target.value="";if(!f)return;resizeImg(f,800,.9).then(function(d){SET.logo=d;return saveMeta("settings",SET)}).then(function(){render()}).catch(function(err){toast(err.message)})});
 function onPhotoFiles(e){
-  var files=[].slice.call(e.target.files||[]);e.target.value="";var m=findM(V.mid);if(!m||!files.length)return;
+  var files=[].slice.call(e.target.files||[]);e.target.value="";var m=photoTarget();if(!m||!files.length)return;m.fotos=m.fotos||[];
   toast("Foto wird gespeichert …",1500);
   var inspId=I.id;
   files.reduce(function(p,f){return p.then(function(){
@@ -1398,7 +1435,7 @@ function onPhotoFiles(e){
         var id=uid();return dput("photos",{id:id,insp:inspId,data:d}).then(function(){PH.set(id,d);m.fotos.push(id);save();renderPhotos(m)});
       });
     })},Promise.resolve())
-    .then(function(){toast("✓ Foto gespeichert ("+m.fotos.length+" bei "+nrText(m.nr)+")")})
+    .then(function(){toast("✓ Foto gespeichert ("+m.fotos.length+(V.v==="mangel"?" bei "+nrText(m.nr):"")+")")})
     .catch(function(err){errBanner("Foto konnte NICHT gespeichert werden ("+(err&&err.name||err)+"). Bitte erneut aufnehmen und danach «Sicherung jetzt» machen.")});
 }
 $("#fcam").addEventListener("change",onPhotoFiles);$("#fgal").addEventListener("change",onPhotoFiles);
@@ -1414,7 +1451,7 @@ var ACT={
     I={id:uid(),version:2,kunde:"",standort:"",datum:todayIso(),pruefer:F.pruefer||"",typ:LAST.typ||"P",hersteller:"",plakStart:1,bemerkung:"",zeilen:[],maengel:[],allg:{},gesamt:"",naechste:addMonths(todayIso(),12),sigP:"",sigK:"",kundeName:"",created:Date.now(),updated:Date.now()};
     PH=new Map();flushSave().then(function(){go("stamm",{id:I.id,neu:1})});
   },
-  open:function(b){go("insp",{id:b.dataset.id})},
+  open:function(b){var x=LISTE.filter(function(y){return y.id===b.dataset.id})[0];go(isNeu(x)?"nhome":"insp",{id:b.dataset.id})},
   stamm:function(){go("stamm",{id:I.id})},
   stammWeiter:function(){go("insp",{id:I.id},true)},
   anlage:function(){go("anlage",{id:I.id})},
@@ -1456,7 +1493,7 @@ var ACT={
   cam:function(){$("#fcam").click()},
   gal:function(){$("#fgal").click()},
   lb:function(b){if(b.src)lightbox(b.src)},
-  delPhoto:function(b){if(!confirm("Foto löschen?"))return;var m=findM(V.mid);m.fotos=m.fotos.filter(function(p){return p!==b.dataset.pid});ddel("photos",b.dataset.pid);save();renderPhotos(m)},
+  delPhoto:function(b){if(!confirm("Foto löschen?"))return;var m=photoTarget();m.fotos=m.fotos.filter(function(p){return p!==b.dataset.pid});ddel("photos",b.dataset.pid);save();renderPhotos(m)},
   delMangel:function(){if(!confirm("Diesen Mangel löschen?"))return;var m=findM(V.mid);(m.fotos||[]).forEach(function(p){ddel("photos",p)});I.maengel=I.maengel.filter(function(x){return x!==m});save();history.back()},
   saveNext:function(){var m=findM(V.mid);if(!checkMangel(m))return;LAST.zeileId=m.zeileId;LAST.bk=m.bk;saveMeta("last",LAST);flushSave();toast("✓ "+nrText(m.nr)+" gespeichert");
     var n={id:uid(),nr:nextNr(),zeileId:m.zeileId,bk:m.bk,bauteil:m.bauteil,art:"",stufe:"",stufeVorschlag:"",feld:m.feld,ebene:"",seite:"",beschreibung:"",massnahme:"",massAuto:true,fotos:[],created:Date.now()};
@@ -1487,6 +1524,614 @@ var ACT={
     b.disabled=true;inspLoeschen(x).then(function(){V.delId=null;history.replaceState(V,"");toast("Inspektion gelöscht");render()})
       .catch(function(e){b.disabled=false;toast("Löschen fehlgeschlagen: "+(e&&e.message||e),5000)})}
 };
+/* =====================================================================
+   NEUAUFNAHME REGALANLAGE – Bedarfsaufnahme beim Kunden als Anfrage an Dexion
+   Datensatz im selben Speicher wie die Inspektion, Kennzeichen art:"neu".
+   Auswahllisten nach DETEC-Dexion-Produktkatalog 2026 (Herstellerangaben, projektbezogen bestätigen).
+   ===================================================================== */
+function rng(a,b,s){var r=[];for(var v=a;v<=b;v+=s)r.push(String(v));return r}
+function isNeu(X){return !!(X&&X.art==="neu")}
+var ZUB={
+  p90:["Durchschubsicherung","Rückwandgitter","Rammschutz an Stützen","Stützenschutz mit Schaumstoff","Regalendschutz / Stirnseitenschutz","Leitplanke","Tunnelschutz bei Unterfahrt","Belastungsschild","Regalkennzeichnung","Sprinklerhalterung","Palettenauszug"],
+  hi:["Rückwand / Regalverkleidung","Seitenwand","Fachteiler","Bügelteiler","Fachtrennwand","Schrägboden","Schubladen","Ausziehfächer","Türen","Sockelleiste","Etikettenhalter","Lager- und Transportboxen","Kleiderstange","Auffangwanne","Stirnseitenschutz","Belastungsschild"],
+  ws:["Rückwandgitter","Seitenwand, gelocht","Schrägboden","Etikettenhalter","Lager- und Transportboxen","Stirnseitenschutz","Belastungsschild"],
+  block:["Rammschutz an Stützen","Stützenschutz mit Schaumstoff","Stirnseitenschutz","Leitplanke","Rückwandgitter","Belastungsschild","Regalkennzeichnung"]
+};
+var PAL=["EUR 800×1200","Industrie 1000×1200","Halbpalette 800×600","Gitterbox 800×1200","Chemiepalette 1140×1140","andere"];
+var F_ANORD=[
+  {k:"zeilen",l:"Anzahl Regalzeilen",t:"sel",o:rng(1,30,1),d:"1"},
+  {k:"ausf",l:"Ausführung",t:"seg",o:["Einzelregal","Doppelregal","Anbau an Bestehendes"],d:"Einzelregal",rr:1,h:"Doppelregal = zwei Regale Rücken an Rücken. Anbau = Erweiterung einer bestehenden Anlage (Hersteller und System der Altanlage in der Bemerkung angeben)."},
+  {k:"felder",l:"Felder pro Zeile",t:"sel",o:rng(1,40,1),d:"3"}
+];
+var SYS=[
+ {k:"hi",l:"1.1 Fachbodenregal Hi280",kat:"Fachlast 75–400 kg · Stützenhöhe 1000–4600 mm · Tiefe 300/400/450/500/600/800 · Fachbodenlänge 900/1000/1290 mm · schraubenlos",zub:"hi",anord:1,fields:[
+  {k:"fb",l:"Fachbodenlänge",t:"seg",o:["900","1000","1290"],u:"mm",d:"1000"},
+  {k:"tiefe",l:"Tiefe",t:"sel",o:["300","400","450","500","600","800"],u:"mm",d:"500"},
+  {k:"hoehe",l:"Stützenhöhe",t:"selx",o:["1000","1500","2000","2250","2500","3000","3500","4000","4600"],u:"mm",d:"2000"},
+  {k:"ebenen",l:"Fachböden pro Feld (inkl. unterster)",t:"sel",o:rng(2,14,1),d:"5"},
+  {k:"fachlast",l:"Fachlast",t:"sel",o:["75","100","150","200","250","300","400"],u:"kg",d:"150",h:"Gleichmässig verteilte Last pro Fachboden."},
+  {k:"ebH",l:"Fachbodenhöhen, falls bekannt",t:"text",d:"",ph:"z. B. 100 / 500 / 900 … – sonst leer"},
+  {k:"gut",l:"Lagergut",t:"sel",o:["Kleinteile","Kartons","Behälter / Boxen","Ersatzteile","Ordner / Archiv","Werkzeug","gemischt"],d:"Kartons"}
+ ]},
+ {k:"his",l:"1.2 Schmalgang-Fachbodenregal Hi280",kat:"Fachlast 75–400 kg · Feldlast bis 4000 kg · Höhe bis 12000 mm · Tiefe 300–1000 mm · Fachbodenlänge 900/1000/1290 mm",zub:"hi",anord:1,fields:[
+  {k:"fb",l:"Fachbodenlänge",t:"seg",o:["900","1000","1290"],u:"mm",d:"1000"},
+  {k:"tiefe",l:"Tiefe",t:"sel",o:["300","400","500","600","800","1000"],u:"mm",d:"500"},
+  {k:"hoehe",l:"Stützenhöhe",t:"selx",o:rng(3000,12000,500),u:"mm",d:"5000"},
+  {k:"ebenen",l:"Fachböden pro Feld (inkl. unterster)",t:"sel",o:rng(2,30,1),d:"10"},
+  {k:"fachlast",l:"Fachlast",t:"sel",o:["75","100","150","200","250","300","400"],u:"kg",d:"150"},
+  {k:"geraet",l:"Bediengerät",t:"sel",o:["Kommissionierer Man-up","Schmalgangstapler","automatisches Bediengerät","abklären"],d:"Kommissionierer Man-up"},
+  {k:"gang",l:"Gangbreite",t:"selx",o:["900","1000","1200","1400","1600"],u:"mm",d:""},
+  {k:"ebH",l:"Fachbodenhöhen, falls bekannt",t:"text",d:"",ph:"sonst leer"},
+  {k:"gut",l:"Lagergut",t:"sel",o:["Kleinteile","Kartons","Behälter / Boxen","Ersatzteile","gemischt"],d:"Kartons"}
+ ]},
+ {k:"cfh",l:"1.3 Durchlaufregal Carton Flow (Fachboden)",kat:"Last je Ladeeinheit ca. 80–350 kg · Höhe typisch bis ca. 5000 mm · Gefälle ca. 4 % · FIFO",zub:"hi",anord:1,fields:[
+  {k:"fb",l:"Feldbreite",t:"selx",o:["900","1000","1290"],u:"mm",d:"1290"},
+  {k:"tiefe",l:"Bahntiefe",t:"selx",o:["800","1000","1200","1500","2000","2500"],u:"mm",d:"1500"},
+  {k:"hoehe",l:"Höhe",t:"selx",o:["1500","2000","2500","3000","3500","4000","5000"],u:"mm",d:"2000"},
+  {k:"ebenen",l:"Durchlaufebenen",t:"sel",o:rng(1,8,1),d:"4"},
+  {k:"rolle",l:"Rollen",t:"seg",o:["Kunststoff","Stahl","abklären"],d:"abklären"},
+  {k:"gut",l:"Ladeeinheit",t:"sel",o:["Kartons","Kleinladungsträger (KLT)","Kisten","gemischt"],d:"Kartons"},
+  {k:"gutMass",l:"Masse Ladeeinheit (L×B×H, Gewicht)",t:"text",d:"",ph:"z. B. 600×400×280, 15 kg"},
+  {k:"pick",l:"Kommissionierhilfe",t:"seg",o:["keine","Pick-by-Light","abklären"],d:"keine"}
+ ]},
+ {k:"hiw",l:"2.1 Weitspannregal Hi280",kat:"Fachlast bis 400 kg je Ebene · Feldlast bis 2400 kg · Rahmenhöhe bis 3000 mm · Tiefe 500/600/800 · Fachbodenlänge 1500–2500 mm",zub:"ws",anord:1,fields:[
+  {k:"fb",l:"Fachbodenlänge",t:"sel",o:["1500","1750","2000","2250","2500"],u:"mm",d:"2000"},
+  {k:"tiefe",l:"Tiefe",t:"sel",o:["500","600","800","1000"],u:"mm",d:"600",h:"1000 mm laut Produktspezifikation möglich – projektbezogen prüfen."},
+  {k:"hoehe",l:"Rahmenhöhe",t:"sel",o:["1500","2000","2500","3000"],u:"mm",d:"2000"},
+  {k:"ebenen",l:"Ebenen pro Feld (inkl. unterster)",t:"sel",o:rng(2,8,1),d:"4"},
+  {k:"fachlast",l:"Fachlast",t:"sel",o:["100","150","200","250","300","400"],u:"kg",d:"250"},
+  {k:"bodenart",l:"Boden",t:"seg",o:["Spanplatte 18 mm","Stahleinlegeboden"],d:"Spanplatte 18 mm"},
+  {k:"ebH",l:"Ebenenhöhen, falls bekannt",t:"text",d:"",ph:"sonst leer"},
+  {k:"gut",l:"Lagergut",t:"sel",o:["sperrige Güter","Kartons","Behälter / Boxen","Ersatzteile","Werkstatt","gemischt"],d:"gemischt"}
+ ]},
+ {k:"ls3",l:"2.2 Weitspannregal LS3",kat:"Fachlast bis 800 kg je Ebene · Feldlast bis 6900 kg · Höhe 1500–5000 mm · Tiefe 450–1200 · Balkenspannweite bis 2700 mm",zub:"ws",anord:1,fields:[
+  {k:"fb",l:"Balkenspannweite",t:"sel",o:["1200","1500","1800","2400","2700"],u:"mm",d:"2400"},
+  {k:"tiefe",l:"Tiefe",t:"sel",o:["450","600","750","900","1000","1200"],u:"mm",d:"750"},
+  {k:"hoehe",l:"Rahmenhöhe",t:"sel",o:["1500","2000","2500","3000","3500","4000","4500","5000"],u:"mm",d:"2500"},
+  {k:"ebenen",l:"Ebenen pro Feld (inkl. unterster)",t:"sel",o:rng(1,8,1),d:"4"},
+  {k:"fachlast",l:"Fachlast",t:"sel",o:["200","300","400","500","600","800"],u:"kg",d:"400"},
+  {k:"bodenart",l:"Belag",t:"sel",o:["Spanplatte","Stahlpaneele","Gitterrost","ohne Belag"],d:"Spanplatte"},
+  {k:"ebH",l:"Ebenenhöhen, falls bekannt",t:"text",d:"",ph:"sonst leer"},
+  {k:"gut",l:"Lagergut",t:"sel",o:["sperrige Güter","Ersatzteile","Reifen","Archiv","Kartons","gemischt"],d:"gemischt"}
+ ]},
+ {k:"p90",l:"3.1 Palettenregal P90",kat:"Fachlast bis 5000 kg · Feldlast bis 30 t · Höhe 1500–30000 mm · Tiefe 800/1000/1100/1200 · Feldbreiten 1800/2200/2700/3300/3600 mm",zub:"p90",anord:1,fields:[
+  {k:"fb",l:"Feldbreite (Traversenlänge, licht)",t:"selx",o:["1800","2200","2700","3300","3600"],u:"mm",d:"2700",h:"Standardbreiten P90. Für 3 Europaletten längs: 2700 mm; für 2 Europaletten längs: 1800 mm; für 2 Industriepaletten: 2200 mm."},
+  {k:"tiefe",l:"Rahmentiefe",t:"selx",o:["800","1000","1100","1200"],u:"mm",d:"1100",h:"Europalette längs (1200 tief): Rahmen 1100 mm, Palette steht vorne und hinten je 50 mm über."},
+  {k:"hoehe",l:"Rahmenhöhe",t:"selx",o:rng(2000,12000,500),u:"mm",d:"5000"},
+  {k:"palette",l:"Palette",t:"sel",o:PAL,d:"EUR 800×1200"},
+  {k:"einl",l:"Einlagerung",t:"seg",o:["längs","quer"],d:"längs",h:"Längs: schmale Seite (800 mm) vorne. Quer: lange Seite (1200 mm) vorne."},
+  {k:"proFach",l:"Paletten pro Fach",t:"seg",o:["1","2","3","4"],d:"3"},
+  {k:"last",l:"Palettengewicht max.",t:"selx",o:["250","500","750","1000","1250","1500"],u:"kg",d:"1000"},
+  {k:"ladeh",l:"Ladehöhe inkl. Palette",t:"selx",o:rng(800,2200,100),u:"mm",d:"1400"},
+  {k:"ebenen",l:"Traversenebenen (ohne Boden)",t:"sel",o:rng(1,12,1),d:"3"},
+  {k:"boden",l:"Unterste Ebene",t:"seg",o:["Palette auf Boden","Traverse"],d:"Palette auf Boden",rr:1},
+  {k:"ebH",l:"Traversenhöhen (OK), falls bekannt",t:"text",d:"",ph:"z. B. 1600 / 3200 / 4800 – sonst leer",h:"Leer lassen: die Vorschau verteilt die Ebenen nach Ladehöhe (+ 250 mm für Traverse und Freiraum). Dexion legt die Höhen definitiv fest."},
+  {k:"belag",l:"Fachbelag",t:"sel",o:["kein (Palette auf Traversen)","Gitterrost","Spanplatte","Stahlpaneele","Querbalken / Palettenunterstützung","Halbpaletten-Auflage","Coil-Auflage","Fassauflage"],d:"kein (Palette auf Traversen)"},
+  {k:"uf",l:"Unterfahrt / Durchfahrt",t:"seg",o:["keine","ja"],d:"keine",rr:1},
+  {k:"ufAnz",l:"Anzahl Unterfahrten",t:"sel",o:rng(1,6,1),d:"1",w:["uf","ja"]},
+  {k:"ufFeld",l:"Unterfahrt in Feld Nr. (von links)",t:"text",d:"",ph:"z. B. 2 oder 2 und 5",w:["uf","ja"]},
+  {k:"ufB",l:"Lichte Breite Unterfahrt",t:"selx",o:["1800","2200","2700","3300","3600"],u:"mm",d:"2700",w:["uf","ja"]},
+  {k:"ufH",l:"Lichte Durchfahrtshöhe",t:"selx",o:rng(2000,4500,250),u:"mm",d:"2500",w:["uf","ja"],h:"Höhe von Fahrzeug bzw. Ladung plus Sicherheitsabstand. Bei Staplerdurchfahrt die Masthöhe eingefahren beachten."},
+  {k:"oberfl",l:"Traversen Oberfläche",t:"seg",o:["verzinkt","lackiert"],d:"verzinkt",h:"Stützen sind beim P90 verzinkt, Traversen verzinkt oder lackiert (RAL)."}
+ ]},
+ {k:"p90s",l:"3.2 Schmalgang-Palettenregal P90",kat:"Fachlast bis 5000 kg · Höhe bis 14 m · Fachhöhe bis 3500 mm · Fachbreite bis 5000 mm · Traversenraster 50 mm",zub:"p90",anord:1,fields:[
+  {k:"fb",l:"Feldbreite (Traversenlänge, licht)",t:"selx",o:["1800","2200","2700","3300","3600"],u:"mm",d:"2700"},
+  {k:"tiefe",l:"Rahmentiefe",t:"selx",o:["800","1000","1100","1200"],u:"mm",d:"1100"},
+  {k:"hoehe",l:"Rahmenhöhe",t:"selx",o:rng(4000,14000,500),u:"mm",d:"9000"},
+  {k:"palette",l:"Palette",t:"sel",o:PAL,d:"EUR 800×1200"},
+  {k:"einl",l:"Einlagerung",t:"seg",o:["längs","quer"],d:"längs"},
+  {k:"proFach",l:"Paletten pro Fach",t:"seg",o:["1","2","3","4"],d:"3"},
+  {k:"last",l:"Palettengewicht max.",t:"selx",o:["250","500","750","1000","1250","1500"],u:"kg",d:"1000"},
+  {k:"ladeh",l:"Ladehöhe inkl. Palette",t:"selx",o:rng(800,2200,100),u:"mm",d:"1400"},
+  {k:"ebenen",l:"Traversenebenen (ohne Boden)",t:"sel",o:rng(1,14,1),d:"5"},
+  {k:"boden",l:"Unterste Ebene",t:"seg",o:["Palette auf Boden","Traverse"],d:"Palette auf Boden"},
+  {k:"ebH",l:"Traversenhöhen (OK), falls bekannt",t:"text",d:"",ph:"sonst leer"},
+  {k:"geraet",l:"Bediengerät",t:"sel",o:["Schmalgangstapler (Man-down)","Kommissionierstapler (Man-up)","Regalbediengerät / automatisch","abklären"],d:"Schmalgangstapler (Man-down)"},
+  {k:"fuehrung",l:"Führung im Gang",t:"seg",o:["Schienenführung","Induktivführung","abklären"],d:"abklären"},
+  {k:"belag",l:"Fachbelag",t:"sel",o:["kein (Palette auf Traversen)","Gitterrost","Spanplatte","Stahlpaneele"],d:"kein (Palette auf Traversen)"}
+ ]},
+ {k:"di",l:"3.3 Einfahrregal P90 Drive-In",kat:"Palettenlast bis 1500 kg · Höhe bis 14 m · Kanalbreite bis 1800 mm · Kanalhöhe bis 3000 mm · LIFO",zub:"block",anord:0,fields:[
+  {k:"kanaele",l:"Anzahl Kanäle",t:"sel",o:rng(1,40,1),d:"4"},
+  {k:"tiefeP",l:"Kanaltiefe in Paletten",t:"sel",o:rng(2,15,1),d:"5"},
+  {k:"ebenen",l:"Ebenen (inkl. Boden)",t:"sel",o:rng(1,8,1),d:"3"},
+  {k:"palette",l:"Palette",t:"sel",o:PAL,d:"EUR 800×1200"},
+  {k:"last",l:"Palettengewicht max.",t:"selx",o:["250","500","750","1000","1250","1500"],u:"kg",d:"1000"},
+  {k:"ladeh",l:"Ladehöhe inkl. Palette",t:"selx",o:rng(800,2200,100),u:"mm",d:"1400"},
+  {k:"hoehe",l:"Gesamthöhe",t:"selx",o:rng(3000,14000,500),u:"mm",d:"6000"},
+  {k:"zugriff",l:"Zugriff",t:"seg",o:["einseitig (Drive-In)","beidseitig (Drive-Through)"],d:"einseitig (Drive-In)"}
+ ]},
+ {k:"dl",l:"3.4 Paletten-Durchlaufregal P90",kat:"Palettengewicht bis 1500 kg · Blockhöhe bis 14000 mm · Kanalbreite 1000/2000/3600 mm · FIFO",zub:"block",anord:0,fields:[
+  {k:"kanaele",l:"Anzahl Kanäle",t:"sel",o:rng(1,40,1),d:"4"},
+  {k:"bahnen",l:"Bahnen pro Kanal",t:"seg",o:["1","2","3"],d:"1",h:"Kanalbreite 1000 mm (1 Bahn), 2000 mm (2 Bahnen), 3600 mm (3 Bahnen)."},
+  {k:"tiefeP",l:"Kanaltiefe in Paletten",t:"sel",o:rng(2,20,1),d:"6"},
+  {k:"ebenen",l:"Ebenen",t:"sel",o:rng(1,8,1),d:"3"},
+  {k:"palette",l:"Palette",t:"sel",o:PAL,d:"EUR 800×1200"},
+  {k:"last",l:"Palettengewicht max.",t:"selx",o:["250","500","750","1000","1250","1500"],u:"kg",d:"1000"},
+  {k:"ladeh",l:"Ladehöhe inkl. Palette",t:"selx",o:rng(800,2200,100),u:"mm",d:"1400"}
+ ]},
+ {k:"pb",l:"3.5 Einschubregal P90 Push-back",kat:"Blockhöhe bis 12000 mm · Blocktiefe bis 10 Paletten · LIFO von einer Seite",zub:"block",anord:0,fields:[
+  {k:"kanaele",l:"Anzahl Kanäle",t:"sel",o:rng(1,40,1),d:"4"},
+  {k:"tiefeP",l:"Kanaltiefe in Paletten",t:"sel",o:rng(2,10,1),d:"4"},
+  {k:"ebenen",l:"Ebenen",t:"sel",o:rng(1,8,1),d:"3"},
+  {k:"palette",l:"Palette",t:"sel",o:PAL,d:"EUR 800×1200"},
+  {k:"einl",l:"Einlagerung",t:"seg",o:["längs","quer"],d:"längs"},
+  {k:"last",l:"Palettengewicht max.",t:"selx",o:["250","500","750","1000","1250","1500"],u:"kg",d:"1000"},
+  {k:"ladeh",l:"Ladehöhe inkl. Palette",t:"selx",o:rng(800,2200,100),u:"mm",d:"1400"}
+ ]},
+ {k:"pa",l:"3.6 Palettenauszug P90",kat:"Zuladung max. 1000 kg · Balken- und Rahmenauszug 70–100 % · Bodenauszug 100 % · manuell oder elektrisch",zub:"p90",anord:0,fields:[
+  {k:"anzahl",l:"Anzahl Palettenauszüge",t:"sel",o:rng(1,40,1),d:"2"},
+  {k:"variante",l:"Ausführung",t:"sel",o:["Balkenauszug (auf Traverse)","Bodenauszug","Rahmenauszug"],d:"Balkenauszug (auf Traverse)"},
+  {k:"antrieb",l:"Antrieb",t:"seg",o:["manuell","elektrisch"],d:"manuell"},
+  {k:"auszug",l:"Auszug",t:"seg",o:["70 %","100 %"],d:"100 %"},
+  {k:"palette",l:"Palette",t:"sel",o:PAL,d:"EUR 800×1200"},
+  {k:"last",l:"Zuladung pro Auszug",t:"sel",o:["250","500","750","1000"],u:"kg",d:"500"},
+  {k:"einbau",l:"Einbau in",t:"seg",o:["neues P90-Regal","bestehendes Regal"],d:"neues P90-Regal",h:"Bei bestehendem Regal: Hersteller, Feldbreite und Rahmentiefe in der Bemerkung angeben."},
+  {k:"ebenen",l:"Auf welchen Ebenen",t:"text",d:"",ph:"z. B. Boden und 1. Ebene"}
+ ]},
+ {k:"cfp",l:"3.7 Durchlaufregal Carton Flow (P90)",kat:"Bis 25 kg pro Bahn · nachrüstbar in bestehende Palettenregale · kühlraumtauglich bis −30 °C · FIFO",zub:"block",anord:1,fields:[
+  {k:"fb",l:"Feldbreite (Traversenlänge)",t:"selx",o:["1800","2200","2700","3300","3600"],u:"mm",d:"2700"},
+  {k:"tiefe",l:"Rahmentiefe / Bahntiefe",t:"selx",o:["800","1000","1100","1200"],u:"mm",d:"1100"},
+  {k:"hoehe",l:"Rahmenhöhe",t:"selx",o:rng(2000,8000,500),u:"mm",d:"3000"},
+  {k:"ebenen",l:"Durchlaufebenen",t:"sel",o:rng(1,8,1),d:"3"},
+  {k:"bahnen",l:"Bahnen pro Ebene und Feld",t:"sel",o:rng(1,12,1),d:"6"},
+  {k:"rolle",l:"Rollen",t:"seg",o:["Kunststoff","Stahl","Tiefkühl"],d:"Kunststoff"},
+  {k:"gut",l:"Ladeeinheit",t:"sel",o:["Kartons","Kisten","Behälter","gemischt"],d:"Kartons"},
+  {k:"gutMass",l:"Masse und Gewicht Ladeeinheit",t:"text",d:"",ph:"z. B. 400×300×250, max. 20 kg"},
+  {k:"einbau",l:"Einbau in",t:"seg",o:["neues P90-Regal","bestehendes Palettenregal"],d:"neues P90-Regal"}
+ ]}
+];
+function sysOf(a){for(var i=0;i<SYS.length;i++)if(SYS[i].k===(a&&a.sys))return SYS[i];return SYS[5]}
+function aFields(a){var s=sysOf(a);return (s.anord?F_ANORD:[]).concat(s.fields)}
+function fShown(f,a){return !f.w||(a.f||{})[f.w[0]]===f.w[1]}
+function fv(a,k){var v=(a.f||{})[k];return v==null?"":String(v)}
+function fnum(a,k){var n=parseFloat(String(fv(a,k)).replace(/[^\d.]/g,""));return isNaN(n)?0:n}
+function defaults(sysKey){var a={sys:sysKey,f:{}};aFields(a).forEach(function(f){if(f.d!=="")a.f[f.k]=f.d});return a.f}
+function anlName(a,i){var s=sysOf(a);return "Anlage "+(i+1)+" · "+s.l.replace(/^\d\.\d /,"")+(a.bez?" · "+a.bez:"")}
+function aOf(id){if(!I||!I.anlagen)return null;for(var i=0;i<I.anlagen.length;i++)if(I.anlagen[i].id===id)return I.anlagen[i];return null}
+function aIdx(a){return I.anlagen.indexOf(a)}
+var NEU_KUNDE=[
+  {k:"kunde",l:"Kunde / Firma",t:"text",ph:"kann auch später ergänzt werden"},
+  {k:"standort",l:"Standort / Adresse",t:"text",ph:"Strasse, Ort"},
+  {k:"raum",l:"Gebäude / Halle / Raum",t:"text",ph:"z. B. Halle 3, UG Lager"},
+  {k:"kontakt",l:"Ansprechperson vor Ort",t:"text"},
+  {k:"telefon",l:"Telefon",t:"tel"},
+  {k:"email",l:"E-Mail",t:"email"},
+  {k:"referenz",l:"Projekt / Referenz des Kunden",t:"text",ph:"optional"},
+  {k:"termin",l:"Gewünschter Termin",t:"sel",o:["so rasch wie möglich","innert 1 Monat","innert 3 Monaten","später / Budgetplanung","offen"],d:"offen"},
+  {k:"leistung",l:"Leistung",t:"seg",o:["Lieferung + Montage","nur Lieferung","abklären"],d:"Lieferung + Montage"},
+  {k:"inspekt",l:"Regalinspektion nach Montage anbieten",t:"seg",o:["ja","nein"],d:"ja"}
+];
+var NEU_UMG=[
+  {k:"hallenH",l:"Lichte Raumhöhe (UK Decke / Unterzug)",t:"selx",o:rng(2500,15000,500),u:"mm",d:""},
+  {k:"hind",l:"Hindernisse in der Höhe",t:"chips",o:["Unterzüge","Leitungen / Kanäle","Lampen","Deckensprinkler","Kranbahn","Tore / Fenster","Stützen im Raum","keine"]},
+  {k:"boden",l:"Boden",t:"sel",o:["Beton (Industrieboden)","Beton mit Belag (Epoxid / Platten)","Asphalt","Holz / Zwischenboden","unbekannt"],d:""},
+  {k:"bodenD",l:"Bodenplatte Stärke",t:"selx",o:["120","150","200","250","300","unbekannt"],u:"mm",d:"",h:"Wichtig für Verankerung und Punktlasten unter den Fussplatten. Wenn unbekannt: Pläne oder Bauleitung anfragen."},
+  {k:"anker",l:"Bodenverankerung (Dübeln)",t:"seg",o:["erlaubt","nicht erlaubt","abklären"],d:"abklären",h:"Fussboden-Heizung oder Abdichtung kann das Dübeln verbieten."},
+  {k:"bodenEben",l:"Boden eben",t:"seg",o:["ja","Gefälle / uneben","abklären"],d:"ja"},
+  {k:"sprinkler",l:"Sprinkleranlage",t:"seg",o:["keine","Deckensprinkler","Regalsprinkler nötig?"],d:"keine"},
+  {k:"stapler",l:"Flurförderzeug",t:"sel",o:["Gabelstapler (Frontstapler)","Schubmaststapler","Hochhubwagen","Handhubwagen","Schmalgangstapler","Kommissionierer","keines (Handbedienung)"],d:""},
+  {k:"hubH",l:"Max. Hubhöhe Gabel",t:"selx",o:rng(1000,12000,500),u:"mm",d:""},
+  {k:"gang",l:"Gangbreite (vorhanden / gewünscht)",t:"selx",o:["800","1000","1200","1500","1800","2500","2800","3000","3500","4000"],u:"mm",d:"",h:"Arbeitsgangbreite für den Stapler laut Datenblatt (Ast). Für Handbedienung mind. 800 mm, Hauptwege breiter."},
+  {k:"zugang",l:"Anlieferung / Zugang",t:"sel",o:["ebenerdig, Lkw und Stapler","Laderampe","Warenlift","nur Treppe","abklären"],d:""},
+  {k:"betrieb",l:"Betrieb während Montage",t:"seg",o:["läuft weiter","Stillstand möglich","abklären"],d:"abklären"},
+  {k:"alt",l:"Bestehende Anlage",t:"seg",o:["keine","demontieren","umbauen / erweitern"],d:"keine",h:"Demontage und Entsorgung sind bei Dexion bauseits – separat klären."}
+];
+
+/* ---------- Kennzahlen und Vorschau (Prinzipskizze, nicht für die Fertigung) ---------- */
+function levelHeights(a){
+  var s=sysOf(a),H=fnum(a,"hoehe"),n=parseInt(fv(a,"ebenen"),10)||0,txt=fv(a,"ebH"),out=[];
+  var given=txt.split(/[^\d]+/).map(function(x){return parseInt(x,10)}).filter(function(x){return x>0});
+  if(given.length){return given.slice(0,20)}
+  if(s.k==="p90"||s.k==="p90s"||s.k==="di"||s.k==="dl"||s.k==="pb"){
+    var lh=fnum(a,"ladeh")||1400,step=lh+250,first=fv(a,"boden")==="Traverse"?150:step;
+    for(var i=0;i<n;i++)out.push(first+i*step);return out;
+  }
+  if(n<2)return n?[100]:[];
+  var top=Math.max(H-300,400);for(var j=0;j<n;j++)out.push(Math.round((100+j*(top-100)/(n-1))/25)*25);return out;
+}
+function ufFelder(a){var n=parseInt(fv(a,"felder"),10)||1;return fv(a,"ufFeld").split(/[^\d]+/).map(function(x){return parseInt(x,10)}).filter(function(x){return x>=1&&x<=n})}
+function kennzahlen(a){
+  var s=sysOf(a),k=s.k,z=parseInt(fv(a,"zeilen"),10)||1,dop=fv(a,"ausf")==="Doppelregal",nF=parseInt(fv(a,"felder"),10)||1,r=[],warn=[];
+  var fb=fnum(a,"fb"),T=fnum(a,"tiefe"),H=fnum(a,"hoehe"),lv=levelHeights(a);
+  if(k==="p90"||k==="p90s"){
+    var st=90,L=nF*fb+(nF+1)*st,uf=fv(a,"uf")==="ja"?ufFelder(a):[],ufH=fnum(a,"ufH"),pro=parseInt(fv(a,"proFach"),10)||1,boden=fv(a,"boden")==="Palette auf Boden";
+    var plFeld=lv.length+(boden?1:0),plFeldUF=lv.filter(function(h){return h>=ufH}).length;
+    var proZeile=(nF-uf.length)*plFeld*pro+uf.length*plFeldUF*pro;
+    if(fb)r.push(["Länge pro Zeile","ca. "+fmtMm(L)]);
+    if(T)r.push(["Tiefe "+(dop?"Doppelregal":"Regal"),"ca. "+fmtMm(dop?2*T+200:T)+(dop?" (inkl. 200 mm Rückenabstand)":"")]);
+    r.push(["Palettenplätze","ca. "+(proZeile*z*(dop?2:1))]);
+    var ld=fnum(a,"last"),pk=ld*pro;if(ld)r.push(["Fachlast (Traversenpaar)","ca. "+fmtKg(pk)]);
+    if(lv.length&&H){var top=lv[lv.length-1];if(top>H-100)warn.push("Oberste Traverse ("+fmtMm(top)+") liegt über der Rahmenhöhe – Ebenen oder Höhe prüfen.");}
+    var hall=fnum({f:I.umg||{}},"hallenH");if(hall&&lv.length){var oben=lv[lv.length-1]+(fnum(a,"ladeh")||0)+100;if(oben>hall)warn.push("Oberste Ladung ca. "+fmtMm(oben)+" ist höher als die lichte Raumhöhe ("+fmtMm(hall)+").");}
+    var hub=fnum({f:I.umg||{}},"hubH");if(hub&&lv.length&&lv[lv.length-1]>hub)warn.push("Oberste Traverse über der Hubhöhe des Staplers ("+fmtMm(hub)+").");
+    var pal=fv(a,"palette"),ein=fv(a,"einl");
+    if(T&&/1200/.test(pal)&&ein==="längs"&&T<1000)warn.push("Palette längs (1200 mm tief) auf Rahmen "+fmtMm(T)+": Überstand zu gross – üblich ist 1100 mm.");
+    if(fb&&/800×1200/.test(pal)&&ein==="längs"){var need=pro*800+(pro+1)*75;if(need>fb)warn.push(pro+" Paletten längs brauchen ca. "+fmtMm(need)+" lichte Breite – Feldbreite "+fmtMm(fb)+" reicht nicht.");}
+    if(dop&&(ZUB_SEL(a).indexOf("Durchschubsicherung")<0))warn.push("Doppelregal: Durchschubsicherung prüfen (nötig, wenn der Abstand zwischen den Paletten unter 100 mm liegt).");
+    if(uf.length&&ZUB_SEL(a).indexOf("Tunnelschutz bei Unterfahrt")<0)warn.push("Unterfahrt: Tunnelschutz bzw. Rückwandgitter über der Durchfahrt vorsehen.");
+  } else if(k==="hi"||k==="his"||k==="hiw"||k==="ls3"||k==="cfh"||k==="cfp"){
+    var stz=k==="ls3"?60:(k==="cfp"?90:30),L2=nF*fb+(nF+1)*stz,eb=parseInt(fv(a,"ebenen"),10)||0;
+    if(fb)r.push(["Länge pro Zeile","ca. "+fmtMm(L2)]);
+    if(T)r.push(["Tiefe "+(dop?"Doppelregal":"Regal"),"ca. "+fmtMm(dop?2*T:T)]);
+    if(eb)r.push(["Fachebenen total",String(eb*nF*z*(dop?2:1))]);
+    var fl=fnum(a,"fachlast");if(fl&&eb)r.push(["Feldlast","ca. "+fmtKg(fl*eb)]);
+    if(k==="hiw"&&fl*eb>2400)warn.push("Feldlast über 2400 kg – beim Weitspannregal Hi280 nicht möglich, LS3 prüfen.");
+    if(k==="ls3"&&fl*eb>6900)warn.push("Feldlast über 6900 kg – beim LS3 nicht möglich.");
+  } else if(k==="di"||k==="dl"||k==="pb"){
+    var ka=parseInt(fv(a,"kanaele"),10)||0,tp=parseInt(fv(a,"tiefeP"),10)||0,e2=parseInt(fv(a,"ebenen"),10)||0;
+    r.push(["Palettenplätze","ca. "+(ka*tp*e2*(k==="dl"?(parseInt(fv(a,"bahnen"),10)||1):1))]);
+  }
+  return {rows:r,warn:warn};
+}
+function ZUB_SEL(a){return a.zub||[]}
+function fmtMm(n){return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,"'")+" mm"}
+function fmtKg(n){return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,"'")+" kg"}
+
+/* Vorderansicht als SVG – massstäblich nach den Angaben, ausdrücklich Prinzipskizze */
+function anlSvg(a){
+  var s=sysOf(a),k=s.k;
+  if(k==="di"||k==="dl"||k==="pb")return blockSvg(a);
+  if(k==="pa")return "";
+  var nF=parseInt(fv(a,"felder"),10)||1,fb=fnum(a,"fb")||1000,H=fnum(a,"hoehe")||2000,lv=levelHeights(a);
+  var pal=k==="p90"||k==="p90s",st=(pal||k==="cfp")?90:(k==="ls3"?60:30),uf=pal&&fv(a,"uf")==="ja"?ufFelder(a):[],ufH=fnum(a,"ufH");
+  var pro=parseInt(fv(a,"proFach"),10)||0,ladeh=fnum(a,"ladeh")||0,boden=fv(a,"boden")==="Palette auf Boden";
+  var L=nF*fb+(nF+1)*st,W=1000,ml=70,mr=110,mt=30,mb=70,sc=Math.min((W-ml-mr)/L,(560-mt-mb)/Math.max(H,ladeh+(lv.length?lv[lv.length-1]:0)));
+  var Hd=Math.max(H,lv.length?lv[lv.length-1]+(pal?ladeh:0):0),h=Math.round(Hd*sc+mt+mb);
+  function X(mm){return ml+mm*sc}function Y(mm){return h-mb-mm*sc}
+  var o='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+h+'" class="anlsvg" font-family="Arial,sans-serif">';
+  o+='<rect x="0" y="0" width="'+W+'" height="'+h+'" fill="#fff"/>';
+  o+='<line x1="'+(ml-20)+'" y1="'+Y(0)+'" x2="'+(X(L)+20)+'" y2="'+Y(0)+'" stroke="#444" stroke-width="2"/>';
+  var pw=pal&&pro?((fv(a,"einl")==="quer"?1200:(/1000×1200/.test(fv(a,"palette"))?1000:800))):0;
+  for(var f=0;f<nF;f++){
+    var x0=st+f*(fb+st),isUF=uf.indexOf(f+1)>=0;
+    if(isUF){o+='<rect x="'+X(x0)+'" y="'+Y(ufH)+'" width="'+(fb*sc)+'" height="'+(ufH*sc)+'" fill="#fde9c7" stroke="#e0a030" stroke-dasharray="6 4"/>';
+      o+='<text x="'+X(x0+fb/2)+'" y="'+Y(ufH/2)+'" text-anchor="middle" font-size="13" fill="#9a6200">Unterfahrt '+fmtMm(ufH)+'</text>'}
+    var lvs=lv.filter(function(y){return !isUF||y>=ufH});
+    lvs.forEach(function(y){o+='<rect x="'+X(x0)+'" y="'+(Y(y)-4)+'" width="'+(fb*sc)+'" height="7" fill="'+(pal?"#E15102":"#7c8b93")+'"/>'});
+    if(pal&&pw){
+      var bases=(boden&&!isUF?[0]:[]).concat(lvs);
+      bases.forEach(function(y){var gap=(fb-pro*pw)/(pro+1);if(gap<0)gap=10;
+        for(var p=0;p<pro;p++){var px=x0+gap+p*(pw+gap);o+='<rect x="'+X(px)+'" y="'+Y(y+ladeh)+'" width="'+(pw*sc)+'" height="'+(Math.max(ladeh-20,10)*sc)+'" fill="#e8eef0" stroke="#9aa9ad"/>'}});
+    }
+  }
+  for(var c=0;c<=nF;c++){var xs=c*(fb+st);o+='<rect x="'+X(xs)+'" y="'+Y(H)+'" width="'+Math.max(st*sc,3)+'" height="'+(H*sc)+'" fill="#0B6E77"/>'}
+  /* Masse */
+  var yb=Y(0)+28;o+=dimH(X(0),X(L),yb,"Länge ca. "+fmtMm(L));
+  if(nF>0)o+=dimH(X(st),X(st+fb),Y(0)+52,fmtMm(fb));
+  o+=dimV(ml-35,Y(0),Y(H),fmtMm(H));
+  lv.forEach(function(y){o+='<text x="'+(X(L)+10)+'" y="'+(Y(y)+4)+'" font-size="12" fill="#333">'+fmtMm(y)+'</text>'});
+  o+='<text x="'+(W-8)+'" y="16" text-anchor="end" font-size="11" fill="#78898D">Prinzipskizze Vorderansicht · 1 Zeile · nicht für die Fertigung</text>';
+  return o+'</svg>';
+}
+function dimH(x1,x2,y,t){return '<g stroke="#333" stroke-width="1"><line x1="'+x1+'" y1="'+y+'" x2="'+x2+'" y2="'+y+'"/><line x1="'+x1+'" y1="'+(y-6)+'" x2="'+x1+'" y2="'+(y+6)+'"/><line x1="'+x2+'" y1="'+(y-6)+'" x2="'+x2+'" y2="'+(y+6)+'"/></g><text x="'+((x1+x2)/2)+'" y="'+(y-5)+'" text-anchor="middle" font-size="13" fill="#111">'+esc(t)+'</text>'}
+function dimV(x,y1,y2,t){return '<g stroke="#333" stroke-width="1"><line x1="'+x+'" y1="'+y1+'" x2="'+x+'" y2="'+y2+'"/><line x1="'+(x-6)+'" y1="'+y2+'" x2="'+(x+6)+'" y2="'+y2+'"/></g><text x="'+(x-6)+'" y="'+((y1+y2)/2)+'" text-anchor="middle" font-size="13" fill="#111" transform="rotate(-90 '+(x-6)+' '+((y1+y2)/2)+')">'+esc(t)+'</text>'}
+function blockSvg(a){
+  var ka=parseInt(fv(a,"kanaele"),10)||1,tp=parseInt(fv(a,"tiefeP"),10)||1,W=1000,cell=Math.min(60,(W-160)/ka),h=Math.min(420,tp*36+90);
+  var o='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+h+'" class="anlsvg" font-family="Arial,sans-serif"><rect width="'+W+'" height="'+h+'" fill="#fff"/>';
+  var ch=Math.min(34,(h-90)/tp);
+  for(var i=0;i<ka;i++)for(var j=0;j<tp;j++)o+='<rect x="'+(80+i*cell+4)+'" y="'+(40+j*ch+3)+'" width="'+(cell-8)+'" height="'+(ch-6)+'" fill="#e8eef0" stroke="#9aa9ad"/>';
+  for(var c=0;c<=ka;c++)o+='<line x1="'+(80+c*cell)+'" y1="40" x2="'+(80+c*cell)+'" y2="'+(40+tp*ch)+'" stroke="#0B6E77" stroke-width="3"/>';
+  o+='<text x="'+(80+ka*cell/2)+'" y="'+(40+tp*ch+30)+'" text-anchor="middle" font-size="14">Bedienseite – '+ka+' Kanäle × '+tp+' Paletten tief</text>';
+  o+='<text x="'+(W-8)+'" y="16" text-anchor="end" font-size="11" fill="#78898D">Prinzipskizze Draufsicht · nicht für die Fertigung</text></svg>';
+  return o;
+}
+
+/* ---------- Formular-Bausteine ---------- */
+function fRow(f,val,attr,a){
+  var h='',id='f_'+attr.replace(/[^a-z]/gi,"")+'_'+f.k,help=f.h?'<button type="button" class="ib" data-act="fhelp" aria-label="Hilfe">ⓘ</button>':'';
+  var lab='<div class="flab"><span>'+esc(f.l)+(f.u?' ('+f.u+')':'')+'</span>'+help+'</div>'+(f.h?'<div class="hp" hidden>'+esc(f.h)+'</div>':'');
+  var dat=attr+'="'+f.k+'"'+(f.rr?' data-rr="1"':'');
+  if(f.t==="sel"){h=lab+'<select '+dat+' id="'+id+'">'+listOpts(f.o,val,"– wählen –")+'</select>'}
+  else if(f.t==="selx"){var inList=!val||f.o.indexOf(String(val))>=0;
+    h=lab+'<div class="selx"><select '+dat+' data-x="1" id="'+id+'">'+listOpts(f.o.map(function(v){return [v,v.replace(/\B(?=(\d{3})+(?!\d))/g,"'")+(f.u?" "+f.u:"")]}).concat([["__x","anderes Mass …"]]),inList?val:"__x","– wählen –")+'</select>'
+     +'<input type="text" inputmode="numeric" '+attr+'="'+f.k+'" data-xi="1" placeholder="Mass in '+(f.u||"")+'" value="'+(inList?"":esc(val))+'"'+(inList?' hidden':'')+'></div>'}
+  else if(f.t==="seg"){h=lab+'<div class="seg nseg s'+Math.min(f.o.length,4)+'">'+f.o.map(function(o){return '<button type="button" data-act="nseg" data-sc="'+attr+'" data-k="'+f.k+'" data-v="'+esc(o)+'"'+(String(val)===o?' data-on="ok"':'')+(f.rr?' data-rr="1"':'')+'>'+esc(o)+(f.u&&/^\d+$/.test(o)?" "+f.u:"")+'</button>'}).join("")+'</div>'}
+  else if(f.t==="chips"){var arr=Array.isArray(val)?val:[];h=lab+'<div class="chips">'+f.o.map(function(o){return '<button type="button" class="chip'+(arr.indexOf(o)>=0?" on":"")+'" data-act="nchip" data-sc="'+attr+'" data-k="'+f.k+'" data-v="'+esc(o)+'">'+esc(o)+'</button>'}).join("")+'</div>'}
+  else {h=lab+'<input type="'+(f.t==="tel"||f.t==="email"?f.t:"text")+'" '+dat+' id="'+id+'" value="'+esc(val)+'" placeholder="'+esc(f.ph||"")+'">'}
+  return '<div class="frow">'+h+'</div>';
+}
+function scopeObj(sc){
+  if(sc==="data-np")return I;
+  if(sc==="data-nu"){I.umg=I.umg||{};return I.umg}
+  if(sc==="data-na"){var a=aOf(V.aid);if(!a)return null;a.f=a.f||{};return a.f}
+  return null;
+}
+
+/* ---------- Ansichten ---------- */
+var NTABS={nhome:1,nkunde:1,numg:1,nanfr:1,nanl:1};
+VIEWS.nhome=function(){
+  setHeader(I.kunde||"Neue Anlage",true);
+  I.anlagen=I.anlagen||[];
+  var h='<div class="card tight nkopf"><div><b>'+esc(I.kunde||"Kunde noch offen")+'</b><span>'+esc([I.standort,I.raum].filter(Boolean).join(" · ")||"Standort noch offen")+' · '+fDate(I.datum)+'</span></div><button class="btn" data-act="ngo" data-v="nkunde">Bearbeiten</button></div>';
+  h+='<button class="btn pri big" data-act="nAnlNeu">+ Anlage aufnehmen</button>';
+  h+='<div class="card flush"><div style="padding:12px 13px 6px"><h2>Aufgenommene Anlagen ('+I.anlagen.length+')</h2></div><div class="list">';
+  if(!I.anlagen.length)h+='<p class="hint" style="padding:0 13px 13px">Noch keine Anlage. Tippe auf «+ Anlage aufnehmen» und wähle das System – Palettenregal, Fachbodenregal, Weitspannregal …</p>';
+  I.anlagen.forEach(function(a,i){var kz=kennzahlen(a),k1=kz.rows[0]?kz.rows[0][1]:"",nf=(a.fotos||[]).length,ns=(a.skizzen||[]).filter(function(s){return s.s&&s.s.length}).length;
+    h+='<button class="item" data-act="nAnl" data-aid="'+a.id+'"><div class="t"><b>'+esc(anlName(a,i))+'</b><span>'+esc(kurzText(a))+'</span><span>'+[nf?nf+" Foto(s)":"",ns?ns+" Skizze(n)":"",kz.warn.length?"⚠ "+kz.warn.length+" Hinweis(e)":""].filter(Boolean).join(" · ")+'</span></div></button>'});
+  h+='</div></div>';
+  var u=I.umg||{},nu=NEU_UMG.filter(function(f){var v=u[f.k];return v&&(!Array.isArray(v)||v.length)}).length;
+  h+='<button class="item card" data-act="ngo" data-v="numg" style="border-radius:var(--r)"><div class="t"><b>Raum und Umgebung</b><span>Raumhöhe, Boden, Stapler, Gangbreite, Zugang</span></div><span class="pill '+(nu>=6?'io':nu?'gp':'offen')+'">'+nu+' / '+NEU_UMG.length+'</span></button>';
+  h+=bkHtml();
+  h+='<button class="btn big" data-act="ngo" data-v="nanfr">Anfrage an Dexion erstellen</button>';
+  main.innerHTML=h;
+};
+function kurzText(a){
+  var s=sysOf(a),k=s.k,p=[];
+  if(s.anord)p.push((fv(a,"zeilen")||"1")+" Zeile(n) × "+(fv(a,"felder")||"?")+" Felder"+(fv(a,"ausf")==="Doppelregal"?", doppelt":""));
+  if(fv(a,"fb"))p.push("B "+fv(a,"fb"));if(fv(a,"tiefe"))p.push("T "+fv(a,"tiefe"));if(fv(a,"hoehe"))p.push("H "+fv(a,"hoehe"));
+  if(fv(a,"ebenen"))p.push(fv(a,"ebenen")+" Ebenen");
+  if(k==="pa")p.push((fv(a,"anzahl")||"?")+" Auszüge, "+fv(a,"variante"));
+  if(k==="di"||k==="dl"||k==="pb")p.push((fv(a,"kanaele")||"?")+" Kanäle × "+(fv(a,"tiefeP")||"?")+" tief");
+  if(fv(a,"uf")==="ja")p.push("mit Unterfahrt");
+  return p.join(" · ");
+}
+VIEWS.nkunde=function(){
+  setHeader("Kunde und Projekt",true);
+  var h=(V.neu?'<p class="hint">Alles optional – Kunde und Adresse kannst du auch später ergänzen.</p>':'');
+  h+='<div class="card">'+NEU_KUNDE.map(function(f){return fRow(f,I[f.k]!=null?I[f.k]:(f.d||""),"data-np")}).join("")
+   +'<div class="two"><label class="f">Datum<input type="date" data-np="datum" value="'+esc(I.datum)+'"></label><label class="f">Aufgenommen von<input type="text" data-np="pruefer" value="'+esc(I.pruefer)+'"></label></div>'
+   +'<label class="f">Bemerkung (Wünsche des Kunden)<textarea data-np="bemerkung" rows="3" placeholder="z. B. Lager soll bis Ende Jahr stehen, Erweiterung später möglich">'+esc(I.bemerkung||"")+'</textarea></label></div>';
+  h+='<button class="btn pri big" data-act="'+(V.neu?"nWeiter":"back")+'">'+(V.neu?"Weiter":"Fertig")+'</button>';
+  main.innerHTML=h;
+};
+VIEWS.numg=function(){
+  setHeader("Raum und Umgebung",true);
+  I.umg=I.umg||{};
+  var h='<div class="card">'+NEU_UMG.map(function(f){return fRow(f,I.umg[f.k]!=null?I.umg[f.k]:(f.d||""),"data-nu")}).join("")
+   +'<label class="f">Bemerkung Raum<textarea data-nu="bem" rows="2">'+esc(I.umg.bem||"")+'</textarea></label></div>';
+  h+='<div class="card tight"><h2>Fotos vom Raum</h2><div class="row"><button class="btn pri" data-act="cam" style="flex:2 1 160px;min-height:56px">📷 Foto</button><button class="btn" data-act="gal">Galerie</button></div><div class="photos" id="phs"></div></div>';
+  h+=skizzenCard(I,"proj","Grundriss / Hallenplan");
+  main.innerHTML=h;renderPhotos(photoTarget());skThumbs();
+};
+VIEWS.nanl=function(){
+  var a=aOf(V.aid);if(!a){history.back();return}
+  var i=aIdx(a),s=sysOf(a);a.f=a.f||{};a.zub=a.zub||[];
+  setHeader("Anlage "+(i+1),true);
+  var h='<div class="card tight"><label class="f">System (Katalog-Nummer)<select data-asys="1" id="a_sys">'+listOpts(SYS.map(function(x){return [x.k,x.l]}),s.k)+'</select></label><p class="hint">'+esc(s.kat)+'</p>'
+   +'<label class="f">Bezeichnung / Standort der Anlage (optional)<input type="text" data-abez="1" value="'+esc(a.bez||"")+'" placeholder="z. B. Halle 2, Wand Nord"></label></div>';
+  if(s.anord)h+='<div class="card tight"><h2>Anordnung</h2>'+F_ANORD.map(function(f){return fRow(f,fv(a,f.k),"data-na",a)}).join("")+'</div>';
+  h+='<div class="card tight"><h2>Masse und Einteilung</h2>'+s.fields.filter(function(f){return fShown(f,a)}).map(function(f){return fRow(f,fv(a,f.k),"data-na",a)}).join("")+'</div>';
+  h+='<div class="card tight"><h2>Vorschau</h2><div id="nprev">'+prevHtml(a)+'</div></div>';
+  var zl=ZUB[s.zub]||[];
+  h+='<div class="card tight"><h2>Zubehör und Sicherheit</h2><div class="chips">'+zl.map(function(z){return '<button type="button" class="chip'+(a.zub.indexOf(z)>=0?" on":"")+'" data-act="nzub" data-v="'+esc(z)+'">'+esc(z)+'</button>'}).join("")+'</div></div>';
+  h+='<div class="card tight"><h2>Fotos</h2><div class="row"><button class="btn pri" data-act="cam" style="flex:2 1 160px;min-height:56px">📷 Foto</button><button class="btn" data-act="gal">Galerie</button></div><div class="photos" id="phs"></div></div>';
+  h+=skizzenCard(a,a.id,"Skizze");
+  h+='<div class="card tight"><label class="f">Bemerkung zur Anlage<textarea data-abem="1" rows="3" placeholder="z. B. Wandabstand 100 mm, Lampe bei Feld 3, Anbau an bestehendes Regal Dexion P90">'+esc(a.bem||"")+'</textarea></label></div>';
+  h+='<button class="btn pri big" data-act="nNext">✓ Weiter zu Anlage '+(i+2>I.anlagen.length?(i+2)+' (neu)':(i+2))+'</button>';
+  h+='<div class="row"><button class="btn" data-act="nDup">Anlage kopieren</button><button class="btn warn" data-act="nDel">Anlage löschen</button></div>';
+  main.innerHTML=h;renderPhotos(photoTarget());skThumbs();
+};
+function prevHtml(a){
+  var kz=kennzahlen(a),svg=anlSvg(a);
+  return (svg?'<div class="svgbox">'+svg+'</div>':'')+(kz.rows.length?'<table class="kz">'+kz.rows.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td></tr>'}).join("")+'</table>':'')
+   +kz.warn.map(function(w){return '<div class="warnbox">⚠ '+esc(w)+'</div>'}).join("")
+   +'<p class="hint">Vorschau aus deinen Angaben, Ebenen ohne bekannte Höhen nach Ladehöhe verteilt. Die definitive Zeichnung macht Dexion.</p>';
+}
+function skizzenCard(owner,ownId,titel){
+  var sk=(owner.skizzen||[]);
+  return '<div class="card tight"><h2>'+esc(titel)+' – von Hand zeichnen</h2><div class="skthumbs">'
+   +sk.map(function(s,j){return '<button class="skth" data-act="nSk" data-own="'+ownId+'" data-sid="'+s.id+'"><img data-sk="'+ownId+'|'+s.id+'" alt="Skizze '+(j+1)+'"><span>Skizze '+(j+1)+'</span></button>'}).join("")
+   +'</div><button class="btn" data-act="nSkNeu" data-own="'+ownId+'">✎ '+(sk.length?'Weitere Skizze':'Skizze zeichnen')+'</button></div>';
+}
+function skOwner(own){if(own==="proj")return I;return aOf(own)}
+function skGet(){var o=skOwner(V.own);if(!o)return null;var l=o.skizzen||[];for(var i=0;i<l.length;i++)if(l[i].id===V.sid)return l[i];return null}
+function skThumbs(){document.querySelectorAll("img[data-sk]").forEach(function(im){var p=im.dataset.sk.split("|"),o=skOwner(p[0]),s=o&&(o.skizzen||[]).filter(function(x){return x.id===p[1]})[0];if(s)skPng(s,500).then(function(d){im.src=d})})}
+
+/* ---------- Anfrage ---------- */
+VIEWS.nanfr=function(){
+  setHeader("Anfrage an Dexion",true);
+  var fehlt=[];I.anlagen=I.anlagen||[];
+  if(!I.anlagen.length)fehlt.push("Noch keine Anlage aufgenommen.");
+  I.anlagen.forEach(function(a,i){var s=sysOf(a);aFields(a).filter(function(f){return fShown(f,a)&&["fb","tiefe","hoehe","ebenen","felder","kanaele","anzahl"].indexOf(f.k)>=0}).forEach(function(f){if(!fv(a,f.k))fehlt.push("Anlage "+(i+1)+": «"+f.l+"» fehlt.")});void s});
+  var u=I.umg||{};if(!u.hallenH)fehlt.push("Raumhöhe fehlt (Raum und Umgebung).");if(!u.stapler)fehlt.push("Flurförderzeug fehlt (Raum und Umgebung).");
+  var warn=[];I.anlagen.forEach(function(a,i){kennzahlen(a).warn.forEach(function(w){warn.push("Anlage "+(i+1)+": "+w)})});
+  var h='';
+  if(fehlt.length)h+='<div class="warnbox"><b>Noch offen:</b><br>'+fehlt.map(esc).join("<br>")+'</div>';
+  if(warn.length)h+='<div class="warnbox"><b>Hinweise zur Prüfung:</b><br>'+warn.map(esc).join("<br>")+'</div>';
+  if(!fehlt.length&&!warn.length)h+='<div class="bk ok"><div><b>Alles Wichtige erfasst ✓</b><span>Die Anfrage kann an Dexion.</span></div></div>';
+  h+='<div class="card"><h2>1 · Anfrage-Datei senden</h2><button class="btn pri big" data-act="nSend">Anfrage-Datei senden (HTML)</button><p class="hint">Teilen-Menü öffnet sich: Mail-App wählen, an Jürg von Wartburg (Dexion) senden. Die Datei enthält alle Angaben, Vorschau-Zeichnungen, Skizzen und Fotos – keine Preise.</p>'
+   +'<button class="btn" data-act="nText">Mail-Text kopieren</button></div>';
+  h+='<div class="card"><h2>2 · Ansehen / PDF</h2><button class="btn big" data-act="nVors">Vorschau und PDF</button></div>';
+  h+='<div class="card"><h2>Daten</h2><div class="row"><button class="btn" data-act="ngo" data-v="nkunde">Kunde und Projekt</button><button class="btn" data-act="exportJson">Sicherungsdatei</button></div><button class="btn warn" data-act="delInsp">Aufnahme löschen</button></div>';
+  main.innerHTML=h;
+};
+function anfrageText(X){
+  var t="Grüezi Jürg\n\nBitte um Angebot und Zeichnung für folgende Regalanlage:\n\n";
+  t+="Kunde: "+(X.kunde||"–")+"\nStandort: "+[X.standort,X.raum].filter(Boolean).join(", ")+"\nTermin: "+(X.termin||"offen")+" · "+(X.leistung||"")+"\n";
+  (X.anlagen||[]).forEach(function(a,i){t+="\n"+anlName(a,i)+"\n";aFields(a).filter(function(f){return fShown(f,a)&&fv(a,f.k)}).forEach(function(f){t+="– "+f.l+": "+fv(a,f.k)+(f.u&&/^\d+$/.test(fv(a,f.k))?" "+f.u:"")+"\n"});
+    if((a.zub||[]).length)t+="– Zubehör: "+a.zub.join(", ")+"\n";if(a.bem)t+="– Bemerkung: "+a.bem+"\n"});
+  var u=X.umg||{};t+="\nRaum: "+NEU_UMG.filter(function(f){var v=u[f.k];return v&&(!Array.isArray(v)||v.length)}).map(function(f){var v=u[f.k];return f.l+" "+(Array.isArray(v)?v.join("/"):v)+(f.u&&/^\d+$/.test(String(v))?" "+f.u:"")}).join("; ")+"\n";
+  if(X.bemerkung)t+="\nBemerkung: "+X.bemerkung+"\n";
+  t+="\nDetails, Skizzen und Fotos in der beigelegten Anfrage-Datei.\n\nFreundliche Grüsse\n"+(X.pruefer||"")+"\n"+((X.firma&&X.firma.name)||SET.firma.name||"");
+  return t;
+}
+
+/* ---------- Zeichenfeld ----------
+   Zeichnung als Vektordaten im Datensatz (A4 hoch, 1000 × 1414 Einheiten) – wird mit dem Rest gespeichert und gespiegelt. */
+var SKW=1000,SKH=1414,SKC={tool:"p",col:"#1a1d21",w:4},SKIMG={};
+var SKCOL=[["#1a1d21","Schwarz"],["#B3122C","Rot"],["#1565C0","Blau"],["#2C7A52","Grün"]];
+var SKTOOLS=[["p","✎","Stift"],["l","╱","Linie"],["m","↔","Mass"],["r","▭","Rechteck"],["x","T","Text"],["e","⌫","Radieren"]];
+function drawSk(ctx,sk,W,bg){
+  var s=W/SKW,H=SKH*s;ctx.save();ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+  if(bg){var r=Math.min(W/bg.width,H/bg.height),bw=bg.width*r,bh=bg.height*r;ctx.globalAlpha=sk.bgA||0.55;ctx.drawImage(bg,(W-bw)/2,(H-bh)/2,bw,bh);ctx.globalAlpha=1}
+  if(sk.grid){ctx.strokeStyle="#dfe6e8";ctx.lineWidth=1;for(var gx=50;gx<SKW;gx+=50){ctx.beginPath();ctx.moveTo(gx*s,0);ctx.lineTo(gx*s,H);ctx.stroke()}for(var gy=50;gy<SKH;gy+=50){ctx.beginPath();ctx.moveTo(0,gy*s);ctx.lineTo(W,gy*s);ctx.stroke()}}
+  (sk.s||[]).forEach(function(o){drawOb(ctx,o,s)});ctx.restore();
+}
+function drawOb(ctx,o,s){
+  ctx.strokeStyle=o.c;ctx.fillStyle=o.c;ctx.lineWidth=Math.max(1,o.w*s);ctx.lineCap="round";ctx.lineJoin="round";var a=o.a||[];
+  if(o.t==="p"){var p=o.p||[];if(p.length<2)return;ctx.beginPath();ctx.moveTo(p[0]*s,p[1]*s);if(p.length===2){ctx.arc(p[0]*s,p[1]*s,ctx.lineWidth/2,0,7);ctx.fill();return}for(var i=2;i<p.length;i+=2)ctx.lineTo(p[i]*s,p[i+1]*s);ctx.stroke()}
+  else if(o.t==="l"){ctx.beginPath();ctx.moveTo(a[0]*s,a[1]*s);ctx.lineTo(a[2]*s,a[3]*s);ctx.stroke()}
+  else if(o.t==="r"){ctx.strokeRect(Math.min(a[0],a[2])*s,Math.min(a[1],a[3])*s,Math.abs(a[2]-a[0])*s,Math.abs(a[3]-a[1])*s)}
+  else if(o.t==="m"){ctx.lineWidth=Math.max(1,Math.min(o.w,3)*s);ctx.beginPath();ctx.moveTo(a[0]*s,a[1]*s);ctx.lineTo(a[2]*s,a[3]*s);ctx.stroke();
+    var ang=Math.atan2(a[3]-a[1],a[2]-a[0]),hl=18*s;[[a[0],a[1],ang],[a[2],a[3],ang+Math.PI]].forEach(function(q){ctx.beginPath();ctx.moveTo(q[0]*s,q[1]*s);ctx.lineTo(q[0]*s+hl*Math.cos(q[2]+0.4),q[1]*s+hl*Math.sin(q[2]+0.4));ctx.moveTo(q[0]*s,q[1]*s);ctx.lineTo(q[0]*s+hl*Math.cos(q[2]-0.4),q[1]*s+hl*Math.sin(q[2]-0.4));ctx.stroke()});
+    if(o.txt){var mx=(a[0]+a[2])/2,my=(a[1]+a[3])/2,rot=ang;if(rot>Math.PI/2||rot<-Math.PI/2)rot+=Math.PI;ctx.save();ctx.translate(mx*s,my*s);ctx.rotate(rot);ctx.font="bold "+Math.round(30*s)+"px Arial";ctx.textAlign="center";ctx.textBaseline="bottom";var tw=ctx.measureText(o.txt).width;ctx.fillStyle="rgba(255,255,255,.85)";ctx.fillRect(-tw/2-4*s,-36*s,tw+8*s,32*s);ctx.fillStyle=o.c;ctx.fillText(o.txt,0,-6*s);ctx.restore()}}
+  else if(o.t==="x"){ctx.font="bold "+Math.round((o.z||34)*s)+"px Arial";ctx.textBaseline="middle";ctx.fillText(o.txt||"",a[0]*s,a[1]*s)}
+}
+function skBg(sk){if(!sk.bg)return Promise.resolve(null);if(SKIMG[sk.bg])return Promise.resolve(SKIMG[sk.bg]);
+  return getPhoto(sk.bg).then(function(d){if(!d)return null;return new Promise(function(res){var im=new Image();im.onload=function(){SKIMG[sk.bg]=im;res(im)};im.onerror=function(){res(null)};im.src=d})})}
+function skPng(sk,W){return skBg(sk).then(function(bg){var c=document.createElement("canvas");c.width=W;c.height=Math.round(W*SKH/SKW);drawSk(c.getContext("2d"),sk,W,bg);return c.toDataURL("image/png")})}
+VIEWS.nskizze=function(){
+  var sk=skGet();if(!sk){history.back();return}
+  var o=skOwner(V.own),nr=(o.skizzen||[]).indexOf(sk)+1;
+  setHeader("Skizze "+nr+(V.own==="proj"?" · Grundriss":" · Anlage "+(aIdx(o)+1)),true);
+  var h='<div class="skbar">'+SKTOOLS.map(function(t){return '<button type="button" data-act="skTool" data-v="'+t[0]+'"'+(SKC.tool===t[0]?' class="on"':'')+' title="'+t[2]+'"><b>'+t[1]+'</b><span>'+t[2]+'</span></button>'}).join("")+'</div>'
+   +'<div class="skbar sk2">'+SKCOL.map(function(c){return '<button type="button" data-act="skCol" data-v="'+c[0]+'" aria-label="'+c[1]+'" class="col'+(SKC.col===c[0]?' on':'')+'"><i style="background:'+c[0]+'"></i></button>'}).join("")
+   +[["2","dünn"],["4","mittel"],["8","dick"]].map(function(w){return '<button type="button" data-act="skW" data-v="'+w[0]+'" class="wd'+(String(SKC.w)===w[0]?' on':'')+'" aria-label="'+w[1]+'"><i style="height:'+(+w[0]+1)+'px"></i></button>'}).join("")
+   +'<button type="button" data-act="skUndo" aria-label="Rückgängig"><b>↶</b></button></div>'
+   +'<div class="skwrap" id="skwrap"><canvas id="skc"></canvas></div>'
+   +'<div class="sktext" id="sktext" hidden><input type="text" id="skin" placeholder="Text oder Mass, z. B. 2700"><button class="btn pri" data-act="skTxtOk">OK</button><button class="btn" data-act="skTxtNo">✕</button></div>'
+   +'<div class="row"><button class="btn" data-act="skGrid">'+(sk.grid?"Raster aus":"Raster ein")+'</button><button class="btn" data-act="skBgPick">'+(sk.bg?"Hintergrund ändern":"Foto als Hintergrund")+'</button>'+(sk.bg?'<button class="btn" data-act="skBgDel">Hintergrund weg</button>':'')+'</div>'
+   +'<div class="row"><button class="btn warn" data-act="skClear">Alles löschen</button><button class="btn warn" data-act="skDel">Skizze entfernen</button></div>'
+   +'<button class="btn pri big" data-act="back">✓ Fertig</button>'
+   +'<p class="hint">Mit einem Finger zeichnen. «Mass»: Linie ziehen, dann das Mass eintippen. Alles wird sofort gespeichert.</p>';
+  main.innerHTML=h;skInit(sk);
+};
+var SKST=null;
+function skInit(sk){
+  var cv=$("#skc"),wrap=$("#skwrap"),dpr=window.devicePixelRatio||1;
+  var maxH=Math.max(320,window.innerHeight-260),W=Math.min(wrap.clientWidth,maxH*SKW/SKH),H=W*SKH/SKW;
+  cv.style.width=W+"px";cv.style.height=H+"px";cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  var ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  SKST={sk:sk,cv:cv,ctx:ctx,W:W,bg:null,cur:null,pend:null};
+  function red(){drawSk(ctx,sk,W,SKST.bg);if(SKST.cur)drawOb(ctx,SKST.cur,W/SKW)}
+  SKST.red=red;red();skBg(sk).then(function(b){SKST.bg=b;red()});
+  function pt(e){var r=cv.getBoundingClientRect();return [Math.round((e.clientX-r.left)/r.width*SKW),Math.round((e.clientY-r.top)/r.height*SKH)]}
+  var pid=null;
+  cv.addEventListener("pointerdown",function(e){if(pid!==null)return;e.preventDefault();pid=e.pointerId;try{cv.setPointerCapture(pid)}catch(x){}
+    var p=pt(e),t=SKC.tool;
+    if(t==="e"){skErase(p);pid=null;return}
+    if(t==="x"){SKST.pend={t:"x",c:SKC.col,w:SKC.w,z:24+SKC.w*4,a:p};skAsk("");pid=null;return}
+    SKST.cur=t==="p"?{t:"p",c:SKC.col,w:SKC.w,p:[p[0],p[1]]}:{t:t,c:SKC.col,w:SKC.w,a:[p[0],p[1],p[0],p[1]]};red()});
+  cv.addEventListener("pointermove",function(e){if(e.pointerId!==pid||!SKST.cur)return;e.preventDefault();var p=pt(e),c=SKST.cur;
+    if(c.t==="p"){var n=c.p.length;if(Math.abs(p[0]-c.p[n-2])+Math.abs(p[1]-c.p[n-1])<3)return;c.p.push(p[0],p[1])}else{c.a[2]=p[0];c.a[3]=p[1]}red()});
+  function end(e){if(e.pointerId!==pid)return;pid=null;var c=SKST.cur;SKST.cur=null;if(!c){red();return}
+    if(c.t!=="p"&&Math.abs(c.a[2]-c.a[0])+Math.abs(c.a[3]-c.a[1])<8){red();return}
+    if(c.t==="m"){SKST.pend=c;red();drawOb(ctx,c,W/SKW);skAsk("");return}
+    skPush(c)}
+  cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);
+}
+function skPush(o){var sk=SKST.sk;sk.s=sk.s||[];sk.s.push(o);sk.upd=Date.now();save();SKST.red()}
+function skAsk(v){var b=$("#sktext"),inp=$("#skin");b.hidden=false;inp.value=v;inp.inputMode=SKST.pend&&SKST.pend.t==="m"?"numeric":"text";setTimeout(function(){inp.focus()},50)}
+function skErase(p){var sk=SKST.sk,l=sk.s||[],best=-1,bd=40;
+  l.forEach(function(o,i){var pts=o.t==="p"?o.p:(o.t==="x"?[o.a[0],o.a[1]]:[o.a[0],o.a[1],o.a[2],o.a[3],(o.a[0]+o.a[2])/2,(o.a[1]+o.a[3])/2]);
+    for(var j=0;j<pts.length;j+=2){var d=Math.abs(pts[j]-p[0])+Math.abs(pts[j+1]-p[1]);if(d<bd){bd=d;best=i}}});
+  if(best>=0){l.splice(best,1);sk.upd=Date.now();save();SKST.red();toast("Element entfernt")}else toast("Nichts getroffen – genauer auf die Linie tippen")}
+
+/* ---------- Anfrage-Datei (eigenständiges HTML, druckbar) ---------- */
+function photoIdsNeu(X){var a=[];(X.anlagen||[]).forEach(function(n){(n.fotos||[]).forEach(function(p){a.push(p)});(n.skizzen||[]).forEach(function(s){if(s.bg)a.push(s.bg)})});
+  ((X.umg||{}).fotos||[]).forEach(function(p){a.push(p)});(X.skizzen||[]).forEach(function(s){if(s.bg)a.push(s.bg)});return a}
+function buildAnfrage(X){
+  var sks=[];(X.skizzen||[]).forEach(function(s){if(s.s&&s.s.length||s.bg)sks.push(s)});(X.anlagen||[]).forEach(function(a){(a.skizzen||[]).forEach(function(s){if(s.s&&s.s.length||s.bg)sks.push(s)})});
+  var SP={};
+  return loadPhotos(photoIdsNeu(X)).then(function(P){return sks.reduce(function(pr,s){return pr.then(function(){return skPng(s,1200).then(function(d){SP[s.id]=d})})},Promise.resolve()).then(function(){return P})})
+  .then(function(P){
+    var F=SET.firma,u=X.umg||{},logo=SET.logo?'<img class="logo" src="'+SET.logo+'" alt="Logo">':'<div class="wm">'+esc(F.name||"DETEC Facility Services")+'</div>';
+    function tr(l,v){return v?'<tr><th>'+esc(l)+'</th><td>'+esc(v)+'</td></tr>':''}
+    function vu(f,v){return (Array.isArray(v)?v.join(", "):String(v))+(f.u&&/^\d+$/.test(String(v))?" "+f.u:"")}
+    var h='<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Anfrage Regalanlage '+esc(X.kunde||"")+' '+fDate(X.datum)+'</title><style>'+ANF_CSS+'</style></head><body><div class="doc">';
+    h+='<header>'+logo+'<div><h1>Anfrage Regalanlage</h1><p>Bedarfsaufnahme vor Ort · '+fDate(X.datum)+' · '+esc(X.pruefer||"")+'</p></div></header>';
+    h+='<p class="noprint tools"><button onclick="window.print()">Drucken / Als PDF sichern</button></p>';
+    h+='<h2>Kunde und Projekt</h2><table class="kv">'+tr("Kunde",X.kunde)+tr("Standort",X.standort)+tr("Gebäude / Raum",X.raum)+tr("Ansprechperson",[X.kontakt,X.telefon,X.email].filter(Boolean).join(" · "))+tr("Referenz Kunde",X.referenz)+tr("Termin",X.termin)+tr("Leistung",X.leistung)+tr("Aufgenommen von",[X.pruefer,F.name,F.email].filter(Boolean).join(" · "))+'</table>';
+    if(X.bemerkung)h+='<p class="bem"><b>Wünsche des Kunden:</b> '+nl(X.bemerkung)+'</p>';
+    h+='<h2>Raum und Umgebung</h2><table class="kv">'+NEU_UMG.map(function(f){var v=u[f.k];return v&&(!Array.isArray(v)||v.length)?tr(f.l,vu(f,v)):''}).join("")+tr("Bemerkung",u.bem)+'</table>';
+    (X.anlagen||[]).forEach(function(a,i){var s=sysOf(a),kz=kennzahlen(a);
+      h+='<section class="anl"><h2>'+esc(anlName(a,i))+'</h2><p class="kat">System: '+esc(s.l)+' – '+esc(s.kat)+'</p><div class="cols"><table class="kv">';
+      aFields(a).filter(function(f){return fShown(f,a)&&fv(a,f.k)}).forEach(function(f){h+=tr(f.l,vu(f,fv(a,f.k)))});
+      if((a.zub||[]).length)h+=tr("Zubehör",a.zub.join(", "));
+      h+='</table><table class="kv kz">'+kz.rows.map(function(r){return tr(r[0],r[1])}).join("")+'</table></div>';
+      if(a.bem)h+='<p class="bem"><b>Bemerkung:</b> '+nl(a.bem)+'</p>';
+      if(kz.warn.length)h+='<div class="warn"><b>Bitte prüfen:</b><br>'+kz.warn.map(esc).join("<br>")+'</div>';
+      var svg=anlSvg(a);if(svg)h+='<div class="svg">'+svg+'</div>';
+      (a.skizzen||[]).forEach(function(sk,j){if(SP[sk.id])h+='<figure class="sk"><img src="'+SP[sk.id]+'" alt="Skizze"><figcaption>Handskizze '+(j+1)+' zu Anlage '+(i+1)+'</figcaption></figure>'});
+      var fo=(a.fotos||[]).filter(function(p){return P[p]});if(fo.length)h+='<div class="fotos">'+fo.map(function(p){return '<img src="'+P[p]+'" alt="Foto">'}).join("")+'</div>';
+      h+='</section>'});
+    var pf=(u.fotos||[]).filter(function(p){return P[p]}),ps=(X.skizzen||[]).filter(function(s){return SP[s.id]});
+    if(pf.length||ps.length){h+='<section class="anl"><h2>Raum: Grundriss und Fotos</h2>'+ps.map(function(s,j){return '<figure class="sk"><img src="'+SP[s.id]+'" alt="Grundriss"><figcaption>Grundriss / Hallenplan '+(j+1)+'</figcaption></figure>'}).join("")+(pf.length?'<div class="fotos">'+pf.map(function(p){return '<img src="'+P[p]+'" alt="Foto Raum">'}).join("")+'</div>':'')+'</section>'}
+    h+='<p class="foot">Vorschau-Zeichnungen sind Prinzipskizzen aus den aufgenommenen Angaben, nicht für die Fertigung. Masse, Lasten und Ausführung bitte gemäss Dexion-Planung bestätigen. Auslegung nach SN EN 15512, Betrieb und Inspektion nach SN EN 15635.<br>'+esc(F.name||"")+' · '+esc(F.email||"")+' · erstellt '+fDate(todayIso())+'</p>';
+    return h+'</div></body></html>';
+  });
+}
+var ANF_CSS='*{box-sizing:border-box}body{margin:0;background:#eef2f3;color:#1a1d21;font:15px/1.45 Arial,Helvetica,sans-serif}.doc{max-width:960px;margin:0 auto;background:#fff;padding:24px}header{display:flex;gap:18px;align-items:center;border-bottom:3px solid #0B6E77;padding-bottom:12px}header h1{margin:0;font-size:24px;color:#0B6E77}header p{margin:2px 0 0;color:#555}.logo{max-height:46px;max-width:220px}.wm{font-weight:700;color:#003F7F;font-size:18px}h2{font-size:17px;color:#0B6E77;border-bottom:1px solid #cfd8da;padding-bottom:3px;margin:22px 0 8px}table.kv{border-collapse:collapse;width:100%;font-size:14px}table.kv th{text-align:left;font-weight:600;color:#48595d;width:42%;padding:4px 8px 4px 0;vertical-align:top}table.kv td{padding:4px 0;vertical-align:top}table.kv tr{border-bottom:1px solid #eef1f2}.cols{display:grid;grid-template-columns:3fr 2fr;gap:18px}.kz{background:#f3f6f6;border-radius:6px}.kz th,.kz td{padding:5px 8px!important}.kat{color:#666;font-size:13px;margin:0 0 6px}.bem{background:#f7f9f9;border-left:4px solid #0B6E77;padding:8px 10px}.warn{background:#fff4d1;border-left:4px solid #e8a400;padding:8px 10px;margin:8px 0;font-size:14px}.svg{border:1px solid #dfe6e8;border-radius:6px;margin:10px 0;padding:4px}.svg svg{width:100%;height:auto;display:block}figure.sk{margin:12px 0;text-align:center}figure.sk img{max-width:100%;max-height:900px;border:1px solid #cfd8da}figcaption{font-size:12px;color:#666}.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:10px 0}.fotos img{width:100%;height:180px;object-fit:cover;border-radius:4px;border:1px solid #cfd8da}.foot{margin-top:24px;font-size:12px;color:#666;border-top:1px solid #cfd8da;padding-top:8px}.tools button{font:600 15px Arial;padding:10px 16px;border-radius:6px;border:0;background:#0B6E77;color:#fff;cursor:pointer}@media(max-width:640px){.cols{grid-template-columns:1fr}.doc{padding:14px}}@media print{body{background:#fff}.doc{max-width:none;padding:0}.noprint{display:none}section.anl{break-before:page}.svg,figure.sk,.fotos img{break-inside:avoid}@page{size:A4;margin:14mm}}';
+VIEWS.nvors=function(){
+  var rv=$("#rptview");
+  buildAnfrage(I).then(function(html){
+    rv.innerHTML='<div class="rptbar"><button class="btn" data-act="back" style="background:#fff">‹ Zurück</button><button class="btn pri" data-act="print" style="flex:1;border-color:#fff">Drucken / Als PDF sichern</button></div><iframe id="anfFrame" title="Anfrage" style="width:100%;border:0;min-height:80vh;background:#fff"></iframe>';
+    var fr=$("#anfFrame");fr.srcdoc=html;fr.onload=function(){try{fr.style.height=(fr.contentDocument.body.scrollHeight+40)+"px"}catch(e){}};
+    $("#hdr").hidden=true;main.hidden=true;$("#tabs").hidden=true;rv.hidden=false;window.scrollTo(0,0);
+  });
+};
+
+/* ---------- Fotos: Ziel je nach Ansicht ---------- */
+function photoTarget(){
+  if(V.v==="mangel")return findM(V.mid);
+  if(V.v==="nanl"){var a=aOf(V.aid);if(a){a.fotos=a.fotos||[];return a}}
+  if(V.v==="numg"&&I){I.umg=I.umg||{};I.umg.fotos=I.umg.fotos||[];return I.umg}
+  return null;
+}
+
+/* ---------- Aktionen Neuaufnahme ---------- */
+function neuRec(){var F=SET.firma;return {id:uid(),art:"neu",version:1,kunde:"",standort:"",raum:"",kontakt:"",telefon:"",email:"",referenz:"",termin:"offen",leistung:"Lieferung + Montage",inspekt:"ja",datum:todayIso(),pruefer:F.pruefer||"",bemerkung:"",umg:{fotos:[]},anlagen:[],skizzen:[],zeilen:[],maengel:[],created:Date.now(),updated:Date.now()}}
+function newAnlage(sysKey,copyFrom){
+  var a=copyFrom?JSON.parse(JSON.stringify(copyFrom)):{sys:sysKey||LAST.nsys||"p90",f:defaults(sysKey||LAST.nsys||"p90"),zub:[],bem:""};
+  a.id=uid();a.fotos=[];a.skizzen=[];if(copyFrom)a.bez=(copyFrom.bez||"")+(copyFrom.bez?" (Kopie)":"");
+  I.anlagen=I.anlagen||[];I.anlagen.push(a);save();return a;
+}
+Object.assign(ACT,{
+  newAuf:function(){I=neuRec();PH=new Map();flushSave().then(function(){go("nkunde",{id:I.id,neu:1})})},
+  nWeiter:function(){go("nhome",{id:I.id},true)},
+  ngo:function(b){go(b.dataset.v,{id:I.id})},
+  nAnlNeu:function(){var a=newAnlage();go("nanl",{id:I.id,aid:a.id})},
+  nAnl:function(b){go("nanl",{id:I.id,aid:b.dataset.aid})},
+  fhelp:function(b){var h=b.closest(".frow").querySelector(".hp");if(h)h.hidden=!h.hidden},
+  nseg:function(b){var o=scopeObj(b.dataset.sc);if(!o)return;o[b.dataset.k]=o[b.dataset.k]===b.dataset.v&&!b.dataset.rr?"":b.dataset.v;save();
+    if(b.dataset.rr){var y=window.scrollY;render();window.scrollTo(0,y);return}
+    b.parentNode.querySelectorAll("button").forEach(function(x){if(x.dataset.v===o[b.dataset.k])x.setAttribute("data-on","ok");else x.removeAttribute("data-on")});nPrev()},
+  nchip:function(b){var o=scopeObj(b.dataset.sc);if(!o)return;var l=o[b.dataset.k]=Array.isArray(o[b.dataset.k])?o[b.dataset.k]:[],i=l.indexOf(b.dataset.v);if(i>=0)l.splice(i,1);else l.push(b.dataset.v);save();b.classList.toggle("on",i<0)},
+  nzub:function(b){var a=aOf(V.aid);a.zub=a.zub||[];var i=a.zub.indexOf(b.dataset.v);if(i>=0)a.zub.splice(i,1);else a.zub.push(b.dataset.v);save();b.classList.toggle("on",i<0);nPrev()},
+  nNext:function(){var a=aOf(V.aid),i=aIdx(a),n=I.anlagen[i+1]||newAnlage(a.sys);V={v:"nanl",id:I.id,aid:n.id};history.replaceState(V,"");render();window.scrollTo(0,0);if(!I.anlagen[i+2]&&n!==I.anlagen[i+1])void 0},
+  nDup:function(){var a=aOf(V.aid),n=newAnlage(a.sys,a);toast("Anlage kopiert (ohne Fotos und Skizzen)");V={v:"nanl",id:I.id,aid:n.id};history.replaceState(V,"");render();window.scrollTo(0,0)},
+  nDel:function(){var a=aOf(V.aid);if(!confirm("Anlage "+(aIdx(a)+1)+" mit allen Fotos und Skizzen löschen?"))return;
+    (a.fotos||[]).concat((a.skizzen||[]).map(function(s){return s.bg}).filter(Boolean)).forEach(function(p){ddel("photos",p)});
+    I.anlagen.splice(aIdx(a),1);save();history.back()},
+  nSkNeu:function(b){var o=skOwner(b.dataset.own);o.skizzen=o.skizzen||[];var s={id:uid(),s:[],grid:true,bg:null};o.skizzen.push(s);save();go("nskizze",{id:I.id,own:b.dataset.own,sid:s.id,aid:V.aid})},
+  nSk:function(b){go("nskizze",{id:I.id,own:b.dataset.own,sid:b.dataset.sid,aid:V.aid})},
+  skTool:function(b){SKC.tool=b.dataset.v;b.parentNode.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b)})},
+  skCol:function(b){SKC.col=b.dataset.v;document.querySelectorAll(".skbar .col").forEach(function(x){x.classList.toggle("on",x===b)})},
+  skW:function(b){SKC.w=+b.dataset.v;document.querySelectorAll(".skbar .wd").forEach(function(x){x.classList.toggle("on",x===b)})},
+  skUndo:function(){var sk=SKST&&SKST.sk;if(!sk||!sk.s||!sk.s.length){toast("Nichts zum Rückgängigmachen");return}sk.s.pop();save();SKST.red()},
+  skTxtOk:function(){var t=$("#skin").value.trim(),p=SKST.pend;$("#sktext").hidden=true;SKST.pend=null;if(!p){return}
+    if(p.t==="m"){if(/^\d+$/.test(t))t=t.replace(/\B(?=(\d{3})+(?!\d))/g,"'");p.txt=t;skPush(p);return}
+    if(!t){SKST.red();return}p.txt=t;skPush(p)},
+  skTxtNo:function(){var p=SKST&&SKST.pend;$("#sktext").hidden=true;if(p&&p.t==="m"){p.txt="";skPush(p)}else if(SKST)SKST.red();if(SKST)SKST.pend=null},
+  skGrid:function(){var sk=skGet();sk.grid=!sk.grid;save();render()},
+  skBgPick:function(){$("#fbg").click()},
+  skBgDel:function(){var sk=skGet();if(sk.bg)ddel("photos",sk.bg);sk.bg=null;save();render()},
+  skClear:function(){var sk=skGet();if(!sk.s||!sk.s.length)return;if(!confirm("Alle Striche dieser Skizze löschen?"))return;sk.s=[];save();SKST.red()},
+  skDel:function(){var o=skOwner(V.own),sk=skGet();if(!confirm("Diese Skizze ganz entfernen?"))return;if(sk.bg)ddel("photos",sk.bg);o.skizzen=o.skizzen.filter(function(x){return x!==sk});save();history.back()},
+  nVors:function(){flushSave().then(function(){go("nvors",{id:I.id})})},
+  nSend:function(){toast("Anfrage-Datei wird erstellt …",2000);flushSave().then(function(){return buildAnfrage(I)}).then(function(h){return saveFile("Anfrage_Regalanlage_"+slug(I.kunde||I.standort||"Kunde")+"_"+I.datum+".html",h,"text/html")}).catch(function(e){if(e&&e.name==="AbortError")return;toast("Fehler: "+(e.message||e),5000)})},
+  nText:function(){var t=anfrageText(I);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){toast("Mail-Text kopiert – im Mail einfügen")}).catch(function(){skCopyFallback(t)});else skCopyFallback(t)}
+});
+function skCopyFallback(t){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Mail-Text kopiert")}catch(e){toast("Kopieren nicht möglich")}ta.remove()}
+function nPrev(){var a=aOf(V.aid),el=$("#nprev");if(a&&el)el.innerHTML=prevHtml(a)}
+$("#fbg").addEventListener("change",function(e){var f=e.target.files[0];e.target.value="";var sk=skGet();if(!f||!sk)return;
+  resizeImg(f,1600,.75).catch(function(){return readDataUrl(f)}).then(function(d){var id=uid();return dput("photos",{id:id,insp:I.id,data:d}).then(function(){PH.set(id,d);if(sk.bg)ddel("photos",sk.bg);sk.bg=id;save();render()})})
+  .catch(function(err){errBanner("Hintergrund-Foto konnte nicht gespeichert werden ("+(err&&err.name||err)+").")})});
+/* Eingaben der Neuaufnahme */
+main.addEventListener("input",function(e){
+  var el=e.target;if(!I||!isNeu(I))return;
+  var sc=["data-np","data-nu","data-na"].filter(function(x){return el.hasAttribute(x)})[0];
+  if(sc){var o=scopeObj(sc),k=el.getAttribute(sc);if(!o)return;
+    if(el.dataset.x){var xi=el.parentNode.querySelector("[data-xi]");if(el.value==="__x"){xi.hidden=false;xi.focus();o[k]=xi.value;}else{xi.hidden=true;xi.value="";o[k]=el.value}}
+    else o[k]=el.value;
+    if(sc==="data-np"&&k==="kunde")$("#ttl").textContent=el.value||"Neue Anlage";
+    save();if(el.dataset.rr&&el.tagName==="SELECT"){var y=window.scrollY;render();window.scrollTo(0,y);return}
+    if(sc==="data-na")nPrev();return}
+  if(el.dataset.asys){var a=aOf(V.aid);a.sys=el.value;LAST.nsys=el.value;saveMeta("last",LAST);var keep=a.f||{},d=defaults(el.value);aFields(a).forEach(function(f){if(keep[f.k]&&(!f.o||f.o.indexOf(String(keep[f.k]))>=0||f.t==="text"))d[f.k]=keep[f.k]});a.f=d;a.zub=(a.zub||[]).filter(function(z){return (ZUB[sysOf(a).zub]||[]).indexOf(z)>=0});save();var y2=window.scrollY;render();window.scrollTo(0,y2);return}
+  if(el.dataset.abez){aOf(V.aid).bez=el.value;save();return}
+  if(el.dataset.abem){aOf(V.aid).bem=el.value;save();return}
+});
+
 main.addEventListener("click",function(e){
   var b=e.target.closest("[data-act]");if(!b||!main.contains(b))return;
   var f=ACT[b.dataset.act];if(f){e.preventDefault();f(b)}
