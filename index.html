@@ -912,7 +912,7 @@ function saveMeta(k,v){return dput("meta",{k:k,v:v}).catch(function(){})}
 function errBanner(t){var b=$("#err");b.textContent=t;b.hidden=!t}
 /* ---------- Updates ----------
    WICHTIG bei jedem Update: APP_V hier UND VERSION in sw.js gleich hochzählen. */
-var APP_V="regal-v8",SWREG=null,updT=0;
+var APP_V="regal-v9",SWREG=null,updT=0;
 function vNr(v){return String(v||"").replace(/^regal-v/,"")}
 function updCheck(manuell){
   if(!navigator.onLine){if(manuell)toast("Kein Netz – Update später prüfen");return}
@@ -991,6 +991,7 @@ function go(v,p,replace){ leaving(); V=Object.assign({v:v},p||{}); history[repla
 addEventListener("popstate",function(e){ leaving(); V=e.state||{v:"home"}; render(); });
 $("#back").addEventListener("click",function(){history.back()});
 function leaving(){
+  if(V.v==="nskizze")skFlush();
   if(V.v==="mangel"&&I){ var m=findM(V.mid); if(isBlank(m)){ I.maengel=I.maengel.filter(function(x){return x!==m}); save(); } }
   pump();
 }
@@ -1432,7 +1433,7 @@ function onPhotoFiles(e){
   var inspId=I.id;
   files.reduce(function(p,f){return p.then(function(){
       return resizeImg(f,1600,.75).catch(function(){return readDataUrl(f)}).then(function(d){
-        var id=uid();return dput("photos",{id:id,insp:inspId,data:d}).then(function(){PH.set(id,d);m.fotos.push(id);save();renderPhotos(m)});
+        var id=uid();return dput("photos",{id:id,insp:inspId,data:d}).then(function(){PH.set(id,d);m.fotos.push(id);save();if(photoTarget()===m)renderPhotos(m)});
       });
     })},Promise.resolve())
     .then(function(){toast("✓ Foto gespeichert ("+m.fotos.length+(V.v==="mangel"?" bei "+nrText(m.nr):"")+")")})
@@ -1720,7 +1721,7 @@ var NEU_UMG=[
 /* ---------- Kennzahlen und Vorschau (Prinzipskizze, nicht für die Fertigung) ---------- */
 function levelHeights(a){
   var s=sysOf(a),H=fnum(a,"hoehe"),n=parseInt(fv(a,"ebenen"),10)||0,txt=fv(a,"ebH"),out=[];
-  var given=txt.split(/[^\d]+/).map(function(x){return parseInt(x,10)}).filter(function(x){return x>0});
+  var given=txt.replace(/['’]/g,"").split(/[^\d]+/).map(function(x){return parseInt(x,10)}).filter(function(x,i,l){return x>0&&l.indexOf(x)===i}).sort(function(x,y){return x-y});
   if(given.length){return given.slice(0,20)}
   if(s.k==="p90"||s.k==="p90s"||s.k==="di"||s.k==="dl"||s.k==="pb"){
     var lh=fnum(a,"ladeh")||1400,step=lh+250,first=fv(a,"boden")==="Traverse"?150:step;
@@ -1729,7 +1730,7 @@ function levelHeights(a){
   if(n<2)return n?[100]:[];
   var top=Math.max(H-300,400);for(var j=0;j<n;j++)out.push(Math.round((100+j*(top-100)/(n-1))/25)*25);return out;
 }
-function ufFelder(a){var n=parseInt(fv(a,"felder"),10)||1;return fv(a,"ufFeld").split(/[^\d]+/).map(function(x){return parseInt(x,10)}).filter(function(x){return x>=1&&x<=n})}
+function ufFelder(a){var n=parseInt(fv(a,"felder"),10)||1;return fv(a,"ufFeld").split(/[^\d]+/).map(function(x){return parseInt(x,10)}).filter(function(x,i,l){return x>=1&&x<=n&&l.indexOf(x)===i})}
 function kennzahlen(a){
   var s=sysOf(a),k=s.k,z=parseInt(fv(a,"zeilen"),10)||1,dop=fv(a,"ausf")==="Doppelregal",nF=parseInt(fv(a,"felder"),10)||1,r=[],warn=[];
   var fb=fnum(a,"fb"),T=fnum(a,"tiefe"),H=fnum(a,"hoehe"),lv=levelHeights(a);
@@ -1746,7 +1747,7 @@ function kennzahlen(a){
     var hub=fnum({f:I.umg||{}},"hubH");if(hub&&lv.length&&lv[lv.length-1]>hub)warn.push("Oberste Traverse über der Hubhöhe des Staplers ("+fmtMm(hub)+").");
     var pal=fv(a,"palette"),ein=fv(a,"einl");
     if(T&&/1200/.test(pal)&&ein==="längs"&&T<1000)warn.push("Palette längs (1200 mm tief) auf Rahmen "+fmtMm(T)+": Überstand zu gross – üblich ist 1100 mm.");
-    if(fb&&/800×1200/.test(pal)&&ein==="längs"){var need=pro*800+(pro+1)*75;if(need>fb)warn.push(pro+" Paletten längs brauchen ca. "+fmtMm(need)+" lichte Breite – Feldbreite "+fmtMm(fb)+" reicht nicht.");}
+    if(fb&&pal!=="andere"){var need=pro*palW(a)+(pro+1)*50;if(need>fb)warn.push(pro+" Paletten ("+pal+", "+ein+") brauchen mind. ca. "+fmtMm(need)+" lichte Breite – Feldbreite "+fmtMm(fb)+" reicht nicht.");}
     if(dop&&(ZUB_SEL(a).indexOf("Durchschubsicherung")<0))warn.push("Doppelregal: Durchschubsicherung prüfen (nötig, wenn der Abstand zwischen den Paletten unter 100 mm liegt).");
     if(uf.length&&ZUB_SEL(a).indexOf("Tunnelschutz bei Unterfahrt")<0)warn.push("Unterfahrt: Tunnelschutz bzw. Rückwandgitter über der Durchfahrt vorsehen.");
   } else if(k==="hi"||k==="his"||k==="hiw"||k==="ls3"||k==="cfh"||k==="cfp"){
@@ -1764,6 +1765,8 @@ function kennzahlen(a){
   return {rows:r,warn:warn};
 }
 function ZUB_SEL(a){return a.zub||[]}
+function palW(a){var p=fv(a,"palette"),q=fv(a,"einl")==="quer";
+  if(/1140/.test(p))return 1140;if(/1000×1200/.test(p))return q?1200:1000;if(/800×600/.test(p))return q?800:600;return q?1200:800}
 function fmtMm(n){return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,"'")+" mm"}
 function fmtKg(n){return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,"'")+" kg"}
 
@@ -1781,7 +1784,7 @@ function anlSvg(a){
   var o='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+h+'" class="anlsvg" font-family="Arial,sans-serif">';
   o+='<rect x="0" y="0" width="'+W+'" height="'+h+'" fill="#fff"/>';
   o+='<line x1="'+(ml-20)+'" y1="'+Y(0)+'" x2="'+(X(L)+20)+'" y2="'+Y(0)+'" stroke="#444" stroke-width="2"/>';
-  var pw=pal&&pro?((fv(a,"einl")==="quer"?1200:(/1000×1200/.test(fv(a,"palette"))?1000:800))):0;
+  var pw=pal&&pro?palW(a):0;
   for(var f=0;f<nF;f++){
     var x0=st+f*(fb+st),isUF=uf.indexOf(f+1)>=0;
     if(isUF){o+='<rect x="'+X(x0)+'" y="'+Y(ufH)+'" width="'+(fb*sc)+'" height="'+(ufH*sc)+'" fill="#fde9c7" stroke="#e0a030" stroke-dasharray="6 4"/>';
@@ -1859,7 +1862,7 @@ function kurzText(a){
   var s=sysOf(a),k=s.k,p=[];
   if(s.anord)p.push((fv(a,"zeilen")||"1")+" Zeile(n) × "+(fv(a,"felder")||"?")+" Felder"+(fv(a,"ausf")==="Doppelregal"?", doppelt":""));
   if(fv(a,"fb"))p.push("B "+fv(a,"fb"));if(fv(a,"tiefe"))p.push("T "+fv(a,"tiefe"));if(fv(a,"hoehe"))p.push("H "+fv(a,"hoehe"));
-  if(fv(a,"ebenen"))p.push(fv(a,"ebenen")+" Ebenen");
+  if(fv(a,"ebenen")&&k!=="pa")p.push(fv(a,"ebenen")+" Ebenen");
   if(k==="pa")p.push((fv(a,"anzahl")||"?")+" Auszüge, "+fv(a,"variante"));
   if(k==="di"||k==="dl"||k==="pb")p.push((fv(a,"kanaele")||"?")+" Kanäle × "+(fv(a,"tiefeP")||"?")+" tief");
   if(fv(a,"uf")==="ja")p.push("mit Unterfahrt");
@@ -1876,7 +1879,7 @@ VIEWS.nkunde=function(){
 };
 VIEWS.numg=function(){
   setHeader("Raum und Umgebung",true);
-  I.umg=I.umg||{};
+  I.umg=I.umg||{};var vorher=JSON.stringify(I.umg);umgDefaults(I.umg);if(JSON.stringify(I.umg)!==vorher)save();
   var h='<div class="card">'+NEU_UMG.map(function(f){return fRow(f,I.umg[f.k]!=null?I.umg[f.k]:(f.d||""),"data-nu")}).join("")
    +'<label class="f">Bemerkung Raum<textarea data-nu="bem" rows="2">'+esc(I.umg.bem||"")+'</textarea></label></div>';
   h+='<div class="card tight"><h2>Fotos vom Raum</h2><div class="row"><button class="btn pri" data-act="cam" style="flex:2 1 160px;min-height:56px">📷 Foto</button><button class="btn" data-act="gal">Galerie</button></div><div class="photos" id="phs"></div></div>';
@@ -1922,7 +1925,7 @@ VIEWS.nanfr=function(){
   setHeader("Anfrage an Dexion",true);
   var fehlt=[];I.anlagen=I.anlagen||[];
   if(!I.anlagen.length)fehlt.push("Noch keine Anlage aufgenommen.");
-  I.anlagen.forEach(function(a,i){var s=sysOf(a);aFields(a).filter(function(f){return fShown(f,a)&&["fb","tiefe","hoehe","ebenen","felder","kanaele","anzahl"].indexOf(f.k)>=0}).forEach(function(f){if(!fv(a,f.k))fehlt.push("Anlage "+(i+1)+": «"+f.l+"» fehlt.")});void s});
+  I.anlagen.forEach(function(a,i){var s=sysOf(a);aFields(a).filter(function(f){return fShown(f,a)&&["fb","tiefe","hoehe","ebenen","felder","kanaele","anzahl"].indexOf(f.k)>=0&&!(s.k==="pa"&&f.k==="ebenen")}).forEach(function(f){if(!fv(a,f.k))fehlt.push("Anlage "+(i+1)+": «"+f.l+"» fehlt.")});void s});
   var u=I.umg||{};if(!u.hallenH)fehlt.push("Raumhöhe fehlt (Raum und Umgebung).");if(!u.stapler)fehlt.push("Flurförderzeug fehlt (Raum und Umgebung).");
   var warn=[];I.anlagen.forEach(function(a,i){kennzahlen(a).warn.forEach(function(w){warn.push("Anlage "+(i+1)+": "+w)})});
   var h='';
@@ -1937,7 +1940,7 @@ VIEWS.nanfr=function(){
 };
 function anfrageText(X){
   var t="Grüezi Jürg\n\nBitte um Angebot und Zeichnung für folgende Regalanlage:\n\n";
-  t+="Kunde: "+(X.kunde||"–")+"\nStandort: "+[X.standort,X.raum].filter(Boolean).join(", ")+"\nTermin: "+(X.termin||"offen")+" · "+(X.leistung||"")+"\n";
+  t+="Kunde: "+(X.kunde||"–")+"\nStandort: "+[X.standort,X.raum].filter(Boolean).join(", ")+"\nTermin: "+(X.termin||"offen")+" · "+(X.leistung||"")+(X.inspekt==="ja"?" · Regalinspektion nach Montage anbieten":"")+"\n";
   (X.anlagen||[]).forEach(function(a,i){t+="\n"+anlName(a,i)+"\n";aFields(a).filter(function(f){return fShown(f,a)&&fv(a,f.k)}).forEach(function(f){t+="– "+f.l+": "+fv(a,f.k)+(f.u&&/^\d+$/.test(fv(a,f.k))?" "+f.u:"")+"\n"});
     if((a.zub||[]).length)t+="– Zubehör: "+a.zub.join(", ")+"\n";if(a.bem)t+="– Bemerkung: "+a.bem+"\n"});
   var u=X.umg||{};t+="\nRaum: "+NEU_UMG.filter(function(f){var v=u[f.k];return v&&(!Array.isArray(v)||v.length)}).map(function(f){var v=u[f.k];return f.l+" "+(Array.isArray(v)?v.join("/"):v)+(f.u&&/^\d+$/.test(String(v))?" "+f.u:"")}).join("; ")+"\n";
@@ -1997,7 +2000,7 @@ function skInit(sk){
   SKST.red=red;red();skBg(sk).then(function(b){SKST.bg=b;red()});
   function pt(e){var r=cv.getBoundingClientRect();return [Math.round((e.clientX-r.left)/r.width*SKW),Math.round((e.clientY-r.top)/r.height*SKH)]}
   var pid=null;
-  cv.addEventListener("pointerdown",function(e){if(pid!==null)return;e.preventDefault();pid=e.pointerId;try{cv.setPointerCapture(pid)}catch(x){}
+  cv.addEventListener("pointerdown",function(e){if(pid!==null)return;e.preventDefault();if(SKST.pend)skFlush();pid=e.pointerId;try{cv.setPointerCapture(pid)}catch(x){}
     var p=pt(e),t=SKC.tool;
     if(t==="e"){skErase(p);pid=null;return}
     if(t==="x"){SKST.pend={t:"x",c:SKC.col,w:SKC.w,z:24+SKC.w*4,a:p};skAsk("");pid=null;return}
@@ -2010,6 +2013,8 @@ function skInit(sk){
     skPush(c)}
   cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);
 }
+function skFlush(){if(!SKST||!SKST.pend)return;var p=SKST.pend,t=($("#skin")||{value:""}).value.trim();SKST.pend=null;var b=$("#sktext");if(b)b.hidden=true;
+  if(p.t==="m"){if(/^\d+$/.test(t))t=t.replace(/\B(?=(\d{3})+(?!\d))/g,"'");p.txt=t;skPush(p)}else if(t){p.txt=t;skPush(p)}else SKST.red()}
 function skPush(o){var sk=SKST.sk;sk.s=sk.s||[];sk.s.push(o);sk.upd=Date.now();save();SKST.red()}
 function skAsk(v){var b=$("#sktext"),inp=$("#skin");b.hidden=false;inp.value=v;inp.inputMode=SKST.pend&&SKST.pend.t==="m"?"numeric":"text";setTimeout(function(){inp.focus()},50)}
 function skErase(p){var sk=SKST.sk,l=sk.s||[],best=-1,bd=40;
@@ -2031,7 +2036,7 @@ function buildAnfrage(X){
     var h='<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Anfrage Regalanlage '+esc(X.kunde||"")+' '+fDate(X.datum)+'</title><style>'+ANF_CSS+'</style></head><body><div class="doc">';
     h+='<header>'+logo+'<div><h1>Anfrage Regalanlage</h1><p>Bedarfsaufnahme vor Ort · '+fDate(X.datum)+' · '+esc(X.pruefer||"")+'</p></div></header>';
     h+='<p class="noprint tools"><button onclick="window.print()">Drucken / Als PDF sichern</button></p>';
-    h+='<h2>Kunde und Projekt</h2><table class="kv">'+tr("Kunde",X.kunde)+tr("Standort",X.standort)+tr("Gebäude / Raum",X.raum)+tr("Ansprechperson",[X.kontakt,X.telefon,X.email].filter(Boolean).join(" · "))+tr("Referenz Kunde",X.referenz)+tr("Termin",X.termin)+tr("Leistung",X.leistung)+tr("Aufgenommen von",[X.pruefer,F.name,F.email].filter(Boolean).join(" · "))+'</table>';
+    h+='<h2>Kunde und Projekt</h2><table class="kv">'+tr("Kunde",X.kunde)+tr("Standort",X.standort)+tr("Gebäude / Raum",X.raum)+tr("Ansprechperson",[X.kontakt,X.telefon,X.email].filter(Boolean).join(" · "))+tr("Referenz Kunde",X.referenz)+tr("Termin",X.termin)+tr("Leistung",X.leistung)+tr("Regalinspektion nach Montage",X.inspekt==="ja"?"anbieten":"")+tr("Aufgenommen von",[X.pruefer,F.name,F.email].filter(Boolean).join(" · "))+'</table>';
     if(X.bemerkung)h+='<p class="bem"><b>Wünsche des Kunden:</b> '+nl(X.bemerkung)+'</p>';
     h+='<h2>Raum und Umgebung</h2><table class="kv">'+NEU_UMG.map(function(f){var v=u[f.k];return v&&(!Array.isArray(v)||v.length)?tr(f.l,vu(f,v)):''}).join("")+tr("Bemerkung",u.bem)+'</table>';
     (X.anlagen||[]).forEach(function(a,i){var s=sysOf(a),kz=kennzahlen(a);
@@ -2070,7 +2075,8 @@ function photoTarget(){
 }
 
 /* ---------- Aktionen Neuaufnahme ---------- */
-function neuRec(){var F=SET.firma;return {id:uid(),art:"neu",version:1,kunde:"",standort:"",raum:"",kontakt:"",telefon:"",email:"",referenz:"",termin:"offen",leistung:"Lieferung + Montage",inspekt:"ja",datum:todayIso(),pruefer:F.pruefer||"",bemerkung:"",umg:{fotos:[]},anlagen:[],skizzen:[],zeilen:[],maengel:[],created:Date.now(),updated:Date.now()}}
+function umgDefaults(u){NEU_UMG.forEach(function(f){if(f.d&&u[f.k]==null)u[f.k]=f.d});return u}
+function neuRec(){var F=SET.firma;return {id:uid(),art:"neu",version:1,kunde:"",standort:"",raum:"",kontakt:"",telefon:"",email:"",referenz:"",termin:"offen",leistung:"Lieferung + Montage",inspekt:"ja",datum:todayIso(),pruefer:F.pruefer||"",bemerkung:"",umg:umgDefaults({fotos:[]}),anlagen:[],skizzen:[],zeilen:[],maengel:[],created:Date.now(),updated:Date.now()}}
 function newAnlage(sysKey,copyFrom){
   var a=copyFrom?JSON.parse(JSON.stringify(copyFrom)):{sys:sysKey||LAST.nsys||"p90",f:defaults(sysKey||LAST.nsys||"p90"),zub:[],bem:""};
   a.id=uid();a.fotos=[];a.skizzen=[];if(copyFrom)a.bez=(copyFrom.bez||"")+(copyFrom.bez?" (Kopie)":"");
@@ -2105,7 +2111,7 @@ Object.assign(ACT,{
   skTxtNo:function(){var p=SKST&&SKST.pend;$("#sktext").hidden=true;if(p&&p.t==="m"){p.txt="";skPush(p)}else if(SKST)SKST.red();if(SKST)SKST.pend=null},
   skGrid:function(){var sk=skGet();sk.grid=!sk.grid;save();render()},
   skBgPick:function(){$("#fbg").click()},
-  skBgDel:function(){var sk=skGet();if(sk.bg)ddel("photos",sk.bg);sk.bg=null;save();render()},
+  skBgDel:function(){var sk=skGet();if(!confirm("Hintergrund-Foto aus dieser Skizze entfernen? Das Foto wird gelöscht."))return;if(sk.bg)ddel("photos",sk.bg);sk.bg=null;save();render()},
   skClear:function(){var sk=skGet();if(!sk.s||!sk.s.length)return;if(!confirm("Alle Striche dieser Skizze löschen?"))return;sk.s=[];save();SKST.red()},
   skDel:function(){var o=skOwner(V.own),sk=skGet();if(!confirm("Diese Skizze ganz entfernen?"))return;if(sk.bg)ddel("photos",sk.bg);o.skizzen=o.skizzen.filter(function(x){return x!==sk});save();history.back()},
   nVors:function(){flushSave().then(function(){go("nvors",{id:I.id})})},
