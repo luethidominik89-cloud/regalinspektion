@@ -764,7 +764,7 @@ function panel(){
   function t(k,l,type){return '<label>'+l+'<input type="'+(type||"text")+'" data-p="'+k+'" value="'+esc(I[k]||"")+'"></label>'}
   $("#edp").innerHTML='<h2>Berichtsdaten bearbeiten</h2><p class="hint">Änderungen werden in diesem Browser automatisch gespeichert. Für den Versand: «Als HTML-Datei speichern» oder «Drucken / PDF».</p><div class="g">'
   +t("kunde","Kunde")+t("standort","Standort / Halle")+t("datum","Datum Inspektion","date")+t("pruefer","Prüfer")
-  +'<label>Regaltyp<select data-p="regaltyp">'+opts(REGALTYPEN,I.regaltyp,"–")+'</select></label>'+t("hersteller","Hersteller")
+  +'<label>Regaltyp<select data-p="typ">'+opts(TYPEN.map(function(x){return {v:x[0],l:x[1]}}),typKey(I.typ),"–")+'</select></label>'+t("hersteller","Hersteller")
   +'<label>Belastungsschild<select data-p="schild">'+opts([{v:"ja",l:"vorhanden"},{v:"nein",l:"nicht vorhanden"}],I.schild,"nicht erfasst")+'</select></label>'
   +t("kundeName","Name Kunde (Unterschrift)")+t("naechste","Nächste Inspektion","date")
   +'<label class="w">Bemerkung<textarea data-p="bemerkung">'+esc(I.bemerkung||"")+'</textarea></label>'
@@ -913,7 +913,7 @@ function saveMeta(k,v){return dput("meta",{k:k,v:v}).catch(function(){})}
 function errBanner(t){var b=$("#err");b.textContent=t;b.hidden=!t}
 /* ---------- Updates ----------
    WICHTIG bei jedem Update: APP_V hier UND VERSION in sw.js gleich hochzählen. */
-var APP_V="regal-v11",SWREG=null,updT=0;
+var APP_V="regal-v12",SWREG=null,updT=0;
 function vNr(v){return String(v||"").replace(/^regal-v/,"")}
 function updCheck(manuell){
   if(!navigator.onLine){if(manuell)toast("Kein Netz – Update später prüfen");return}
